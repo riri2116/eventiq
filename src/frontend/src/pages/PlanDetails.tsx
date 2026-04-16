@@ -457,26 +457,34 @@ function SmartInsights({
 
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 export function PlanDetailsPage() {
-  const search = useSearch({ strict: false }) as { id?: string };
-  const planId = search?.id;
+  // Use strict:false so this works even if route validateSearch isn't wired,
+  // but cast explicitly so we always get a string | undefined
+  const search = useSearch({ strict: false });
+  const planId = (search as { id?: string })?.id ?? undefined;
 
   const [planSet, setPlanSet] = useState<SavedPlanSet | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    // Reset state on each planId change
+    setPlanSet(null);
+    setNotFound(false);
+
     if (!planId) {
       setNotFound(true);
       return;
     }
+
     let found: SavedPlanSet | null = null;
 
-    // Scan all localStorage keys with our prefix
+    // Scan ALL localStorage keys with our prefix — regardless of which user saved it
     for (const key of Object.keys(localStorage)) {
       if (!key.startsWith("eventiq_plans_")) continue;
       try {
-        const plans: SavedPlanSet[] = JSON.parse(
-          localStorage.getItem(key) ?? "[]",
-        );
+        const stored = localStorage.getItem(key);
+        if (!stored) continue;
+        const plans: SavedPlanSet[] = JSON.parse(stored);
+        if (!Array.isArray(plans)) continue;
         const match = plans.find((p) => p.id === planId);
         if (match) {
           found = match;
@@ -487,7 +495,7 @@ export function PlanDetailsPage() {
       }
     }
 
-    // Fallback: sessionStorage
+    // Fallback: sessionStorage (for plans passed directly without saving)
     if (!found) {
       try {
         const raw = sessionStorage.getItem(`plan_${planId}`);
@@ -497,8 +505,11 @@ export function PlanDetailsPage() {
       }
     }
 
-    if (found) setPlanSet(found);
-    else setNotFound(true);
+    if (found) {
+      setPlanSet(found);
+    } else {
+      setNotFound(true);
+    }
   }, [planId]);
 
   // Build enriched vendor list from bestFit plan + DB16 rich data

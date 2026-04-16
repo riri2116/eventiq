@@ -5,6 +5,7 @@ import {
   LogOut,
   Menu,
   Moon,
+  Store,
   Sun,
   User,
   X,
@@ -14,12 +15,6 @@ import { useTheme } from "next-themes";
 import { type ReactNode, useState } from "react";
 import { ChatAssistant } from "./ChatAssistant";
 import { FloatingBlobs } from "./FloatingBlobs";
-
-const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Plan Event", to: "/planning" },
-  { label: "Dashboard", to: "/dashboard" },
-];
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -41,6 +36,17 @@ export function Layout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouterState();
   const currentPath = router.location.pathname;
+
+  const isVendor = isLoggedIn && !!currentUser?.isVendor;
+
+  const NAV_LINKS = [
+    { label: "Home", to: "/" },
+    { label: "Plan Event", to: "/planning" },
+    { label: "Dashboard", to: "/dashboard" },
+    ...(isVendor
+      ? [{ label: "Vendor Dashboard", to: "/vendor-dashboard" }]
+      : []),
+  ] as const;
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative">
@@ -77,9 +83,16 @@ export function Layout({ children }: { children: ReactNode }) {
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
-                data-ocid={`nav.${link.label.toLowerCase().replace(" ", "_")}_link`}
+                data-ocid={`nav.${link.label.toLowerCase().replace(/ /g, "_")}_link`}
               >
-                {link.label}
+                {link.label === "Vendor Dashboard" ? (
+                  <span className="flex items-center gap-1.5">
+                    <Store size={14} />
+                    {link.label}
+                  </span>
+                ) : (
+                  link.label
+                )}
               </Link>
             ))}
           </nav>
@@ -94,6 +107,11 @@ export function Layout({ children }: { children: ReactNode }) {
                   <span className="font-medium text-foreground">
                     {currentUser?.name}
                   </span>
+                  {isVendor && (
+                    <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wider">
+                      Vendor
+                    </span>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -145,12 +163,14 @@ export function Layout({ children }: { children: ReactNode }) {
                 key={link.to}
                 to={link.to}
                 onClick={() => setMobileOpen(false)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth ${
                   currentPath === link.to
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
+                data-ocid={`nav.mobile_${link.label.toLowerCase().replace(/ /g, "_")}_link`}
               >
+                {link.label === "Vendor Dashboard" && <Store size={14} />}
                 {link.label}
               </Link>
             ))}

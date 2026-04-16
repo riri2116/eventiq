@@ -363,6 +363,19 @@ export function DashboardPage() {
     isLoggedIn && currentUser ? loadPlansFromStorage(currentUser.email) : [],
   );
 
+  // Must be defined before any conditional returns to obey React's rules of hooks
+  function handleDelete(id: string) {
+    if (!currentUser) return;
+    const updated = plans.filter((p) => p.id !== id);
+    // Write to localStorage synchronously BEFORE updating React state to avoid race conditions
+    localStorage.setItem(
+      `eventiq_plans_${currentUser.email}`,
+      JSON.stringify(updated),
+    );
+    setPlans(updated);
+    toast.success("Plan deleted successfully.");
+  }
+
   /* ── Not logged in ── */
   if (!isLoggedIn) {
     return (
@@ -396,17 +409,6 @@ export function DashboardPage() {
         </div>
       </Layout>
     );
-  }
-
-  function handleDelete(id: string) {
-    if (!currentUser) return;
-    const updated = plans.filter((p) => p.id !== id);
-    setPlans(updated);
-    localStorage.setItem(
-      `eventiq_plans_${currentUser.email}`,
-      JSON.stringify(updated),
-    );
-    toast.success("Plan deleted successfully.");
   }
 
   const tabs: { id: Tab; label: string; icon: typeof BarChart3 }[] = [

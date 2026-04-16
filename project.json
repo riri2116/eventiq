@@ -1,0 +1,25 @@
+{
+  "overview": "EventIQ is a smart event planning SaaS platform with a curtain landing page, intelligent vendor plan generator, dashboard, auth flows, and an AI-powered chat assistant — all running fully in the browser.",
+  "features": [
+    "Curtain landing page with glass-morphism reveal animation",
+    "Smart planner with dual-handle budget slider and vendor multi-select",
+    "Intelligent plan generation (Best Fit, Standard, Least Fit) using hardcoded vendor database",
+    "Dark/light mode with localStorage persistence",
+    "Floating blob animations (abstract organic shapes)",
+    "Dashboard with saved plans from localStorage",
+    "Login/Signup with vendor registration flow",
+    "Vendor setup form with services and pricing",
+    "Floating AI chat assistant with predefined replies",
+    "All logic runs offline — zero external API calls"
+  ],
+  "category": "productivity",
+  "tags": [
+    "event-planning",
+    "saas",
+    "dashboard",
+    "vendor-management",
+    "dark-mode",
+    "offline-first"
+  ],
+  "last_updated": "2026-04-15T05:07:46.615Z"
+}

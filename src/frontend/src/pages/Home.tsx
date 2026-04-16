@@ -277,7 +277,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         </button>
 
         <p className="text-xs mt-5" style={{ color: "rgba(248,250,252,0.3)" }}>
-          No account required · Works 100% offline
+          We Welcome You
         </p>
       </div>
     </div>
@@ -511,7 +511,7 @@ export function HomePage() {
                 Ready to start planning?
               </h2>
               <p className="text-muted-foreground text-lg mb-8 max-w-sm mx-auto">
-                No account needed. Generate your first plan in under 2 minutes.
+                We Welcome You — start planning your perfect event today.
               </p>
               <Link to="/signup" data-ocid="cta.get_started_button">
                 <Button

@@ -12,22 +12,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
 import { loadPlansFromStorage } from "@/lib/planGenerator";
-import type { SavedPlanSet, SelectedVendors, VendorItem } from "@/types";
+import type { SavedPlanSet } from "@/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
   Eye,
   Mail,
-  MapPin,
   PlusCircle,
   ShieldCheck,
   Store,
@@ -41,106 +34,11 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-/* ─── Plan Detail Dialog ─────────────────────────────────────── */
-function PlanDetailDialog({
-  planSet,
-  open,
-  onClose,
-}: { planSet: SavedPlanSet; open: boolean; onClose: () => void }) {
-  const variants = [
-    {
-      key: "bestFit",
-      label: "Best Fit",
-      plan: planSet.plans.bestFit,
-      accent: "border-green-500/40 bg-green-500/5",
-      badge: "bg-green-500/10 text-green-600 border-green-500/30",
-    },
-    {
-      key: "standard",
-      label: "Standard",
-      plan: planSet.plans.standard,
-      accent: "border-primary/30",
-      badge: "bg-primary/10 text-primary border-primary/30",
-    },
-    {
-      key: "leastFit",
-      label: "Least Fit",
-      plan: planSet.plans.leastFit,
-      accent: "border-border",
-      badge: "bg-muted text-muted-foreground border-border",
-    },
-  ] as const;
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent
-        className="max-w-2xl max-h-[80vh] overflow-y-auto"
-        data-ocid="dashboard.plan_detail_dialog"
-      >
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl">
-            {planSet.eventName}
-          </DialogTitle>
-          <p className="text-sm text-muted-foreground mt-1">
-            {planSet.eventType} ·{" "}
-            {new Date(planSet.savedAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-        </DialogHeader>
-        <div className="grid md:grid-cols-3 gap-4 pt-2">
-          {variants.map(({ key, label, plan, accent, badge }) => (
-            <div
-              key={key}
-              className={`rounded-xl border p-4 space-y-3 ${accent}`}
-            >
-              <span
-                className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full border ${badge}`}
-              >
-                {label}
-              </span>
-              <p className="font-display font-bold text-xl text-foreground">
-                ₹{plan.totalCost.toLocaleString()}
-              </p>
-              <div className="space-y-1.5">
-                {(
-                  Object.entries(plan.vendors) as [
-                    keyof SelectedVendors,
-                    VendorItem,
-                  ][]
-                ).map(([k, v]) => (
-                  <div
-                    key={k}
-                    className="text-xs text-muted-foreground flex justify-between gap-2"
-                  >
-                    <span className="capitalize">{k}</span>
-                    <span className="font-medium text-foreground truncate text-right">
-                      {v.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground pt-1 border-t border-border">
-                Budget: ₹{plan.budget.toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-end pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            data-ocid="dashboard.plan_detail_close_button"
-          >
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+/* ─── helpers ────────────────────────────────────────────────── */
+function formatBudget(amount: number): string {
+  if (amount >= 1_00_00_000) return `₹${(amount / 1_00_00_000).toFixed(1)} Cr`;
+  if (amount >= 1_00_000) return `₹${(amount / 1_00_000).toFixed(1)} L`;
+  return `₹${amount.toLocaleString()}`;
 }
 
 /* ─── Plan Card ──────────────────────────────────────────────── */
@@ -149,137 +47,158 @@ function PlanCard({
   onDelete,
   index,
 }: { planSet: SavedPlanSet; onDelete: (id: string) => void; index: number }) {
-  const [detailOpen, setDetailOpen] = useState(false);
+  const navigate = useNavigate();
   const { plans } = planSet;
 
   const vendorKeys = planSet.plans.bestFit.selectedVendorKeys;
 
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.08 }}
-        className="bg-card border border-border rounded-2xl p-6 shadow-soft hover:shadow-elevated transition-smooth group"
-        data-ocid={`dashboard.plan_card.${index + 1}`}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="min-w-0 flex-1">
-            <h3
-              className="font-display font-semibold text-lg text-foreground truncate"
-              title={planSet.eventName}
-            >
-              {planSet.eventName}
-            </h3>
-            <Badge variant="secondary" className="mt-1 text-xs">
-              {planSet.eventType}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1.5 ml-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setDetailOpen(true)}
-              className="p-2 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-smooth"
-              aria-label="View plan details"
-              data-ocid={`dashboard.view_plan_button.${index + 1}`}
-            >
-              <Eye size={15} />
-            </button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button
-                  type="button"
-                  className="p-2 rounded-lg bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-smooth"
-                  aria-label="Delete plan"
-                  data-ocid={`dashboard.delete_button.${index + 1}`}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent data-ocid="dashboard.delete_dialog">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    "{planSet.eventName}" will be permanently removed from your
-                    dashboard. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel data-ocid="dashboard.delete_cancel_button">
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onDelete(planSet.id)}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    data-ocid="dashboard.delete_confirm_button"
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
+  function handleCardClick() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    navigate({ to: "/plan-details" as any, search: { id: planSet.id } as any });
+  }
 
-        {/* Meta row */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground mb-4">
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="bg-card border border-border rounded-2xl p-6 shadow-soft hover:shadow-elevated hover:scale-[1.02] transition-smooth group cursor-pointer"
+      data-ocid={`dashboard.plan_card.${index + 1}`}
+      data-plan-id={planSet.id}
+      onClick={handleCardClick}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="min-w-0 flex-1">
+          <h3
+            className="font-display font-semibold text-lg text-foreground truncate"
+            title={planSet.eventName}
+          >
+            {planSet.eventName}
+          </h3>
+          <Badge variant="secondary" className="mt-1 text-xs">
+            {planSet.eventType}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-1.5 ml-3 shrink-0">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              navigate({
+                to: "/plan-details" as any,
+                search: { id: planSet.id } as any,
+              });
+            }}
+            className="p-2 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-smooth"
+            aria-label="View plan details"
+            data-ocid={`dashboard.view_plan_button.${index + 1}`}
+          >
+            <Eye size={15} />
+          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-lg bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-smooth"
+                aria-label="Delete plan"
+                data-ocid={`dashboard.delete_button.${index + 1}`}
+              >
+                <Trash2 size={15} />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent data-ocid="dashboard.delete_dialog">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  "{planSet.eventName}" will be permanently removed from your
+                  dashboard. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-ocid="dashboard.delete_cancel_button">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onDelete(planSet.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  data-ocid="dashboard.delete_confirm_button"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
+
+      {/* Meta row */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground mb-4">
+        <span className="flex items-center gap-1.5">
+          <Wallet size={12} className="text-primary" />
+          Budget:{" "}
+          <span className="font-medium text-foreground">
+            {formatBudget(planSet.budget)}
+          </span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Calendar size={12} className="text-secondary" />
+          {new Date(planSet.savedAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        </span>
+        {vendorKeys.length > 0 && (
           <span className="flex items-center gap-1.5">
-            <Wallet size={12} className="text-primary" />
-            Budget:{" "}
+            <Store size={12} className="text-green-500" />
             <span className="font-medium text-foreground">
-              ₹{planSet.budget.toLocaleString()}
+              {vendorKeys.length} vendor{vendorKeys.length !== 1 ? "s" : ""}
             </span>
           </span>
-          <span className="flex items-center gap-1.5">
-            <Calendar size={12} className="text-secondary" />
-            {new Date(planSet.savedAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </span>
-        </div>
-
-        {/* Vendor tags */}
-        {vendorKeys.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {vendorKeys.map((key) => (
-              <span
-                key={key}
-                className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs capitalize"
-              >
-                {key.replace(/s$/, "")}
-              </span>
-            ))}
-          </div>
         )}
+      </div>
 
-        {/* Cost breakdown */}
-        <div className="pt-4 border-t border-border grid grid-cols-3 gap-2 text-center">
-          {(["bestFit", "standard", "leastFit"] as const).map((k) => (
-            <div key={k}>
-              <p className="text-xs text-muted-foreground">
-                {k === "bestFit"
-                  ? "Best"
-                  : k === "standard"
-                    ? "Standard"
-                    : "Economy"}
-              </p>
-              <p className="font-display font-semibold text-sm text-foreground">
-                ₹{plans[k].totalCost.toLocaleString()}
-              </p>
-            </div>
+      {/* Vendor tags */}
+      {vendorKeys.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {vendorKeys.slice(0, 6).map((key) => (
+            <span
+              key={key}
+              className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs capitalize"
+            >
+              {key.replace(/s$/, "")}
+            </span>
           ))}
+          {vendorKeys.length > 6 && (
+            <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+              +{vendorKeys.length - 6} more
+            </span>
+          )}
         </div>
-      </motion.div>
+      )}
 
-      <PlanDetailDialog
-        planSet={planSet}
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-      />
-    </>
+      {/* Cost breakdown */}
+      <div className="pt-4 border-t border-border grid grid-cols-3 gap-2 text-center">
+        {(["bestFit", "standard", "leastFit"] as const).map((k) => (
+          <div key={k}>
+            <p className="text-xs text-muted-foreground">
+              {k === "bestFit"
+                ? "Best"
+                : k === "standard"
+                  ? "Standard"
+                  : "Economy"}
+            </p>
+            <p className="font-display font-semibold text-sm text-foreground">
+              {formatBudget(plans[k].totalCost)}
+            </p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
   );
 }
 

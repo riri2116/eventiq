@@ -32,7 +32,9 @@ const DashboardPage = lazy(() =>
 const VendorSetupPage = lazy(() =>
   import("@/pages/VendorSetup").then((m) => ({ default: m.VendorSetupPage })),
 );
-
+const PlanDetailsPage = lazy(() =>
+  import("@/pages/PlanDetails").then((m) => ({ default: m.PlanDetailsPage })),
+);
 function PageLoader() {
   return (
     <div className="container mx-auto px-8 py-16 space-y-4">
@@ -82,6 +84,11 @@ const vendorSetupRoute = createRoute({
   path: "/vendor-setup",
   component: VendorSetupPage,
 });
+const planDetailsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/plan-details",
+  component: PlanDetailsPage,
+});
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -90,6 +97,7 @@ const routeTree = rootRoute.addChildren([
   signupRoute,
   dashboardRoute,
   vendorSetupRoute,
+  planDetailsRoute,
 ]);
 
 const router = createRouter({ routeTree });

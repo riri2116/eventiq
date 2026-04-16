@@ -4,10 +4,65 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Store, Zap } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Store, Zap } from "lucide-react";
 import { motion } from "motion/react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { toast } from "sonner";
+
+/* ── Validation helpers ─────────────────────────────────────── */
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+
+function getPasswordStrength(pw: string): {
+  level: 0 | 1 | 2 | 3;
+  label: string;
+  color: string;
+} {
+  if (pw.length === 0) return { level: 0, label: "", color: "" };
+  const hasUpper = /[A-Z]/.test(pw);
+  const hasNum = /[0-9]/.test(pw);
+  const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+  const score = [pw.length >= 8, hasUpper, hasNum, hasSpecial].filter(
+    Boolean,
+  ).length;
+  if (pw.length < 6) return { level: 1, label: "Weak", color: "bg-red-500" };
+  if (score <= 2) return { level: 1, label: "Weak", color: "bg-red-500" };
+  if (score === 3) return { level: 2, label: "Medium", color: "bg-yellow-500" };
+  return { level: 3, label: "Strong", color: "bg-green-500" };
+}
+
+function FieldError({ msg }: { msg: string }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-[11px] text-destructive mt-1 leading-tight"
+      role="alert"
+    >
+      {msg}
+    </motion.p>
+  );
+}
+
+function FieldSuccessIcon() {
+  return (
+    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
+      <CheckCircle2 size={14} />
+    </span>
+  );
+}
+
+function inputCls(hasError: boolean, isOk: boolean, extraRight = false) {
+  const rPad = extraRight ? "pr-20" : "pr-10";
+  return `h-11 ${rPad} focus-visible:ring-primary ${
+    hasError
+      ? "border-destructive focus-visible:ring-destructive/40"
+      : isOk
+        ? "border-green-500 focus-visible:ring-green-500/30"
+        : ""
+  }`;
+}
 
 export function SignupPage() {
   const { register } = useAuth();
@@ -15,41 +70,108 @@ export function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [isVendor, setIsVendor] = useState(false);
+
+  /* Field values */
+  const [nameVal, setNameVal] = useState("");
+  const [emailVal, setEmailVal] = useState("");
+  const [passwordVal, setPasswordVal] = useState("");
+  const [confirmVal, setConfirmVal] = useState("");
+
+  /* Touched map */
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirm: false,
+  });
+
+  /* Refs for focus-on-error */
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLInputElement>(null);
+
+  const touch = (field: keyof typeof touched) =>
+    setTouched((t) => ({ ...t, [field]: true }));
+
+  /* Derived errors */
+  const nameError = touched.name
+    ? nameVal.trim().length === 0
+      ? "Name is required"
+      : nameVal.trim().length < 2
+        ? "Name must be at least 2 characters"
+        : ""
+    : "";
+  const emailError = touched.email
+    ? !isValidEmail(emailVal)
+      ? "Please enter a valid email address"
+      : ""
+    : "";
+  const passwordError = touched.password
+    ? passwordVal.length === 0
+      ? "Password is required"
+      : passwordVal.length < 8
+        ? "Password must be at least 8 characters"
+        : !/[A-Z]/.test(passwordVal)
+          ? "Password must contain at least one uppercase letter"
+          : !/[0-9]/.test(passwordVal)
+            ? "Password must contain at least one number"
+            : ""
+    : "";
+  const confirmError = touched.confirm
+    ? confirmVal !== passwordVal
+      ? "Passwords do not match"
+      : confirmVal.length === 0
+        ? "Please confirm your password"
+        : ""
+    : "";
+
+  const nameOk = touched.name && !nameError;
+  const emailOk = touched.email && !emailError;
+  const passwordOk = touched.password && !passwordError;
+  const confirmOk = touched.confirm && !confirmError;
+
+  const strength = getPasswordStrength(passwordVal);
+
+  function validateAll() {
+    setTouched({ name: true, email: true, password: true, confirm: true });
+    if (nameVal.trim().length < 2) {
+      nameRef.current?.focus();
+      return false;
+    }
+    if (!isValidEmail(emailVal)) {
+      emailRef.current?.focus();
+      return false;
+    }
+    if (
+      passwordVal.length < 8 ||
+      !/[A-Z]/.test(passwordVal) ||
+      !/[0-9]/.test(passwordVal)
+    ) {
+      passwordRef.current?.focus();
+      return false;
+    }
+    if (confirmVal !== passwordVal) {
+      confirmRef.current?.focus();
+      return false;
+    }
+    return true;
+  }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
+    setServerError("");
+    if (!validateAll()) return;
     setLoading(true);
-
-    const form = e.currentTarget;
-    const name = (
-      form.elements.namedItem("name") as HTMLInputElement
-    ).value.trim();
-    const email = (
-      form.elements.namedItem("email") as HTMLInputElement
-    ).value.trim();
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
-    const confirmPassword = (
-      form.elements.namedItem("confirmPassword") as HTMLInputElement
-    ).value;
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setLoading(false);
-      return;
-    }
-
-    const result = register(email, name, password, isVendor);
+    const result = register(
+      emailVal.trim(),
+      nameVal.trim(),
+      passwordVal,
+      isVendor,
+    );
     setLoading(false);
-
     if (result.success) {
       toast.success(
         isVendor
@@ -58,7 +180,7 @@ export function SignupPage() {
       );
       navigate({ to: isVendor ? "/vendor-setup" : "/dashboard" });
     } else {
-      setError(result.error ?? "Registration failed.");
+      setServerError(result.error ?? "Registration failed.");
     }
   }
 
@@ -66,7 +188,6 @@ export function SignupPage() {
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background px-4 py-16">
       <FloatingBlobs />
 
-      {/* EventIQ wordmark top-left */}
       <Link
         to="/"
         className="absolute top-6 left-8 flex items-center gap-2 z-10"
@@ -87,7 +208,6 @@ export function SignupPage() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="bg-card border border-border rounded-2xl shadow-elevated p-10">
-          {/* Card header */}
           <div className="mb-8 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 mb-4">
               <Zap size={22} className="text-primary" />
@@ -103,51 +223,77 @@ export function SignupPage() {
           <form
             onSubmit={handleSubmit}
             className="space-y-5"
+            noValidate
             data-ocid="signup.form"
           >
             {/* Full Name */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                name="name"
-                required
-                autoComplete="name"
-                placeholder="Aanya Sharma"
-                className="h-11 focus-visible:ring-primary"
-                data-ocid="signup.name_input"
-              />
+              <div className="relative">
+                <Input
+                  ref={nameRef}
+                  id="name"
+                  name="name"
+                  autoComplete="name"
+                  placeholder="Aanya Sharma"
+                  value={nameVal}
+                  onChange={(e) => setNameVal(e.target.value)}
+                  onBlur={() => touch("name")}
+                  className={inputCls(!!nameError, nameOk)}
+                  aria-invalid={!!nameError}
+                  data-ocid="signup.name_input"
+                />
+                {nameOk && <FieldSuccessIcon />}
+              </div>
+              {nameError && <FieldError msg={nameError} />}
             </div>
 
             {/* Email */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="you@example.com"
-                className="h-11 focus-visible:ring-primary"
-                data-ocid="signup.email_input"
-              />
+              <div className="relative">
+                <Input
+                  ref={emailRef}
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={emailVal}
+                  onChange={(e) => setEmailVal(e.target.value)}
+                  onBlur={() => touch("email")}
+                  className={inputCls(!!emailError, emailOk)}
+                  aria-invalid={!!emailError}
+                  data-ocid="signup.email_input"
+                />
+                {emailOk && <FieldSuccessIcon />}
+              </div>
+              {emailError && <FieldError msg={emailError} />}
             </div>
 
             {/* Password */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
+                  ref={passwordRef}
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  required
                   autoComplete="new-password"
-                  placeholder="Min. 6 characters"
-                  className="h-11 pr-11 focus-visible:ring-primary"
+                  placeholder="Min. 8 chars, uppercase & number"
+                  value={passwordVal}
+                  onChange={(e) => setPasswordVal(e.target.value)}
+                  onBlur={() => touch("password")}
+                  className={inputCls(!!passwordError, passwordOk, true)}
+                  aria-invalid={!!passwordError}
                   data-ocid="signup.password_input"
                 />
+                {passwordOk && (
+                  <span className="absolute right-9 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
+                    <CheckCircle2 size={14} />
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
@@ -158,22 +304,60 @@ export function SignupPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {/* Strength meter */}
+              {passwordVal.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((lvl) => (
+                      <div
+                        key={lvl}
+                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                          strength.level >= lvl ? strength.color : "bg-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  {strength.label && (
+                    <p
+                      className={`text-[11px] font-medium ${
+                        strength.level === 1
+                          ? "text-red-500"
+                          : strength.level === 2
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : "text-green-600 dark:text-green-400"
+                      }`}
+                    >
+                      {strength.label} password
+                    </p>
+                  )}
+                </div>
+              )}
+              {passwordError && <FieldError msg={passwordError} />}
             </div>
 
             {/* Confirm Password */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative">
                 <Input
+                  ref={confirmRef}
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirm ? "text" : "password"}
-                  required
                   autoComplete="new-password"
                   placeholder="Repeat password"
-                  className="h-11 pr-11 focus-visible:ring-primary"
+                  value={confirmVal}
+                  onChange={(e) => setConfirmVal(e.target.value)}
+                  onBlur={() => touch("confirm")}
+                  className={inputCls(!!confirmError, confirmOk, true)}
+                  aria-invalid={!!confirmError}
                   data-ocid="signup.confirm_password_input"
                 />
+                {confirmOk && (
+                  <span className="absolute right-9 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
+                    <CheckCircle2 size={14} />
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowConfirm((s) => !s)}
@@ -188,6 +372,7 @@ export function SignupPage() {
                   {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {confirmError && <FieldError msg={confirmError} />}
             </div>
 
             {/* Vendor toggle */}
@@ -218,15 +403,15 @@ export function SignupPage() {
               </div>
             </label>
 
-            {/* Error */}
-            {error && (
+            {/* Server error */}
+            {serverError && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3"
                 data-ocid="signup.error_state"
               >
-                {error}
+                {serverError}
               </motion.div>
             )}
 

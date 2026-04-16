@@ -8,6 +8,7 @@ import { DEHRADUN_LOCALITIES } from "@/data/vendorDatabase";
 import type { VendorProfile } from "@/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  AlertCircle,
   Building2,
   CheckCircle,
   LayoutDashboard,
@@ -37,6 +38,28 @@ const PRICING_TIERS = [
 
 type PricingTier = "$" | "$$" | "$$$";
 
+/* ─── Validation helpers ──────────────────────────────────────── */
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+function isValidIndianPhone(v: string) {
+  return /^(\+91[-\s]?)?[6-9]\d{9}$/.test(v.replace(/\s/g, ""));
+}
+
+function FieldError({ msg }: { msg: string }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-[11px] text-destructive mt-1.5 leading-tight flex items-center gap-1"
+      role="alert"
+    >
+      <AlertCircle size={11} className="shrink-0" />
+      {msg}
+    </motion.p>
+  );
+}
+
 /* ─── Stored profile interface ────────────────────────────────── */
 interface FullVendorProfile {
   ownerEmail: string;
@@ -50,7 +73,6 @@ interface FullVendorProfile {
   contactEmail: string;
   contactPhone: string;
   savedAt: string;
-  // legacy compat
   services?: string[];
   pricing?: string;
   createdAt?: string;
@@ -69,10 +91,7 @@ function loadProfile(email: string): FullVendorProfile | null {
 function Section({
   title,
   children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+}: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
       <h3 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider">
@@ -83,6 +102,20 @@ function Section({
   );
 }
 
+/* ─── Field state types ───────────────────────────────────────── */
+interface VendorFields {
+  businessName: string;
+  serviceCategory: string;
+  description: string;
+  locality: string;
+  contactEmail: string;
+  contactPhone: string;
+  minPrice: string;
+  maxPrice: string;
+}
+
+type TouchedFields = Record<keyof VendorFields, boolean>;
+
 /* ─── Main Page ──────────────────────────────────────────────── */
 export function VendorSetupPage() {
   const { currentUser, isLoggedIn } = useAuth();
@@ -91,10 +124,112 @@ export function VendorSetupPage() {
   const [savedProfile, setSavedProfile] = useState<FullVendorProfile | null>(
     () => (currentUser ? loadProfile(currentUser.email) : null),
   );
+  const p = savedProfile;
+
   const [pricingTier, setPricingTier] = useState<PricingTier>(
-    (savedProfile?.pricingTier ?? savedProfile?.pricing ?? "$") as PricingTier,
+    (p?.pricingTier ?? p?.pricing ?? "$") as PricingTier,
   );
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Controlled field values
+  const [fields, setFields] = useState<VendorFields>({
+    businessName: p?.businessName ?? "",
+    serviceCategory: p?.serviceCategory ?? "",
+    description: p?.description ?? "",
+    locality: p?.locality ?? "",
+    contactEmail: p?.contactEmail ?? currentUser?.email ?? "",
+    contactPhone: p?.contactPhone ?? "",
+    minPrice: p?.minPrice ? String(p.minPrice) : "",
+    maxPrice: p?.maxPrice ? String(p.maxPrice) : "",
+  });
+
+  const [touched, setTouched] = useState<TouchedFields>({
+    businessName: false,
+    serviceCategory: false,
+    description: false,
+    locality: false,
+    contactEmail: false,
+    contactPhone: false,
+    minPrice: false,
+    maxPrice: false,
+  });
+
+  const touch = (field: keyof TouchedFields) =>
+    setTouched((t) => ({ ...t, [field]: true }));
+
+  const set = (field: keyof VendorFields, value: string) =>
+    setFields((f) => ({ ...f, [field]: value }));
+
+  // Derived errors
+  const errors: Partial<
+    VendorFields & { pricingTier: string; priceRange: string }
+  > = {};
+  if (touched.businessName) {
+    if (!fields.businessName.trim())
+      errors.businessName = "Business name is required";
+    else if (fields.businessName.trim().length < 2)
+      errors.businessName = "Business name must be at least 2 characters";
+  }
+  if (touched.serviceCategory && !fields.serviceCategory)
+    errors.serviceCategory = "Please select a service category";
+  if (touched.description) {
+    if (!fields.description.trim())
+      errors.description = "Description is required";
+    else if (fields.description.trim().length < 20)
+      errors.description = "Description must be at least 20 characters";
+    else if (fields.description.trim().length > 500)
+      errors.description = "Description cannot exceed 500 characters";
+  }
+  if (touched.locality && !fields.locality)
+    errors.locality = "Please select a locality";
+  if (touched.contactEmail && !isValidEmail(fields.contactEmail))
+    errors.contactEmail = "Please enter a valid email address";
+  if (touched.contactPhone && !isValidIndianPhone(fields.contactPhone))
+    errors.contactPhone = "Enter a valid 10-digit Indian mobile number";
+  if (touched.minPrice && (!fields.minPrice || Number(fields.minPrice) < 0))
+    errors.minPrice = "Enter a valid minimum price";
+  if (touched.maxPrice && (!fields.maxPrice || Number(fields.maxPrice) < 0))
+    errors.maxPrice = "Enter a valid maximum price";
+
+  const descCount = fields.description.length;
+
+  function inputCls(field: keyof VendorFields) {
+    const hasErr =
+      touched[field] && !!(errors as Record<string, string>)[field];
+    return `h-11 ${hasErr ? "border-destructive focus-visible:ring-destructive/40" : ""}`;
+  }
+
+  function selectCls(field: keyof VendorFields) {
+    const hasErr =
+      touched[field] && !!(errors as Record<string, string>)[field];
+    return `w-full h-11 rounded-lg border ${hasErr ? "border-destructive ring-1 ring-destructive/40" : "border-input"} bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-smooth`;
+  }
+
+  function validateAll(): boolean {
+    const allTouched: TouchedFields = {
+      businessName: true,
+      serviceCategory: true,
+      description: true,
+      locality: true,
+      contactEmail: true,
+      contactPhone: true,
+      minPrice: true,
+      maxPrice: true,
+    };
+    setTouched(allTouched);
+
+    if (!fields.businessName.trim() || fields.businessName.trim().length < 2)
+      return false;
+    if (!fields.serviceCategory) return false;
+    const dl = fields.description.trim().length;
+    if (dl < 20 || dl > 500) return false;
+    if (!fields.locality) return false;
+    if (!isValidEmail(fields.contactEmail)) return false;
+    if (!isValidIndianPhone(fields.contactPhone)) return false;
+    if (!fields.minPrice || Number(fields.minPrice) < 0) return false;
+    if (!fields.maxPrice || Number(fields.maxPrice) < 0) return false;
+    return true;
+  }
 
   /* ── Not logged in ── */
   if (!isLoggedIn) {
@@ -128,17 +263,13 @@ export function VendorSetupPage() {
     e.preventDefault();
     if (!currentUser) return;
 
-    const form = e.currentTarget;
-    const get = (name: string) =>
-      (
-        form.elements.namedItem(name) as
-          | HTMLInputElement
-          | HTMLTextAreaElement
-          | HTMLSelectElement
-      )?.value ?? "";
+    if (!validateAll()) {
+      toast.error("Please fix all validation errors before saving.");
+      return;
+    }
 
-    const minPrice = Number(get("minPrice"));
-    const maxPrice = Number(get("maxPrice"));
+    const minPrice = Number(fields.minPrice);
+    const maxPrice = Number(fields.maxPrice);
 
     if (minPrice > maxPrice) {
       toast.error("Minimum price cannot exceed maximum price.");
@@ -147,15 +278,15 @@ export function VendorSetupPage() {
 
     const profile: FullVendorProfile = {
       ownerEmail: currentUser.email,
-      businessName: get("businessName"),
-      serviceCategory: get("serviceCategory"),
-      description: get("description"),
+      businessName: fields.businessName.trim(),
+      serviceCategory: fields.serviceCategory,
+      description: fields.description.trim(),
       pricingTier,
       minPrice,
       maxPrice,
-      locality: get("locality"),
-      contactEmail: get("contactEmail"),
-      contactPhone: get("contactPhone"),
+      locality: fields.locality,
+      contactEmail: fields.contactEmail.trim(),
+      contactPhone: fields.contactPhone.trim(),
       savedAt: new Date().toISOString(),
     };
 
@@ -163,7 +294,6 @@ export function VendorSetupPage() {
       `eventiq_vendor_${currentUser.email}`,
       JSON.stringify(profile),
     );
-    // Also save in vendor profile key expected by VendorProfile type
     const legacyProfile: VendorProfile = {
       ownerEmail: currentUser.email,
       businessName: profile.businessName,
@@ -182,8 +312,6 @@ export function VendorSetupPage() {
     toast.success("Vendor profile saved successfully!");
     setTimeout(() => setShowSuccess(false), 5000);
   }
-
-  const p = savedProfile;
 
   return (
     <Layout>
@@ -249,6 +377,7 @@ export function VendorSetupPage() {
             <form
               onSubmit={handleSubmit}
               className="space-y-8"
+              noValidate
               data-ocid="vendor.form"
             >
               {/* ── Business Info ── */}
@@ -258,12 +387,17 @@ export function VendorSetupPage() {
                   <Input
                     id="businessName"
                     name="businessName"
-                    required
-                    defaultValue={p?.businessName ?? ""}
                     placeholder="e.g. Grand Events Dehradun"
-                    className="h-11"
+                    className={inputCls("businessName")}
+                    value={fields.businessName}
+                    onChange={(e) => set("businessName", e.target.value)}
+                    onBlur={() => touch("businessName")}
+                    aria-invalid={!!errors.businessName}
                     data-ocid="vendor.business_name_input"
                   />
+                  {errors.businessName && (
+                    <FieldError msg={errors.businessName} />
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -271,9 +405,13 @@ export function VendorSetupPage() {
                   <select
                     id="serviceCategory"
                     name="serviceCategory"
-                    required
-                    defaultValue={p?.serviceCategory ?? ""}
-                    className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-smooth"
+                    className={selectCls("serviceCategory")}
+                    value={fields.serviceCategory}
+                    onChange={(e) => {
+                      set("serviceCategory", e.target.value);
+                      touch("serviceCategory");
+                    }}
+                    onBlur={() => touch("serviceCategory")}
                     data-ocid="vendor.service_category_select"
                   >
                     <option value="">Select a category</option>
@@ -283,21 +421,34 @@ export function VendorSetupPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.serviceCategory && (
+                    <FieldError msg={errors.serviceCategory} />
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description">Description *</Label>
+                    <span
+                      className={`text-xs ${descCount > 500 ? "text-destructive" : descCount > 400 ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`}
+                    >
+                      {descCount}/500
+                    </span>
+                  </div>
                   <textarea
                     id="description"
                     name="description"
-                    required
                     rows={4}
-                    minLength={20}
-                    defaultValue={p?.description ?? ""}
                     placeholder="Describe your services, experience, and what makes your business special..."
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition-smooth"
+                    className={`w-full rounded-lg border ${touched.description && errors.description ? "border-destructive ring-1 ring-destructive/40" : "border-input"} bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition-smooth`}
+                    value={fields.description}
+                    onChange={(e) => set("description", e.target.value)}
+                    onBlur={() => touch("description")}
                     data-ocid="vendor.description_textarea"
                   />
+                  {errors.description && (
+                    <FieldError msg={errors.description} />
+                  )}
                 </div>
               </Section>
 
@@ -336,13 +487,15 @@ export function VendorSetupPage() {
                       id="minPrice"
                       name="minPrice"
                       type="number"
-                      required
                       min={0}
-                      defaultValue={p?.minPrice ?? ""}
                       placeholder="e.g. 5000"
-                      className="h-11"
+                      className={inputCls("minPrice")}
+                      value={fields.minPrice}
+                      onChange={(e) => set("minPrice", e.target.value)}
+                      onBlur={() => touch("minPrice")}
                       data-ocid="vendor.min_price_input"
                     />
+                    {errors.minPrice && <FieldError msg={errors.minPrice} />}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="maxPrice">Maximum Price (₹) *</Label>
@@ -350,13 +503,15 @@ export function VendorSetupPage() {
                       id="maxPrice"
                       name="maxPrice"
                       type="number"
-                      required
                       min={0}
-                      defaultValue={p?.maxPrice ?? ""}
                       placeholder="e.g. 50000"
-                      className="h-11"
+                      className={inputCls("maxPrice")}
+                      value={fields.maxPrice}
+                      onChange={(e) => set("maxPrice", e.target.value)}
+                      onBlur={() => touch("maxPrice")}
                       data-ocid="vendor.max_price_input"
                     />
+                    {errors.maxPrice && <FieldError msg={errors.maxPrice} />}
                   </div>
                 </div>
               </Section>
@@ -374,9 +529,13 @@ export function VendorSetupPage() {
                   <select
                     id="locality"
                     name="locality"
-                    required
-                    defaultValue={p?.locality ?? ""}
-                    className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-smooth"
+                    className={selectCls("locality")}
+                    value={fields.locality}
+                    onChange={(e) => {
+                      set("locality", e.target.value);
+                      touch("locality");
+                    }}
+                    onBlur={() => touch("locality")}
                     data-ocid="vendor.locality_select"
                   >
                     <option value="">Select locality</option>
@@ -386,6 +545,7 @@ export function VendorSetupPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.locality && <FieldError msg={errors.locality} />}
                 </div>
               </Section>
 
@@ -397,12 +557,17 @@ export function VendorSetupPage() {
                     id="contactEmail"
                     name="contactEmail"
                     type="email"
-                    required
-                    defaultValue={p?.contactEmail ?? currentUser?.email ?? ""}
                     placeholder="vendor@example.com"
-                    className="h-11"
+                    className={inputCls("contactEmail")}
+                    value={fields.contactEmail}
+                    onChange={(e) => set("contactEmail", e.target.value)}
+                    onBlur={() => touch("contactEmail")}
+                    aria-invalid={!!errors.contactEmail}
                     data-ocid="vendor.contact_email_input"
                   />
+                  {errors.contactEmail && (
+                    <FieldError msg={errors.contactEmail} />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label
@@ -416,12 +581,17 @@ export function VendorSetupPage() {
                     id="contactPhone"
                     name="contactPhone"
                     type="tel"
-                    required
-                    defaultValue={p?.contactPhone ?? ""}
                     placeholder="+91 98765 43210"
-                    className="h-11"
+                    className={inputCls("contactPhone")}
+                    value={fields.contactPhone}
+                    onChange={(e) => set("contactPhone", e.target.value)}
+                    onBlur={() => touch("contactPhone")}
+                    aria-invalid={!!errors.contactPhone}
                     data-ocid="vendor.contact_phone_input"
                   />
+                  {errors.contactPhone && (
+                    <FieldError msg={errors.contactPhone} />
+                  )}
                 </div>
               </Section>
 

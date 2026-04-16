@@ -17,19 +17,16 @@ import {
   EVENT_MONTHS,
   EVENT_TYPES,
   TARGET_AUDIENCES,
-  VENDOR_LABELS,
+  VENDOR_CATEGORIES_16,
+  VENDOR_EMOJI_16,
+  VENDOR_LABELS_16,
 } from "@/data/vendorDatabase";
 import {
   type PlanFormData,
   generatePlans,
   savePlanToStorage,
 } from "@/lib/planGenerator";
-import type {
-  SavedPlanSet,
-  SelectedVendors,
-  VendorItem,
-  VendorKey,
-} from "@/types";
+import type { SavedPlanSet, SelectedVendors16, VendorItemFull } from "@/types";
 import {
   AlertCircle,
   CheckCircle,
@@ -64,7 +61,7 @@ function FloatingBlobs() {
           right: "-60px",
           borderRadius: "71% 29% 70% 30% / 30% 54% 46% 70%",
           background:
-            "radial-gradient(circle at 30% 30%, oklch(0.65 0.18 40 / 0.18), oklch(0.55 0.11 261 / 0.12))",
+            "radial-gradient(circle at 30% 30%, oklch(0.55 0.11 261 / 0.18), oklch(0.55 0.11 261 / 0.10))",
           filter: "blur(24px)",
         }}
       />
@@ -77,7 +74,7 @@ function FloatingBlobs() {
           left: "-80px",
           borderRadius: "30% 70% 46% 54% / 71% 29% 70% 30%",
           background:
-            "radial-gradient(circle at 70% 70%, oklch(0.62 0.14 261 / 0.15), oklch(0.65 0.18 40 / 0.10))",
+            "radial-gradient(circle at 70% 70%, oklch(0.62 0.14 261 / 0.15), oklch(0.55 0.11 261 / 0.08))",
           filter: "blur(20px)",
           animationDelay: "7s",
         }}
@@ -91,7 +88,7 @@ function FloatingBlobs() {
           right: "8%",
           borderRadius: "54% 46% 30% 70% / 29% 71% 30% 70%",
           background:
-            "radial-gradient(circle at 40% 60%, oklch(0.7 0.17 162 / 0.12), oklch(0.65 0.18 40 / 0.08))",
+            "radial-gradient(circle at 40% 60%, oklch(0.7 0.17 162 / 0.12), oklch(0.62 0.14 261 / 0.08))",
           filter: "blur(18px)",
           animationDelay: "14s",
         }}
@@ -114,10 +111,9 @@ function formatBudget(value: number): string {
 }
 
 // ─── DualRangeSlider ─────────────────────────────────────────────────────────
-const SLIDER_MIN = 500;
+const SLIDER_MIN = 3000;
 const SLIDER_MAX = 500000000; // ₹50 Crores
 
-// Logarithmic scale helpers — makes the full ₹500–₹50Cr range uniformly draggable
 const LOG_MIN = Math.log10(SLIDER_MIN);
 const LOG_MAX = Math.log10(SLIDER_MAX);
 
@@ -131,7 +127,6 @@ function valToPct(val: number): number {
 function pctToVal(pct: number): number {
   const logVal = LOG_MIN + (pct / 100) * (LOG_MAX - LOG_MIN);
   const raw = 10 ** logVal;
-  // Snap to human-friendly steps based on magnitude
   if (raw < 10000) return Math.round(raw / 500) * 500;
   if (raw < 100000) return Math.round(raw / 5000) * 5000;
   if (raw < 1000000) return Math.round(raw / 50000) * 50000;
@@ -139,7 +134,6 @@ function pctToVal(pct: number): number {
   return Math.round(raw / 5000000) * 5000000;
 }
 
-// Min gap between handles expressed as a log-space fraction (≈ one readable step apart)
 const LOG_GAP_PCT = 1.5;
 
 function DualRangeSlider({
@@ -210,7 +204,6 @@ function DualRangeSlider({
 
   return (
     <div className="w-full py-3 select-none" data-ocid="planning.budget_slider">
-      {/* Track */}
       <div
         ref={trackRef}
         className="relative h-2 rounded-full bg-muted cursor-pointer"
@@ -229,13 +222,10 @@ function DualRangeSlider({
         }}
         onKeyDown={() => {}}
       >
-        {/* Active range fill */}
         <div
           className="absolute h-2 rounded-full bg-primary"
           style={{ left: `${minPct}%`, width: `${maxPct - minPct}%` }}
         />
-
-        {/* Min handle */}
         <div
           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-primary border-2 border-background shadow-elevated cursor-grab active:cursor-grabbing transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/60"
           style={{ left: `${minPct}%` }}
@@ -269,8 +259,6 @@ function DualRangeSlider({
             }
           }}
         />
-
-        {/* Max handle */}
         <div
           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-primary border-2 border-background shadow-elevated cursor-grab active:cursor-grabbing transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/60"
           style={{ left: `${maxPct}%` }}
@@ -305,24 +293,31 @@ function DualRangeSlider({
           }}
         />
       </div>
-
       <div className="flex justify-between text-xs text-muted-foreground mt-3">
-        <span>₹500</span>
-        <span>₹50 Cr</span>
+        <span>₹3,000</span>
+        <span>Infy</span>
       </div>
     </div>
   );
 }
 
+// ─── Inline field error ───────────────────────────────────────────────────────
+function FieldError({ msg, ocid }: { msg: string; ocid?: string }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-[11px] text-destructive mt-1.5 leading-tight flex items-center gap-1"
+      role="alert"
+      data-ocid={ocid ?? "planning.field_error"}
+    >
+      <AlertCircle size={11} className="shrink-0" />
+      {msg}
+    </motion.p>
+  );
+}
+
 // ─── Plan card ───────────────────────────────────────────────────────────────
-const VENDOR_KEYS: VendorKey[] = [
-  "venues",
-  "caterers",
-  "florists",
-  "photographers",
-  "djs",
-  "decorators",
-];
 
 function PlanCard({
   planSet,
@@ -364,9 +359,10 @@ function PlanCard({
     },
   }[planKey];
 
+  // Support both legacy SelectedVendors and new SelectedVendors16
   const vendorEntries = Object.entries(plan.vendors) as [
-    keyof SelectedVendors,
-    VendorItem,
+    string,
+    VendorItemFull,
   ][];
 
   function handleSave() {
@@ -392,8 +388,6 @@ function PlanCard({
         {highlight && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500/0 via-green-500 to-green-500/0" />
         )}
-
-        {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <Badge
             variant="outline"
@@ -408,8 +402,6 @@ function PlanCard({
             </div>
           )}
         </div>
-
-        {/* Total */}
         <div>
           <p className="font-display font-bold text-3xl text-foreground tracking-tight">
             {formatBudget(plan.totalCost)}
@@ -418,8 +410,6 @@ function PlanCard({
             Total estimated cost
           </p>
         </div>
-
-        {/* Line items */}
         <div className="space-y-2 flex-1">
           {vendorEntries.map(([key, vendor]) => (
             <div
@@ -428,19 +418,21 @@ function PlanCard({
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-sm">
-                  {(
-                    {
-                      venue: "🏢",
-                      caterer: "🍽️",
-                      florist: "💐",
-                      photographer: "📸",
-                      dj: "🎧",
-                      decorator: "🎨",
-                    } as Record<string, string>
-                  )[key] ?? "📦"}
+                  {(vendor as VendorItemFull).emoji ??
+                    (
+                      {
+                        venue: "🏢",
+                        caterer: "🍽️",
+                        florist: "💐",
+                        photographer: "📸",
+                        dj: "🎧",
+                        decorator: "🎨",
+                      } as Record<string, string>
+                    )[key] ??
+                    "📦"}
                 </span>
                 <span className="text-muted-foreground capitalize text-xs truncate">
-                  {key}
+                  {key.replace(/([A-Z])/g, " $1").trim()}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -460,8 +452,6 @@ function PlanCard({
             </div>
           ))}
         </div>
-
-        {/* Budget warning */}
         {plan.totalCost > plan.budget && (
           <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2">
             <AlertCircle size={13} />
@@ -470,8 +460,6 @@ function PlanCard({
             </span>
           </div>
         )}
-
-        {/* Within budget */}
         {plan.totalCost <= plan.budget && (
           <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-500/8 rounded-lg px-3 py-2">
             <CheckCircle size={13} />
@@ -480,7 +468,6 @@ function PlanCard({
             </span>
           </div>
         )}
-
         <Button
           type="button"
           onClick={handleSave}
@@ -544,23 +531,86 @@ function ResultsSkeleton() {
   );
 }
 
+// ─── Validation types ─────────────────────────────────────────────────────────
+interface FormErrors {
+  eventName?: string;
+  eventType?: string;
+  locality?: string;
+  eventMonth?: string;
+  audienceScale?: string;
+  targetAudience?: string;
+  vendors?: string;
+}
+
+interface FormTouched {
+  eventName: boolean;
+  eventType: boolean;
+  locality: boolean;
+  eventMonth: boolean;
+  audienceScale: boolean;
+  targetAudience: boolean;
+  vendors: boolean;
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export function PlanningPage() {
   const [planSet, setPlanSet] = useState<SavedPlanSet | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [budgetMin, setBudgetMin] = useState(SLIDER_MIN);
   const [budgetMax, setBudgetMax] = useState(SLIDER_MAX);
-  const [selectedVendors, setSelectedVendors] = useState<Set<VendorKey>>(
-    new Set(["venues", "caterers"]),
+  const [selectedVendors, setSelectedVendors] = useState<Set<string>>(
+    new Set(["banquetHall", "caterer"]),
   );
 
-  function toggleVendor(key: VendorKey) {
+  // Controlled field values for validation
+  const [eventNameVal, setEventNameVal] = useState("");
+  const [eventTypeVal, setEventTypeVal] = useState("");
+  const [localityVal, setLocalityVal] = useState("");
+  const [eventMonthVal, setEventMonthVal] = useState("");
+  const [audienceScaleVal, setAudienceScaleVal] = useState("");
+  const [targetAudienceVal, setTargetAudienceVal] = useState("");
+
+  const [touched, setTouched] = useState<FormTouched>({
+    eventName: false,
+    eventType: false,
+    locality: false,
+    eventMonth: false,
+    audienceScale: false,
+    targetAudience: false,
+    vendors: false,
+  });
+
+  const touch = (field: keyof FormTouched) =>
+    setTouched((t) => ({ ...t, [field]: true }));
+
+  // Derived errors
+  const errors: FormErrors = {};
+  if (touched.eventName) {
+    if (!eventNameVal.trim()) errors.eventName = "Event name is required";
+    else if (eventNameVal.trim().length < 2)
+      errors.eventName = "Event name must be at least 2 characters";
+  }
+  if (touched.eventType && !eventTypeVal)
+    errors.eventType = "Please select an event type";
+  if (touched.locality && !localityVal)
+    errors.locality = "Please select a locality";
+  if (touched.eventMonth && !eventMonthVal)
+    errors.eventMonth = "Please select an event month";
+  if (touched.audienceScale && !audienceScaleVal)
+    errors.audienceScale = "Please select an audience scale";
+  if (touched.targetAudience && !targetAudienceVal)
+    errors.targetAudience = "Please select a target audience";
+  if (touched.vendors && selectedVendors.size === 0)
+    errors.vendors = "Please select at least one vendor category";
+
+  function toggleVendor(key: string) {
     setSelectedVendors((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
       return next;
     });
+    touch("vendors");
   }
 
   function handleBudgetChange(min: number, max: number) {
@@ -568,26 +618,48 @@ export function PlanningPage() {
     setBudgetMax(max);
   }
 
+  function validateAll(): boolean {
+    const allTouched: FormTouched = {
+      eventName: true,
+      eventType: true,
+      locality: true,
+      eventMonth: true,
+      audienceScale: true,
+      targetAudience: true,
+      vendors: true,
+    };
+    setTouched(allTouched);
+
+    if (!eventNameVal.trim() || eventNameVal.trim().length < 2) return false;
+    if (!eventTypeVal) return false;
+    if (!localityVal) return false;
+    if (!eventMonthVal) return false;
+    if (!audienceScaleVal) return false;
+    if (!targetAudienceVal) return false;
+    if (selectedVendors.size === 0) return false;
+    return true;
+  }
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-
-    if (selectedVendors.size === 0) {
-      toast.error("Please select at least one vendor category.");
+    if (!validateAll()) {
+      toast.error(
+        "Please fill in all required fields before generating plans.",
+      );
       return;
     }
 
     const formData: PlanFormData = {
-      eventName: data.get("eventName") as string,
-      eventType: data.get("eventType") as string,
-      category: data.get("category") as "individual" | "group",
-      locality: data.get("locality") as string,
-      eventMonth: data.get("eventMonth") as string,
-      audienceScale: data.get("audienceScale") as string,
-      targetAudience: data.get("targetAudience") as string,
+      eventName: eventNameVal.trim(),
+      eventType: eventTypeVal,
+      locality: localityVal,
+      eventMonth: eventMonthVal,
+      audienceScale: audienceScaleVal,
+      targetAudience: targetAudienceVal,
       budget: budgetMax,
-      selectedVendorKeys: Array.from(selectedVendors),
+      selectedVendorKeys: Array.from(selectedVendors) as Parameters<
+        typeof generatePlans
+      >[0]["selectedVendorKeys"],
     };
 
     setIsGenerating(true);
@@ -605,8 +677,8 @@ export function PlanningPage() {
     }, 800);
   }
 
-  const selectClass =
-    "w-full h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-smooth";
+  const selectCls = (hasError: boolean) =>
+    `w-full h-11 rounded-lg border ${hasError ? "border-destructive ring-1 ring-destructive/40" : "border-input"} bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-smooth`;
 
   return (
     <Layout>
@@ -646,6 +718,7 @@ export function PlanningPage() {
               <form
                 onSubmit={handleSubmit}
                 className="space-y-8"
+                noValidate
                 data-ocid="planning.form"
               >
                 {/* 1. Event Name */}
@@ -656,11 +729,20 @@ export function PlanningPage() {
                   <Input
                     id="eventName"
                     name="eventName"
-                    required
                     placeholder="e.g. Priya's Wedding Reception"
-                    className="h-11"
+                    className={`h-11 ${touched.eventName && errors.eventName ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
+                    value={eventNameVal}
+                    onChange={(e) => setEventNameVal(e.target.value)}
+                    onBlur={() => touch("eventName")}
+                    aria-invalid={!!errors.eventName}
                     data-ocid="planning.event_name_input"
                   />
+                  {errors.eventName && (
+                    <FieldError
+                      msg={errors.eventName}
+                      ocid="planning.event_name_error"
+                    />
+                  )}
                 </div>
 
                 {/* 2. Event Type */}
@@ -671,8 +753,13 @@ export function PlanningPage() {
                   <select
                     id="eventType"
                     name="eventType"
-                    required
-                    className={selectClass}
+                    className={selectCls(!!errors.eventType)}
+                    value={eventTypeVal}
+                    onChange={(e) => {
+                      setEventTypeVal(e.target.value);
+                      touch("eventType");
+                    }}
+                    onBlur={() => touch("eventType")}
                     data-ocid="planning.event_type_select"
                   >
                     <option value="">Select event type</option>
@@ -682,39 +769,15 @@ export function PlanningPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.eventType && (
+                    <FieldError
+                      msg={errors.eventType}
+                      ocid="planning.event_type_error"
+                    />
+                  )}
                 </div>
 
-                {/* 3. Category */}
-                <div className="space-y-3">
-                  <Label className="font-medium">Category</Label>
-                  <div className="flex gap-6">
-                    {(
-                      [
-                        { value: "individual", label: "👤 Individual" },
-                        { value: "group", label: "👥 Group" },
-                      ] as const
-                    ).map((c) => (
-                      <label
-                        key={c.value}
-                        className="flex items-center gap-2.5 cursor-pointer group"
-                      >
-                        <input
-                          type="radio"
-                          name="category"
-                          value={c.value}
-                          defaultChecked={c.value === "individual"}
-                          className="accent-primary w-4 h-4"
-                          data-ocid={`planning.category_${c.value}_radio`}
-                        />
-                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                          {c.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 4. Locality */}
+                {/* 3. Locality */}
                 <div className="space-y-2">
                   <Label htmlFor="locality" className="font-medium">
                     Locality{" "}
@@ -725,8 +788,13 @@ export function PlanningPage() {
                   <select
                     id="locality"
                     name="locality"
-                    required
-                    className={selectClass}
+                    className={selectCls(!!errors.locality)}
+                    value={localityVal}
+                    onChange={(e) => {
+                      setLocalityVal(e.target.value);
+                      touch("locality");
+                    }}
+                    onBlur={() => touch("locality")}
                     data-ocid="planning.locality_select"
                   >
                     <option value="">Select locality</option>
@@ -736,6 +804,12 @@ export function PlanningPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.locality && (
+                    <FieldError
+                      msg={errors.locality}
+                      ocid="planning.locality_error"
+                    />
+                  )}
                 </div>
 
                 {/* 5. Event Month */}
@@ -746,8 +820,13 @@ export function PlanningPage() {
                   <select
                     id="eventMonth"
                     name="eventMonth"
-                    required
-                    className={selectClass}
+                    className={selectCls(!!errors.eventMonth)}
+                    value={eventMonthVal}
+                    onChange={(e) => {
+                      setEventMonthVal(e.target.value);
+                      touch("eventMonth");
+                    }}
+                    onBlur={() => touch("eventMonth")}
                     data-ocid="planning.month_select"
                   >
                     <option value="">Select month</option>
@@ -757,6 +836,12 @@ export function PlanningPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.eventMonth && (
+                    <FieldError
+                      msg={errors.eventMonth}
+                      ocid="planning.month_error"
+                    />
+                  )}
                 </div>
 
                 {/* 6 & 7. Audience Scale + Target Audience */}
@@ -768,8 +853,13 @@ export function PlanningPage() {
                     <select
                       id="audienceScale"
                       name="audienceScale"
-                      required
-                      className={selectClass}
+                      className={selectCls(!!errors.audienceScale)}
+                      value={audienceScaleVal}
+                      onChange={(e) => {
+                        setAudienceScaleVal(e.target.value);
+                        touch("audienceScale");
+                      }}
+                      onBlur={() => touch("audienceScale")}
                       data-ocid="planning.audience_scale_select"
                     >
                       <option value="">Select scale</option>
@@ -779,6 +869,12 @@ export function PlanningPage() {
                         </option>
                       ))}
                     </select>
+                    {errors.audienceScale && (
+                      <FieldError
+                        msg={errors.audienceScale}
+                        ocid="planning.audience_scale_error"
+                      />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="targetAudience" className="font-medium">
@@ -787,8 +883,13 @@ export function PlanningPage() {
                     <select
                       id="targetAudience"
                       name="targetAudience"
-                      required
-                      className={selectClass}
+                      className={selectCls(!!errors.targetAudience)}
+                      value={targetAudienceVal}
+                      onChange={(e) => {
+                        setTargetAudienceVal(e.target.value);
+                        touch("targetAudience");
+                      }}
+                      onBlur={() => touch("targetAudience")}
                       data-ocid="planning.target_audience_select"
                     >
                       <option value="">Select audience</option>
@@ -798,6 +899,12 @@ export function PlanningPage() {
                         </option>
                       ))}
                     </select>
+                    {errors.targetAudience && (
+                      <FieldError
+                        msg={errors.targetAudience}
+                        ocid="planning.target_audience_error"
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -822,37 +929,154 @@ export function PlanningPage() {
                   />
                 </div>
 
-                {/* 9. Vendor Selection */}
+                {/* 9. Vendor Selection — 16 categories */}
                 <div className="space-y-3">
-                  <Label className="font-medium">
-                    Select Vendors{" "}
-                    <span className="text-muted-foreground font-normal text-xs ml-1">
-                      (choose all that apply)
-                    </span>
-                  </Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {VENDOR_KEYS.map((key) => (
-                      <label
-                        key={key}
-                        className={`flex items-center gap-2.5 p-3.5 rounded-xl border cursor-pointer transition-smooth ${
-                          selectedVendors.has(key)
-                            ? "border-primary/50 bg-primary/8 text-primary"
-                            : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-primary/4"
-                        }`}
-                        data-ocid={`planning.vendor_${key}_checkbox`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedVendors.has(key)}
-                          onChange={() => toggleVendor(key)}
-                          className="accent-primary w-4 h-4 shrink-0"
-                        />
-                        <span className="text-sm font-medium leading-tight">
-                          {VENDOR_LABELS[key]}
-                        </span>
-                      </label>
-                    ))}
+                  <div className="flex items-center justify-between">
+                    <Label className="font-medium">
+                      Select Vendors{" "}
+                      <span className="text-muted-foreground font-normal text-xs ml-1">
+                        (choose all that apply)
+                      </span>
+                    </Label>
+                    {selectedVendors.size > 0 && (
+                      <span className="text-xs text-primary font-medium bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5">
+                        {selectedVendors.size} selected
+                      </span>
+                    )}
                   </div>
+                  <div
+                    className="vendor-grid grid gap-3 grid-cols-1"
+                    data-ocid="planning.vendors_grid"
+                  >
+                    <style>{`
+                      @media (min-width: 480px) { .vendor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+                      @media (min-width: 768px) { .vendor-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+                      @media (min-width: 1024px) { .vendor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+                    `}</style>
+                    {VENDOR_CATEGORIES_16.map((key) => {
+                      const isChecked = selectedVendors.has(key);
+                      const hasError = !!(touched.vendors && errors.vendors);
+                      return (
+                        <label
+                          key={key}
+                          className="vendor-checkbox-item cursor-pointer transition-all duration-200 ease"
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: "12px",
+                            paddingTop: "14px",
+                            paddingBottom: "14px",
+                            paddingLeft: "18px",
+                            paddingRight: "18px",
+                            background: isChecked
+                              ? "rgba(59, 130, 246, 0.07)"
+                              : "var(--card)",
+                            border: isChecked
+                              ? "1.5px solid #3B82F6"
+                              : hasError
+                                ? "1.5px solid var(--destructive)"
+                                : "1.5px solid var(--border)",
+                            borderRadius: "12px",
+                            transform: "translateY(0px)",
+                            boxShadow: "none",
+                          }}
+                          onMouseEnter={(e) => {
+                            const el = e.currentTarget;
+                            el.style.borderColor = "#3B82F6";
+                            el.style.transform = "translateY(-2px)";
+                            el.style.boxShadow =
+                              "0 4px 12px rgba(59, 130, 246, 0.18)";
+                          }}
+                          onMouseLeave={(e) => {
+                            const el = e.currentTarget;
+                            el.style.borderColor = isChecked
+                              ? "#3B82F6"
+                              : hasError
+                                ? "var(--destructive)"
+                                : "var(--border)";
+                            el.style.transform = "translateY(0px)";
+                            el.style.boxShadow = "none";
+                          }}
+                          data-ocid={`planning.vendor_${key}_checkbox`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            value={key}
+                            checked={isChecked}
+                            onChange={() => toggleVendor(key)}
+                          />
+                          {/* Custom checkbox indicator */}
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "22px",
+                              height: "22px",
+                              minWidth: "22px",
+                              borderRadius: "6px",
+                              border: isChecked
+                                ? "2px solid #3B82F6"
+                                : "2px solid var(--border)",
+                              background: isChecked ? "#3B82F6" : "transparent",
+                              transition: "all 0.2s ease",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {isChecked && (
+                              <svg
+                                viewBox="0 0 16 16"
+                                width="13"
+                                height="13"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                              >
+                                <polyline
+                                  points="2,8 6,12 14,4"
+                                  stroke="white"
+                                  strokeWidth="2.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                          {/* Emoji */}
+                          <span
+                            style={{
+                              fontSize: "22px",
+                              lineHeight: "1",
+                              display: "block",
+                            }}
+                          >
+                            {VENDOR_EMOJI_16[key]}
+                          </span>
+                          {/* Vendor name — strip leading emoji + space */}
+                          <span
+                            style={{
+                              fontSize: "15px",
+                              fontWeight: 500,
+                              color: "var(--foreground)",
+                              lineHeight: "1.3",
+                            }}
+                          >
+                            {VENDOR_LABELS_16[key]
+                              .replace(/^[^\w]+/, "")
+                              .trim()}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {errors.vendors && (
+                    <FieldError
+                      msg={errors.vendors}
+                      ocid="planning.vendors_error"
+                    />
+                  )}
                 </div>
 
                 {/* Submit */}
@@ -907,7 +1131,6 @@ export function PlanningPage() {
                   </span>
                 </p>
               </div>
-
               <div className="grid md:grid-cols-3 gap-6">
                 <PlanCard
                   planSet={planSet}

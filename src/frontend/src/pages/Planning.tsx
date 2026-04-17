@@ -22,17 +22,33 @@ import {
   VENDOR_LABELS_16,
 } from "@/data/vendorDatabase";
 import {
+  type BackendPlan,
+  type BackendVendor,
+  type EventPlanRequest,
+  submitEventPlan,
+} from "@/lib/apiService";
+import {
   type PlanFormData,
   generatePlans,
   savePlanToStorage,
 } from "@/lib/planGenerator";
-import type { SavedPlanSet, SelectedVendors16, VendorItemFull } from "@/types";
+import type {
+  ApiSavedPlanSet,
+  BackendResponse,
+  SavedPlanSet,
+  SelectedVendors16,
+  VendorItemFull,
+} from "@/types";
 import {
   AlertCircle,
   CheckCircle,
+  Globe,
   Loader2,
+  Phone,
   Sparkles,
   Star,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { motion } from "motion/react";
 import {
@@ -44,6 +60,51 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+
+// ─── Vendor key → service label mapping (for backend services[] array) ────────
+const VENDOR_KEY_TO_SERVICE: Record<string, string> = {
+  banquetHall: "banquet hall",
+  caterer: "caterer",
+  djService: "dj service",
+  eventDecorator: "event decorator",
+  eventPlanner: "event planner",
+  florist: "florist",
+  hotelBanquetHall: "hotel banquet hall",
+  lightingService: "lighting service",
+  makeupArtist: "makeup artist",
+  mehendiArtist: "mehendi artist",
+  partyHall: "party hall",
+  tentHouse: "tent house",
+  weddingBand: "wedding band",
+  weddingLawn: "wedding lawn",
+  weddingPhotographer: "wedding photographer",
+  weddingResort: "wedding resort",
+};
+
+// ─── Audience scale → guest count mapping ─────────────────────────────────────
+const AUDIENCE_SCALE_TO_GUEST_COUNT: Record<string, number> = {
+  "Intimate (10-30)": 20,
+  "Small (30-60)": 45,
+  "Medium (60-150)": 100,
+  "Large (150-300)": 200,
+  "Grand (300+)": 400,
+};
+
+// ─── Month name → number mapping ──────────────────────────────────────────────
+const MONTH_NAME_TO_NUMBER: Record<string, number> = {
+  January: 1,
+  February: 2,
+  March: 3,
+  April: 4,
+  May: 5,
+  June: 6,
+  July: 7,
+  August: 8,
+  September: 9,
+  October: 10,
+  November: 11,
+  December: 12,
+};
 
 // ─── FloatingBlobs ──────────────────────────────────────────────────────────
 function FloatingBlobs() {
@@ -112,7 +173,7 @@ function formatBudget(value: number): string {
 
 // ─── DualRangeSlider ─────────────────────────────────────────────────────────
 const SLIDER_MIN = 3000;
-const SLIDER_MAX = 500000000; // ₹50 Crores
+const SLIDER_MAX = 500000000;
 
 const LOG_MIN = Math.log10(SLIDER_MIN);
 const LOG_MAX = Math.log10(SLIDER_MAX);
@@ -317,9 +378,8 @@ function FieldError({ msg, ocid }: { msg: string; ocid?: string }) {
   );
 }
 
-// ─── Plan card ───────────────────────────────────────────────────────────────
-
-function PlanCard({
+// ─── Offline Plan Card (existing offline-generated plans) ────────────────────
+function OfflinePlanCard({
   planSet,
   planKey,
   highlight,
@@ -359,7 +419,6 @@ function PlanCard({
     },
   }[planKey];
 
-  // Support both legacy SelectedVendors and new SelectedVendors16
   const vendorEntries = Object.entries(plan.vendors) as [
     string,
     VendorItemFull,
@@ -502,6 +561,199 @@ function PlanCard({
   );
 }
 
+// ─── API Plan Card (plans from backend API) ───────────────────────────────────
+
+const PLAN_TYPE_CONFIG = {
+  premium: {
+    label: "Premium Plan",
+    badge: "⭐ Premium",
+    cardClass:
+      "border-2 border-green-500/50 shadow-[0_0_28px_rgba(34,197,94,0.18)] bg-card",
+    badgeClass: "bg-green-500/10 text-green-500 border-green-500/30",
+    btnVariant: "default" as const,
+    highlight: true,
+  },
+  balanced: {
+    label: "Balanced Plan",
+    badge: "⚖️ Balanced",
+    cardClass: "border border-border bg-card shadow-soft",
+    badgeClass: "bg-primary/10 text-primary border-primary/30",
+    btnVariant: "outline" as const,
+    highlight: false,
+  },
+  budget: {
+    label: "Budget Plan",
+    badge: "💰 Budget",
+    cardClass: "border border-border bg-muted/30 shadow-soft",
+    badgeClass: "bg-muted text-muted-foreground border-border",
+    btnVariant: "outline" as const,
+    highlight: false,
+  },
+};
+
+function ApiPlanCard({
+  plan,
+  eventName,
+  eventType,
+  apiResponse,
+  index,
+}: {
+  plan: BackendPlan;
+  eventName: string;
+  eventType: string;
+  apiResponse: BackendResponse;
+  index: number;
+}) {
+  const { isLoggedIn, currentUser } = useAuth();
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  const config = PLAN_TYPE_CONFIG[plan.plan_type] ?? PLAN_TYPE_CONFIG.balanced;
+
+  function handleSave() {
+    if (!isLoggedIn) {
+      setLoginOpen(true);
+      return;
+    }
+    // Save the full API response structure to localStorage — no transformation
+    const apiPlanSet: ApiSavedPlanSet = {
+      id: `api_${apiResponse.event_id}_${plan.plan_type}_${Date.now()}`,
+      eventName,
+      eventType,
+      budget: plan.total_cost + plan.remaining_budget,
+      savedAt: new Date().toISOString(),
+      source: "api",
+      event_id: apiResponse.event_id,
+      plans: apiResponse.plans,
+    };
+    const key = `eventiq_plans_${currentUser!.email}`;
+    const existing: (SavedPlanSet | ApiSavedPlanSet)[] = JSON.parse(
+      localStorage.getItem(key) ?? "[]",
+    );
+    existing.unshift(apiPlanSet);
+    localStorage.setItem(key, JSON.stringify(existing));
+    toast.success("Plan saved to your dashboard!", {
+      description: `${eventName} — ${config.label} saved.`,
+    });
+  }
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: index * 0.1 }}
+        className={`rounded-2xl p-6 flex flex-col gap-4 transition-smooth relative overflow-hidden ${config.cardClass}`}
+        data-ocid={`plan.${plan.plan_type}_card`}
+      >
+        {config.highlight && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500/0 via-green-500 to-green-500/0" />
+        )}
+        <div className="flex items-start justify-between gap-2">
+          <Badge
+            variant="outline"
+            className={`text-xs font-semibold px-2.5 py-1 ${config.badgeClass}`}
+          >
+            {config.badge}
+          </Badge>
+          {config.highlight && (
+            <div className="flex items-center gap-1 text-green-500">
+              <Star size={12} fill="currentColor" />
+              <span className="text-xs font-medium">Recommended</span>
+            </div>
+          )}
+        </div>
+
+        {/* Cost summary */}
+        <div>
+          <p className="font-display font-bold text-3xl text-foreground tracking-tight">
+            {formatBudget(plan.total_cost)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Total estimated cost
+          </p>
+        </div>
+
+        {/* Scores row */}
+        <div className="flex gap-3">
+          <div className="flex-1 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2 text-center">
+            <p className="text-[10px] text-muted-foreground mb-0.5">
+              Optimization
+            </p>
+            <p className="font-display font-bold text-sm text-primary">
+              {plan.optimization_score}%
+            </p>
+          </div>
+          <div className="flex-1 rounded-lg bg-green-500/8 border border-green-500/20 px-3 py-2 text-center">
+            <p className="text-[10px] text-muted-foreground mb-0.5">
+              Remaining
+            </p>
+            <p className="font-display font-bold text-sm text-green-600 dark:text-green-400">
+              {formatBudget(plan.remaining_budget)}
+            </p>
+          </div>
+        </div>
+
+        {/* Vendor list */}
+        <div className="space-y-2 flex-1">
+          {plan.vendors.map((vendor: BackendVendor) => (
+            <div
+              key={vendor.vendor_id}
+              className="flex items-center justify-between gap-2 text-sm py-1.5 border-b border-border/50 last:border-0"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-muted-foreground text-xs capitalize truncate">
+                  {vendor.category}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="font-medium text-foreground text-xs truncate max-w-24">
+                  {vendor.name}
+                </span>
+                <span className="text-[10px] text-yellow-600 dark:text-yellow-400 font-mono">
+                  ★{vendor.rating.toFixed(1)}
+                </span>
+                <span className="text-muted-foreground text-xs font-mono">
+                  {formatBudget(vendor.allocated_budget)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Button
+          type="button"
+          onClick={handleSave}
+          variant={config.btnVariant}
+          className="w-full mt-auto"
+          data-ocid={`plan.${plan.plan_type}_save_button`}
+        >
+          Save Plan
+        </Button>
+      </motion.div>
+
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent data-ocid="plan.login_dialog">
+          <DialogHeader>
+            <DialogTitle>Sign in to save plans</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Create a free account or sign in to save and manage your event
+            plans.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button asChild className="flex-1">
+              <a href="/login">Sign in</a>
+            </Button>
+            <Button asChild variant="outline" className="flex-1">
+              <a href="/signup">Create Account</a>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 // ─── ResultsSkeleton ─────────────────────────────────────────────────────────
 function ResultsSkeleton() {
   return (
@@ -535,6 +787,7 @@ function ResultsSkeleton() {
 interface FormErrors {
   eventName?: string;
   eventType?: string;
+  eventDate?: string;
   locality?: string;
   eventMonth?: string;
   audienceScale?: string;
@@ -545,6 +798,7 @@ interface FormErrors {
 interface FormTouched {
   eventName: boolean;
   eventType: boolean;
+  eventDate: boolean;
   locality: boolean;
   eventMonth: boolean;
   audienceScale: boolean;
@@ -554,17 +808,27 @@ interface FormTouched {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export function PlanningPage() {
+  // Offline plan result
   const [planSet, setPlanSet] = useState<SavedPlanSet | null>(null);
+  // API plan result
+  const [apiResult, setApiResult] = useState<{
+    response: BackendResponse;
+    eventName: string;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
   const [budgetMin, setBudgetMin] = useState(SLIDER_MIN);
   const [budgetMax, setBudgetMax] = useState(SLIDER_MAX);
   const [selectedVendors, setSelectedVendors] = useState<Set<string>>(
     new Set(["banquetHall", "caterer"]),
   );
 
-  // Controlled field values for validation
+  // Controlled field values
   const [eventNameVal, setEventNameVal] = useState("");
   const [eventTypeVal, setEventTypeVal] = useState("");
+  const [eventDateVal, setEventDateVal] = useState(""); // YYYY-MM-DD
   const [localityVal, setLocalityVal] = useState("");
   const [eventMonthVal, setEventMonthVal] = useState("");
   const [audienceScaleVal, setAudienceScaleVal] = useState("");
@@ -573,6 +837,7 @@ export function PlanningPage() {
   const [touched, setTouched] = useState<FormTouched>({
     eventName: false,
     eventType: false,
+    eventDate: false,
     locality: false,
     eventMonth: false,
     audienceScale: false,
@@ -583,6 +848,23 @@ export function PlanningPage() {
   const touch = (field: keyof FormTouched) =>
     setTouched((t) => ({ ...t, [field]: true }));
 
+  // Auto-derive month from event_date when it changes
+  function handleDateChange(val: string) {
+    setEventDateVal(val);
+    touch("eventDate");
+    if (val) {
+      const monthNum = new Date(val).getMonth() + 1; // 1-12
+      // Sync the month dropdown to match the selected date
+      const monthName = Object.entries(MONTH_NAME_TO_NUMBER).find(
+        ([, num]) => num === monthNum,
+      )?.[0];
+      if (monthName) {
+        setEventMonthVal(monthName);
+        setTouched((t) => ({ ...t, eventMonth: false })); // clear error when auto-set
+      }
+    }
+  }
+
   // Derived errors
   const errors: FormErrors = {};
   if (touched.eventName) {
@@ -592,6 +874,8 @@ export function PlanningPage() {
   }
   if (touched.eventType && !eventTypeVal)
     errors.eventType = "Please select an event type";
+  if (touched.eventDate && !eventDateVal)
+    errors.eventDate = "Please select an event date";
   if (touched.locality && !localityVal)
     errors.locality = "Please select a locality";
   if (touched.eventMonth && !eventMonthVal)
@@ -622,6 +906,7 @@ export function PlanningPage() {
     const allTouched: FormTouched = {
       eventName: true,
       eventType: true,
+      eventDate: true,
       locality: true,
       eventMonth: true,
       audienceScale: true,
@@ -632,6 +917,7 @@ export function PlanningPage() {
 
     if (!eventNameVal.trim() || eventNameVal.trim().length < 2) return false;
     if (!eventTypeVal) return false;
+    if (!eventDateVal) return false;
     if (!localityVal) return false;
     if (!eventMonthVal) return false;
     if (!audienceScaleVal) return false;
@@ -640,7 +926,7 @@ export function PlanningPage() {
     return true;
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validateAll()) {
       toast.error(
@@ -649,23 +935,80 @@ export function PlanningPage() {
       return;
     }
 
-    const formData: PlanFormData = {
-      eventName: eventNameVal.trim(),
-      eventType: eventTypeVal,
-      locality: localityVal,
-      eventMonth: eventMonthVal,
-      audienceScale: audienceScaleVal,
-      targetAudience: targetAudienceVal,
-      budget: budgetMax,
-      selectedVendorKeys: Array.from(selectedVendors) as Parameters<
-        typeof generatePlans
-      >[0]["selectedVendorKeys"],
-    };
-
     setIsGenerating(true);
     setPlanSet(null);
+    setApiResult(null);
+    setIsOfflineMode(false);
+    setApiError(null);
 
-    setTimeout(() => {
+    // Derive month number — prefer from date picker, fall back to dropdown
+    let month: number;
+    if (eventDateVal) {
+      month = new Date(eventDateVal).getMonth() + 1;
+    } else {
+      month = MONTH_NAME_TO_NUMBER[eventMonthVal] ?? 1;
+    }
+
+    // Build guest_count from audience scale
+    const guest_count =
+      AUDIENCE_SCALE_TO_GUEST_COUNT[audienceScaleVal] ??
+      // Fallback: parse first number from the label
+      Number.parseInt(audienceScaleVal.match(/\d+/)?.[0] ?? "100", 10);
+
+    // Build services array from selected vendor keys
+    const services = Array.from(selectedVendors)
+      .map((key) => VENDOR_KEY_TO_SERVICE[key])
+      .filter(Boolean);
+
+    // Build the exact request payload — field names match backend spec exactly
+    const request: EventPlanRequest = {
+      event_type: eventTypeVal,
+      event_date:
+        eventDateVal ||
+        `${new Date().getFullYear()}-${String(month).padStart(2, "0")}-01`,
+      locality: localityVal,
+      guest_count,
+      min_budget: Math.round(budgetMin),
+      max_budget: Math.round(budgetMax),
+      services,
+      month,
+    };
+
+    // Try API first
+    try {
+      const response: BackendResponse = await submitEventPlan(request);
+
+      if (response.status !== "success") {
+        throw new Error(`Backend returned status: ${response.status}`);
+      }
+
+      setApiResult({ response, eventName: eventNameVal.trim() });
+      setIsGenerating(false);
+      setTimeout(() => {
+        document
+          .getElementById("plan-results")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } catch (err) {
+      // API failed — fall back to offline generation
+      const errorMsg = err instanceof Error ? err.message : "API unavailable";
+      setApiError(errorMsg);
+      setIsOfflineMode(true);
+
+      // Run offline plan generation as fallback
+      const formData: PlanFormData = {
+        eventName: eventNameVal.trim(),
+        eventType: eventTypeVal,
+        locality: localityVal,
+        eventMonth: eventMonthVal,
+        audienceScale: audienceScaleVal,
+        targetAudience: targetAudienceVal,
+        budget: budgetMax,
+        selectedVendorKeys: Array.from(selectedVendors) as Parameters<
+          typeof generatePlans
+        >[0]["selectedVendorKeys"],
+      };
+
       const result = generatePlans(formData);
       setPlanSet(result);
       setIsGenerating(false);
@@ -674,7 +1017,7 @@ export function PlanningPage() {
           .getElementById("plan-results")
           ?.scrollIntoView({ behavior: "smooth" });
       }, 100);
-    }, 800);
+    }
   }
 
   const selectCls = (hasError: boolean) =>
@@ -702,9 +1045,8 @@ export function PlanningPage() {
               Plan Your Event
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl">
-              Tell us about your event and we'll instantly generate three
-              intelligent plans — Best Fit, Standard, and Budget — tailored to
-              your needs.
+              Tell us about your event and we'll generate three intelligent
+              plans — Budget, Balanced, and Premium — tailored to your needs.
             </p>
           </motion.div>
 
@@ -745,14 +1087,14 @@ export function PlanningPage() {
                   )}
                 </div>
 
-                {/* 2. Event Type */}
+                {/* 2. Event Type — maps to event_type */}
                 <div className="space-y-2">
                   <Label htmlFor="eventType" className="font-medium">
                     Event Type
                   </Label>
                   <select
                     id="eventType"
-                    name="eventType"
+                    name="event_type"
                     className={selectCls(!!errors.eventType)}
                     value={eventTypeVal}
                     onChange={(e) => {
@@ -764,7 +1106,7 @@ export function PlanningPage() {
                   >
                     <option value="">Select event type</option>
                     {EVENT_TYPES.map((t) => (
-                      <option key={t} value={t}>
+                      <option key={t} value={t.toLowerCase()}>
                         {t}
                       </option>
                     ))}
@@ -777,7 +1119,34 @@ export function PlanningPage() {
                   )}
                 </div>
 
-                {/* 3. Locality */}
+                {/* 3. Event Date — maps to event_date (YYYY-MM-DD) + auto-derives month */}
+                <div className="space-y-2">
+                  <Label htmlFor="eventDate" className="font-medium">
+                    Event Date{" "}
+                    <span className="text-muted-foreground font-normal text-xs">
+                      (auto-sets month below)
+                    </span>
+                  </Label>
+                  <Input
+                    id="eventDate"
+                    type="date"
+                    name="event_date"
+                    className={`h-11 ${touched.eventDate && errors.eventDate ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
+                    value={eventDateVal}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    onBlur={() => touch("eventDate")}
+                    aria-invalid={!!errors.eventDate}
+                    data-ocid="planning.event_date_input"
+                  />
+                  {errors.eventDate && (
+                    <FieldError
+                      msg={errors.eventDate}
+                      ocid="planning.event_date_error"
+                    />
+                  )}
+                </div>
+
+                {/* 4. Locality — maps to locality */}
                 <div className="space-y-2">
                   <Label htmlFor="locality" className="font-medium">
                     Locality{" "}
@@ -799,7 +1168,7 @@ export function PlanningPage() {
                   >
                     <option value="">Select locality</option>
                     {DEHRADUN_LOCALITIES.map((l) => (
-                      <option key={l} value={l}>
+                      <option key={l} value={l.toLowerCase()}>
                         {l}
                       </option>
                     ))}
@@ -812,10 +1181,13 @@ export function PlanningPage() {
                   )}
                 </div>
 
-                {/* 5. Event Month */}
+                {/* 5. Event Month — maps to month (integer 1-12) */}
                 <div className="space-y-2">
                   <Label htmlFor="eventMonth" className="font-medium">
-                    Event Month
+                    Event Month{" "}
+                    <span className="text-muted-foreground font-normal text-xs">
+                      (auto-filled when date is selected)
+                    </span>
                   </Label>
                   <select
                     id="eventMonth"
@@ -844,11 +1216,14 @@ export function PlanningPage() {
                   )}
                 </div>
 
-                {/* 6 & 7. Audience Scale + Target Audience */}
+                {/* 6 & 7. Audience Scale (→ guest_count) + Target Audience */}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="audienceScale" className="font-medium">
-                      Audience Scale
+                      Audience Scale{" "}
+                      <span className="text-muted-foreground font-normal text-xs">
+                        (sets guest count)
+                      </span>
                     </Label>
                     <select
                       id="audienceScale"
@@ -908,7 +1283,7 @@ export function PlanningPage() {
                   </div>
                 </div>
 
-                {/* 8. Budget Dual Slider */}
+                {/* 8. Budget Dual Slider — maps to min_budget / max_budget */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="font-medium">Budget Range</Label>
@@ -929,7 +1304,7 @@ export function PlanningPage() {
                   />
                 </div>
 
-                {/* 9. Vendor Selection — 16 categories */}
+                {/* 9. Vendor Selection — maps to services[] */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="font-medium">
@@ -1007,7 +1382,6 @@ export function PlanningPage() {
                             checked={isChecked}
                             onChange={() => toggleVendor(key)}
                           />
-                          {/* Custom checkbox indicator */}
                           <span
                             style={{
                               display: "flex",
@@ -1044,7 +1418,6 @@ export function PlanningPage() {
                               </svg>
                             )}
                           </span>
-                          {/* Emoji */}
                           <span
                             style={{
                               fontSize: "22px",
@@ -1054,7 +1427,6 @@ export function PlanningPage() {
                           >
                             {VENDOR_EMOJI_16[key]}
                           </span>
-                          {/* Vendor name — strip leading emoji + space */}
                           <span
                             style={{
                               fontSize: "15px",
@@ -1106,14 +1478,113 @@ export function PlanningPage() {
           {/* Loading skeleton */}
           {isGenerating && <ResultsSkeleton />}
 
-          {/* Results */}
-          {planSet && !isGenerating && (
+          {/* Offline mode indicator */}
+          {isOfflineMode && apiResult === null && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 max-w-3xl"
+              data-ocid="planning.offline_mode_indicator"
+            >
+              <WifiOff
+                size={16}
+                className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+              />
+              <div>
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                  Using offline mode
+                </p>
+                <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">
+                  Backend API is unavailable. Plans were generated from the
+                  local dataset.
+                  {apiError && (
+                    <span className="block mt-1 font-mono text-[10px] opacity-70">
+                      {apiError}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* API success indicator */}
+          {apiResult && !isOfflineMode && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-2.5 max-w-3xl"
+              data-ocid="planning.api_mode_indicator"
+            >
+              <Wifi
+                size={14}
+                className="text-green-600 dark:text-green-400 shrink-0"
+              />
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Plans generated live from backend · Event ID:{" "}
+                <span className="font-mono font-semibold">
+                  {apiResult.response.event_id}
+                </span>
+              </p>
+            </motion.div>
+          )}
+
+          {/* API Results */}
+          {apiResult && !isGenerating && (
             <motion.div
               id="plan-results"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mt-16"
+              className="mt-10"
+              data-ocid="planning.results_section"
+            >
+              <div className="mb-8">
+                <h2 className="font-display font-bold text-3xl text-foreground mb-2">
+                  Your Event Plans
+                </h2>
+                <p className="text-muted-foreground">
+                  Three options generated for{" "}
+                  <span className="font-semibold text-foreground">
+                    {apiResult.eventName}
+                  </span>{" "}
+                  · Budget{" "}
+                  <span className="font-semibold text-primary">
+                    {formatBudget(budgetMin)} — {formatBudget(budgetMax)}
+                  </span>
+                </p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Render in order: premium, balanced, budget */}
+                {(["premium", "balanced", "budget"] as const).map(
+                  (planType, idx) => {
+                    const plan = apiResult.response.plans.find(
+                      (p) => p.plan_type === planType,
+                    );
+                    if (!plan) return null;
+                    return (
+                      <ApiPlanCard
+                        key={plan.plan_type}
+                        plan={plan}
+                        eventName={apiResult.eventName}
+                        eventType={eventTypeVal}
+                        apiResponse={apiResult.response}
+                        index={idx}
+                      />
+                    );
+                  },
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Offline Results (fallback) */}
+          {planSet && !isGenerating && !apiResult && (
+            <motion.div
+              id="plan-results"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mt-10"
               data-ocid="planning.results_section"
             >
               <div className="mb-8">
@@ -1132,19 +1603,19 @@ export function PlanningPage() {
                 </p>
               </div>
               <div className="grid md:grid-cols-3 gap-6">
-                <PlanCard
+                <OfflinePlanCard
                   planSet={planSet}
                   planKey="bestFit"
                   highlight={true}
                   index={0}
                 />
-                <PlanCard
+                <OfflinePlanCard
                   planSet={planSet}
                   planKey="standard"
                   highlight={false}
                   index={1}
                 />
-                <PlanCard
+                <OfflinePlanCard
                   planSet={planSet}
                   planKey="leastFit"
                   highlight={false}

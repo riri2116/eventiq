@@ -214,3 +214,59 @@ export interface EventPlan16
   vendors: SelectedVendors16;
   guestCount?: number;
 }
+
+// ── Backend API types — exact field names, zero transformation ───────────────
+// These interfaces mirror the backend API spec 1:1. Do NOT rename any field.
+
+export interface EventPlanRequest {
+  event_type: string;
+  event_date: string; // YYYY-MM-DD
+  locality: string;
+  guest_count: number;
+  min_budget: number;
+  max_budget: number;
+  services: string[];
+  month: number; // 1–12
+}
+
+export interface BackendVendor {
+  vendor_id: string;
+  name: string;
+  category: string;
+  allocated_budget: number;
+  score: number;
+  address: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  contact: string;
+  website: string;
+  rating: number;
+}
+
+export interface BackendPlan {
+  plan_type: "budget" | "balanced" | "premium";
+  vendors: BackendVendor[];
+  total_cost: number;
+  remaining_budget: number;
+  optimization_score: number;
+}
+
+export interface BackendResponse {
+  status: string;
+  event_id: number;
+  plans: BackendPlan[];
+}
+
+// ── Unified saved plan that can hold either offline or API plans ──────────────
+
+export interface ApiSavedPlanSet {
+  id: string;
+  eventName: string;
+  eventType: string;
+  budget: number;
+  savedAt: string;
+  source: "api";
+  event_id: number;
+  plans: BackendPlan[];
+}

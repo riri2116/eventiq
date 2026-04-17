@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { loadPlansFromStorage } from "@/lib/planGenerator";
-import type { SavedPlanSet } from "@/types";
+import type { ApiSavedPlanSet, SavedPlanSet } from "@/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   BarChart3,
@@ -45,12 +45,22 @@ function PlanCard({
   planSet,
   onDelete,
   index,
-}: { planSet: SavedPlanSet; onDelete: (id: string) => void; index: number }) {
+}: {
+  planSet: SavedPlanSet | ApiSavedPlanSet;
+  onDelete: (id: string) => void;
+  index: number;
+}) {
   const navigate = useNavigate();
-  const { plans } = planSet;
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const vendorKeys = planSet.plans.bestFit.selectedVendorKeys;
+  const isApiPlan = (planSet as ApiSavedPlanSet).source === "api";
+  const apiPlan = isApiPlan ? (planSet as ApiSavedPlanSet) : null;
+  const offlinePlan = isApiPlan ? null : (planSet as SavedPlanSet);
+
+  // For offline plans: vendor keys from bestFit; for API plans: vendor names from first plan
+  const vendorKeys = offlinePlan?.plans?.bestFit?.selectedVendorKeys ?? [];
+  const apiVendorNames =
+    apiPlan?.plans?.[0]?.vendors?.slice(0, 6).map((v) => v.name) ?? [];
 
   function handleCardClick() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,8 +119,16 @@ function PlanCard({
               {planSet.eventName}
             </h3>
             <Badge variant="secondary" className="mt-1 text-xs">
-              {planSet.eventType}
+              {planSet.eventType || (isApiPlan ? "API Plan" : "Event")}
             </Badge>
+            {isApiPlan && (
+              <Badge
+                variant="outline"
+                className="mt-1 ml-1 text-[10px] text-blue-600 dark:text-blue-400 border-blue-500/30"
+              >
+                🌐 Live Plan
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-1.5 ml-3 shrink-0">
             <button
@@ -171,9 +189,18 @@ function PlanCard({
               </span>
             </span>
           )}
+          {isApiPlan && (apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 0 && (
+            <span className="flex items-center gap-1.5">
+              <Store size={12} className="text-green-500" />
+              <span className="font-medium text-foreground">
+                {apiPlan?.plans?.[0]?.vendors?.length} vendor
+                {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) !== 1 ? "s" : ""}
+              </span>
+            </span>
+          )}
         </div>
 
-        {/* Vendor tags */}
+        {/* Vendor tags — offline plans show category keys; API plans show vendor names */}
         {vendorKeys.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {vendorKeys.slice(0, 6).map((key) => (
@@ -191,23 +218,55 @@ function PlanCard({
             )}
           </div>
         )}
+        {apiVendorNames.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {apiVendorNames.map((name) => (
+              <span
+                key={name}
+                className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
+              >
+                {name}
+              </span>
+            ))}
+            {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 6 && (
+              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+                +{(apiPlan?.plans?.[0]?.vendors?.length ?? 0) - 6} more
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Cost breakdown */}
+        {/* Cost breakdown — offline: bestFit/standard/leastFit; API: budget/balanced/premium */}
         <div className="pt-4 border-t border-border grid grid-cols-3 gap-2 text-center">
-          {(["bestFit", "standard", "leastFit"] as const).map((k) => (
-            <div key={k}>
-              <p className="text-xs text-muted-foreground">
-                {k === "bestFit"
-                  ? "Best"
-                  : k === "standard"
-                    ? "Standard"
-                    : "Economy"}
-              </p>
-              <p className="font-display font-semibold text-sm text-foreground">
-                {formatBudget(plans[k].totalCost)}
-              </p>
-            </div>
-          ))}
+          {offlinePlan &&
+            (["bestFit", "standard", "leastFit"] as const).map((k) => (
+              <div key={k}>
+                <p className="text-xs text-muted-foreground">
+                  {k === "bestFit"
+                    ? "Best"
+                    : k === "standard"
+                      ? "Standard"
+                      : "Economy"}
+                </p>
+                <p className="font-display font-semibold text-sm text-foreground">
+                  {formatBudget(offlinePlan.plans[k].totalCost)}
+                </p>
+              </div>
+            ))}
+          {apiPlan &&
+            (["premium", "balanced", "budget"] as const).map((pt) => {
+              const p = apiPlan.plans.find((pl) => pl.plan_type === pt);
+              return (
+                <div key={pt}>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {pt}
+                  </p>
+                  <p className="font-display font-semibold text-sm text-foreground">
+                    {p ? formatBudget(p.total_cost) : "—"}
+                  </p>
+                </div>
+              );
+            })}
         </div>
       </motion.div>
     </>
@@ -215,7 +274,7 @@ function PlanCard({
 }
 
 /* ─── Stats Bar ──────────────────────────────────────────────── */
-function StatsBar({ plans }: { plans: SavedPlanSet[] }) {
+function StatsBar({ plans }: { plans: (SavedPlanSet | ApiSavedPlanSet)[] }) {
   const totalBudget = plans.reduce((s, p) => s + p.budget, 0);
   const lastActivity =
     plans.length > 0
@@ -359,8 +418,14 @@ export function DashboardPage() {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("plans");
-  const [plans, setPlans] = useState<SavedPlanSet[]>(() =>
-    isLoggedIn && currentUser ? loadPlansFromStorage(currentUser.email) : [],
+  // Load all plans (both offline SavedPlanSet and API ApiSavedPlanSet) from localStorage
+  const [plans, setPlans] = useState<(SavedPlanSet | ApiSavedPlanSet)[]>(() =>
+    isLoggedIn && currentUser
+      ? (loadPlansFromStorage(currentUser.email) as (
+          | SavedPlanSet
+          | ApiSavedPlanSet
+        )[])
+      : [],
   );
 
   // Must be defined before any conditional returns to obey React's rules of hooks

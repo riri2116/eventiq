@@ -498,12 +498,6 @@ function OfflinePlanCard({
                 <span className="font-medium text-foreground text-xs truncate max-w-20">
                   {vendor.name}
                 </span>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] py-0 px-1 h-4 font-mono"
-                >
-                  {vendor.tier}
-                </Badge>
                 <span className="text-muted-foreground text-xs font-mono">
                   {formatBudget(vendor.cost)}
                 </span>

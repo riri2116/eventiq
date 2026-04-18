@@ -679,14 +679,6 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
               {formatBudget(plan.remaining_budget)}
             </p>
           </div>
-          <div className="rounded-lg bg-accent/30 border border-border px-3 py-2.5 text-center">
-            <p className="text-[10px] text-muted-foreground mb-0.5">
-              Optimization
-            </p>
-            <p className="font-display font-bold text-sm text-foreground">
-              {plan.optimization_score}%
-            </p>
-          </div>
         </div>
       </div>
 
@@ -1063,14 +1055,6 @@ export function PlanDetailsPage() {
             {displayEventType && (
               <Badge variant="secondary" className="text-xs">
                 🎉 {displayEventType}
-              </Badge>
-            )}
-            {apiPlanSet && (
-              <Badge
-                variant="outline"
-                className="text-xs text-blue-600 dark:text-blue-400 border-blue-500/30"
-              >
-                🌐 API Plan · Event #{apiPlanSet.event_id}
               </Badge>
             )}
           </div>

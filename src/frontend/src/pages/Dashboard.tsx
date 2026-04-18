@@ -119,16 +119,8 @@ function PlanCard({
               {planSet.eventName}
             </h3>
             <Badge variant="secondary" className="mt-1 text-xs">
-              {planSet.eventType || (isApiPlan ? "API Plan" : "Event")}
+              {planSet.eventType || "Event"}
             </Badge>
-            {isApiPlan && (
-              <Badge
-                variant="outline"
-                className="mt-1 ml-1 text-[10px] text-blue-600 dark:text-blue-400 border-blue-500/30"
-              >
-                🌐 Live Plan
-              </Badge>
-            )}
           </div>
           <div className="flex items-center gap-1.5 ml-3 shrink-0">
             <button

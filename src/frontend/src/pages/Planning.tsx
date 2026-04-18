@@ -669,14 +669,6 @@ function ApiPlanCard({
 
         {/* Scores row */}
         <div className="flex gap-3">
-          <div className="flex-1 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2 text-center">
-            <p className="text-[10px] text-muted-foreground mb-0.5">
-              Optimization
-            </p>
-            <p className="font-display font-bold text-sm text-primary">
-              {plan.optimization_score}%
-            </p>
-          </div>
           <div className="flex-1 rounded-lg bg-green-500/8 border border-green-500/20 px-3 py-2 text-center">
             <p className="text-[10px] text-muted-foreground mb-0.5">
               Remaining
@@ -1514,10 +1506,7 @@ export function PlanningPage() {
                 className="text-green-600 dark:text-green-400 shrink-0"
               />
               <p className="text-sm text-green-700 dark:text-green-300">
-                Plans generated live from backend · Event ID:{" "}
-                <span className="font-mono font-semibold">
-                  {apiResult.response.event_id}
-                </span>
+                Plan Generated Successfully
               </p>
             </motion.div>
           )}

@@ -399,21 +399,23 @@ function OfflinePlanCard({
       label: "Best Fit",
       badge: "⭐ Best Fit",
       cardClass:
-        "border-2 border-green-500/50 shadow-[0_0_28px_rgba(34,197,94,0.18)] bg-card",
+        "border-2 border-green-500/50 hover:border-green-500 shadow-[0_0_28px_rgba(34,197,94,0.18)] bg-card",
       badgeClass: "bg-green-500/10 text-green-500 border-green-500/30",
       btnVariant: "default" as const,
     },
     standard: {
       label: "Standard",
       badge: "⚖️ Standard",
-      cardClass: "border border-border bg-card shadow-soft",
+      cardClass:
+        "border-2 border-border hover:border-orange-500 bg-card shadow-soft",
       badgeClass: "bg-primary/10 text-primary border-primary/30",
       btnVariant: "outline" as const,
     },
     leastFit: {
       label: "Budget",
       badge: "💰 Budget",
-      cardClass: "border border-border bg-muted/30 shadow-soft",
+      cardClass:
+        "border-2 border-border hover:border-blue-500 bg-muted/30 shadow-soft",
       badgeClass: "bg-muted text-muted-foreground border-border",
       btnVariant: "outline" as const,
     },
@@ -562,7 +564,7 @@ const PLAN_TYPE_CONFIG = {
     label: "Premium Plan",
     badge: "⭐ Premium",
     cardClass:
-      "border-2 border-green-500/50 shadow-[0_0_28px_rgba(34,197,94,0.18)] bg-card",
+      "border-2 border-green-500/50 hover:border-green-500 shadow-[0_0_28px_rgba(34,197,94,0.18)] bg-card",
     badgeClass: "bg-green-500/10 text-green-500 border-green-500/30",
     btnVariant: "default" as const,
     highlight: true,
@@ -570,7 +572,8 @@ const PLAN_TYPE_CONFIG = {
   balanced: {
     label: "Balanced Plan",
     badge: "⚖️ Balanced",
-    cardClass: "border border-border bg-card shadow-soft",
+    cardClass:
+      "border-2 border-border hover:border-orange-500 bg-card shadow-soft",
     badgeClass: "bg-primary/10 text-primary border-primary/30",
     btnVariant: "outline" as const,
     highlight: false,
@@ -578,7 +581,8 @@ const PLAN_TYPE_CONFIG = {
   budget: {
     label: "Budget Plan",
     badge: "💰 Budget",
-    cardClass: "border border-border bg-muted/30 shadow-soft",
+    cardClass:
+      "border-2 border-border hover:border-blue-500 bg-muted/30 shadow-soft",
     badgeClass: "bg-muted text-muted-foreground border-border",
     btnVariant: "outline" as const,
     highlight: false,
@@ -1419,6 +1423,10 @@ export function PlanningPage() {
                               fontWeight: 500,
                               color: "var(--foreground)",
                               lineHeight: "1.3",
+                              minWidth: 0,
+                              overflow: "hidden",
+                              wordBreak: "break-word",
+                              whiteSpace: "normal",
                             }}
                           >
                             {VENDOR_LABELS_16[key]

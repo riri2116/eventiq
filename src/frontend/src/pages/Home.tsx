@@ -2,15 +2,22 @@ import { FloatingBlobs } from "@/components/FloatingBlobs";
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   ArrowRight,
-  ChevronRight,
+  Calendar,
+  CheckSquare,
+  Coins,
+  FileText,
+  Flame,
+  Handshake,
   MapPin,
-  ShieldCheck,
+  Scale,
   Sparkles,
   Star,
-  Workflow,
+  Tag,
+  Users,
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -61,13 +68,6 @@ const EVENT_TAGS = [
   },
 ];
 
-const HOW_WE_WORK_STEPS = [
-  "Tell us about your event",
-  "Set your budget & guest count",
-  "Choose vendor categories",
-  "Get 3 tailored plans instantly",
-];
-
 const DIFFERENTIATORS = [
   "No algorithms, no waiting",
   "Instant local vendor matching",
@@ -76,108 +76,137 @@ const DIFFERENTIATORS = [
   "Zero loading wait — fully offline",
 ];
 
-const FEATURES = [
+const HOW_IT_WORKS_CARDS = [
   {
-    icon: Zap,
-    title: "Instant Plans",
-    desc: "Generate three tailored event plans — Best Fit, Standard, and Budget — in under a second. No waiting, no API calls.",
-    color: "bg-yellow-500/10 text-yellow-400",
-  },
-  {
-    icon: MapPin,
-    title: "Local Vendors",
-    desc: "Curated vendor network across Dehradun covering venues, caterers, photographers, decorators, DJs, and florists.",
+    icon: FileText,
+    step: "01",
+    title: "Tell Us",
+    desc: "Share your event type, date and location",
     color: "bg-primary/10 text-primary",
   },
   {
-    icon: ShieldCheck,
-    title: "Zero Fees",
-    desc: "EventIQ is completely free to use. No hidden charges, no premium upsells — just smart planning for everyone.",
-    color: "bg-green-500/10 text-green-400",
+    icon: Coins,
+    step: "02",
+    title: "Set Budget",
+    desc: "Define your min and max budget range",
+    color: "bg-yellow-500/10 text-yellow-500",
+  },
+  {
+    icon: CheckSquare,
+    step: "03",
+    title: "Choose Vendors",
+    desc: "Select the services you need",
+    color: "bg-green-500/10 text-green-500",
+  },
+  {
+    icon: Sparkles,
+    step: "04",
+    title: "Get Plans",
+    desc: "Receive 3 tailored plans instantly",
+    color: "bg-purple-500/10 text-purple-400",
   },
 ];
 
-/* ─── Scroll-fade hook ──────────────────────────────────────── */
+const HERO_SLIDES = [
+  {
+    img: "/assets/generated/hero-slide-1.dim_900x600.jpg",
+    label: "Wedding Ceremony",
+    tag: "Premium Venues",
+  },
+  {
+    img: "/assets/generated/hero-slide-2.dim_900x600.jpg",
+    label: "Corporate Gala",
+    tag: "Corporate Events",
+  },
+  {
+    img: "/assets/generated/hero-slide-3.dim_900x600.jpg",
+    label: "Birthday Celebration",
+    tag: "Birthday Parties",
+  },
+];
 
-function useScrollFade(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
-      { threshold },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
+const LOCAL_SPOTLIGHT = [
+  {
+    name: "The Grand Himalayan Hall",
+    category: "Banquet Hall",
+    rating: 4.8,
+    img: "/assets/generated/venue-wedding.dim_800x500.jpg",
+  },
+  {
+    name: "Rajpur Road Convention",
+    category: "Convention Centre",
+    rating: 4.7,
+    img: "/assets/generated/venue-corporate.dim_800x500.jpg",
+  },
+  {
+    name: "Sahastradhara Garden",
+    category: "Garden Venue",
+    rating: 4.9,
+    img: "/assets/generated/venue-garden.dim_800x500.jpg",
+  },
+  {
+    name: "Paltan Bazaar Terrace",
+    category: "Rooftop Party",
+    rating: 4.6,
+    img: "/assets/generated/venue-birthday.dim_800x500.jpg",
+  },
+  {
+    name: "Dehradun Cantt Club",
+    category: "Club Venue",
+    rating: 4.8,
+    img: "/assets/generated/venue-concert.dim_800x500.jpg",
+  },
+  {
+    name: "Clement Town Lawns",
+    category: "Outdoor Venue",
+    rating: 4.5,
+    img: "/assets/generated/venue-garden.dim_800x500.jpg",
+  },
+];
 
-/* ─── Scroll-fade text item ─────────────────────────────────── */
-
-function FadeItem({
-  text,
-  delay,
-  bullet,
-}: { text: string; delay: number; bullet?: React.ReactNode }) {
-  const { ref, visible } = useScrollFade(0.1);
-  return (
-    <div
-      ref={ref}
-      className="flex items-start gap-3 transition-all duration-700"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(18px)",
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      {bullet ?? <Star size={14} className="text-secondary mt-1 shrink-0" />}
-      <span className="text-sm text-muted-foreground leading-relaxed">
-        {text}
-      </span>
-    </div>
-  );
-}
-
-/* ─── Marquee component ─────────────────────────────────────── */
-
-function EventMarquee() {
-  const doubled = [...EVENT_TAGS, ...EVENT_TAGS];
-  return (
-    <div className="overflow-hidden relative" aria-hidden="true">
-      <div
-        className="flex gap-2 w-max"
-        style={{ animation: "marquee-scroll 18s linear infinite" }}
-      >
-        {doubled.map((tag, i) => (
-          <span
-            key={`fwd-${tag.label}-${i}`}
-            className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap ${tag.color}`}
-          >
-            {tag.label}
-          </span>
-        ))}
-      </div>
-      <div
-        className="flex gap-2 w-max mt-2"
-        style={{ animation: "marquee-scroll 22s linear infinite reverse" }}
-      >
-        {[...doubled].reverse().map((tag, i) => (
-          <span
-            key={`rev-${tag.label}-${i}`}
-            className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap ${tag.color}`}
-          >
-            {tag.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
+const CATEGORY_TAGS = [
+  {
+    label: "Weddings",
+    emoji: "💍",
+    color:
+      "bg-pink-500/10 text-pink-500 border-pink-500/20 hover:bg-pink-500/20",
+  },
+  {
+    label: "Birthdays",
+    emoji: "🎂",
+    color:
+      "bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20",
+  },
+  {
+    label: "Corporate Events",
+    emoji: "💼",
+    color: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20",
+  },
+  {
+    label: "Music Concerts",
+    emoji: "🎵",
+    color:
+      "bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/20",
+  },
+  {
+    label: "Cultural Programs",
+    emoji: "🎭",
+    color:
+      "bg-teal-500/10 text-teal-500 border-teal-500/20 hover:bg-teal-500/20",
+  },
+  {
+    label: "Exhibitions",
+    emoji: "🖼",
+    color:
+      "bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500/20",
+  },
+  {
+    label: "Parties",
+    emoji: "🎉",
+    color:
+      "bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20",
+  },
+];
 
 /* ─── Curtain overlay ───────────────────────────────────────── */
 
@@ -202,7 +231,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
       }}
       data-ocid="curtain.overlay"
     >
-      {/* Decorative blobs inside curtain */}
       <div
         className="absolute w-96 h-96 rounded-full opacity-10 pointer-events-none"
         style={{
@@ -223,8 +251,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           animation: "blob-float 22s infinite alternate-reverse ease-in-out",
         }}
       />
-
-      {/* Glass card */}
       <div
         className="relative flex flex-col items-center text-center px-12 py-12 rounded-3xl max-w-md mx-4"
         style={{
@@ -244,7 +270,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         >
           <Zap size={26} style={{ color: "#4FC3F7" }} />
         </div>
-
         <h1
           className="font-display font-bold text-3xl mb-2"
           style={{ color: "#F8FAFC" }}
@@ -260,7 +285,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         >
           Dehradun's intelligent event planning companion
         </p>
-
         <button
           type="button"
           data-ocid="curtain.start_button"
@@ -275,7 +299,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         >
           Start Planning <ArrowRight size={18} />
         </button>
-
         <p className="text-xs mt-5" style={{ color: "rgba(248,250,252,0.3)" }}>
           We Welcome You
         </p>
@@ -284,9 +307,164 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
+/* ─── Hero Carousel ─────────────────────────────────────────── */
+
+function HeroCarousel() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const prev = () =>
+    setCurrent((c) => (c - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  const next = () => setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+
+  return (
+    <div
+      className="relative w-full rounded-2xl overflow-hidden shadow-elevated"
+      style={{ aspectRatio: "9/6" }}
+    >
+      {HERO_SLIDES.map((slide, i) => (
+        <div
+          key={slide.label}
+          className="absolute inset-0 transition-opacity duration-700"
+          style={{ opacity: i === current ? 1 : 0 }}
+        >
+          <img
+            src={slide.img}
+            alt={slide.label}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute bottom-4 left-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/80 text-white backdrop-blur-sm">
+              <Tag size={10} />
+              {slide.tag}
+            </span>
+            <p className="text-white font-display font-semibold text-lg mt-1 drop-shadow-lg">
+              {slide.label}
+            </p>
+          </div>
+        </div>
+      ))}
+
+      {/* Arrows */}
+      <button
+        type="button"
+        onClick={prev}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-smooth"
+        aria-label="Previous slide"
+        data-ocid="hero.carousel_prev"
+      >
+        <ArrowLeft size={16} />
+      </button>
+      <button
+        type="button"
+        onClick={next}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-smooth"
+        aria-label="Next slide"
+        data-ocid="hero.carousel_next"
+      >
+        <ArrowRight size={16} />
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-3 right-4 flex gap-1.5">
+        {HERO_SLIDES.map((slide, i) => (
+          <button
+            key={`dot-${slide.label}`}
+            type="button"
+            onClick={() => setCurrent(i)}
+            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/50"}`}
+            aria-label={`Go to slide ${i + 1}`}
+            data-ocid={`hero.carousel_dot.${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Plan Mini Card ────────────────────────────────────────── */
+
+function PlanMiniCard({
+  icon: Icon,
+  label,
+  badge,
+  badgeColor,
+}: {
+  icon: React.ElementType;
+  label: string;
+  badge?: string;
+  badgeColor?: string;
+}) {
+  return (
+    <div className="flex-1 bg-card border border-border rounded-xl p-3 flex flex-col items-center gap-2 shadow-soft hover:shadow-elevated transition-smooth hover:scale-[1.03]">
+      <Icon size={20} className="text-muted-foreground" />
+      <span className="text-xs font-semibold text-foreground text-center leading-tight">
+        {label}
+      </span>
+      {badge && (
+        <span
+          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeColor}`}
+        >
+          {badge}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ─── Spotlight Card ────────────────────────────────────────── */
+
+function SpotlightCard({
+  venue,
+  index,
+}: {
+  venue: (typeof LOCAL_SPOTLIGHT)[0];
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.45, delay: index * 0.08 }}
+      className="group relative rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-smooth hover:scale-[1.02] cursor-pointer"
+      style={{ aspectRatio: "4/3" }}
+      data-ocid={`spotlight.card.${index + 1}`}
+    >
+      <img
+        src={venue.img}
+        alt={venue.name}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <p className="text-white font-display font-semibold text-sm leading-tight">
+          {venue.name}
+        </p>
+        <div className="flex items-center justify-between mt-1">
+          <span className="text-white/70 text-xs">{venue.category}</span>
+          <span className="flex items-center gap-1 bg-amber-500/90 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            <Star size={9} fill="white" />
+            {venue.rating}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Main page ─────────────────────────────────────────────── */
 
 export function HomePage() {
+  const navigate = useNavigate();
+
   const [curtainVisible, setCurtainVisible] = useState(() => {
     try {
       return sessionStorage.getItem("eventiq-curtain-seen") !== "true";
@@ -304,223 +482,441 @@ export function HomePage() {
     }
   }
 
+  function handleTagClick() {
+    navigate({ to: "/planning" });
+  }
+
   return (
     <>
-      {/* Curtain overlay */}
       {curtainVisible && <CurtainOverlay onDismiss={dismissCurtain} />}
 
       <Layout>
         {/* ── HERO ──────────────────────────────────────────── */}
         <section
-          className="relative min-h-screen flex items-center overflow-hidden bg-background"
+          className="relative overflow-hidden bg-background pt-8 pb-16"
           data-ocid="hero.section"
         >
           <FloatingBlobs />
 
-          <div className="container mx-auto px-8 py-28 relative z-10">
-            <div className="max-w-2xl">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55 }}
-              >
-                <Badge
-                  variant="outline"
-                  className="mb-6 px-4 py-1.5 text-sm font-medium border-primary/30 text-primary bg-primary/5"
-                >
-                  <Zap size={12} className="mr-1.5" />
-                  Dehradun's Smart Event Planner
-                </Badge>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.1 }}
-                className="font-display font-bold text-5xl md:text-7xl text-foreground leading-[1.06] tracking-tight mb-6"
-              >
-                Plan Smart.
-                <br />
-                <span className="text-primary">Execute Perfect.</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-xl text-muted-foreground leading-relaxed mb-10 max-w-lg"
-              >
-                Your intelligent event planning companion. From intimate
-                gatherings to grand celebrations — powered by local vendor
-                intelligence.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.32 }}
-                className="flex flex-wrap gap-4"
-              >
-                <Link to="/signup" data-ocid="hero.create_account_button">
-                  <Button
-                    size="lg"
-                    className="gap-2 px-8 shadow-elevated font-semibold"
-                  >
-                    Create Account <ArrowRight size={18} />
-                  </Button>
-                </Link>
-                <Link to="/planning" data-ocid="hero.start_planning_button">
-                  <Button size="lg" variant="outline" className="gap-2 px-8">
-                    Start Planning <ChevronRight size={18} />
-                  </Button>
-                </Link>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── DYNAMIC 3-COLUMN SECTION ──────────────────────── */}
-        <section className="bg-muted/30 py-24" data-ocid="motion.section">
-          <div className="container mx-auto px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55 }}
-              className="text-center mb-16"
-            >
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-3">
-                Everything you need, right here
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Smart planning for every occasion
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-10 items-start">
-              {/* Col 1 — How We Work */}
-              <div className="bg-card rounded-2xl p-8 border border-border shadow-soft">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                  <Workflow size={20} className="text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-foreground mb-6">
-                  How We Work
-                </h3>
-                <div className="space-y-4">
-                  {HOW_WE_WORK_STEPS.map((step, i) => (
-                    <FadeItem
-                      key={step}
-                      text={step}
-                      delay={i * 120}
-                      bullet={
-                        <span className="font-display font-bold text-lg text-primary/30 leading-none mt-0.5">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Col 2 — What Makes Us Different */}
-              <div className="bg-card rounded-2xl p-8 border border-border shadow-soft">
-                <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
-                  <Sparkles size={20} className="text-secondary" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-foreground mb-6">
-                  What Makes Us Different
-                </h3>
-                <div className="space-y-4">
-                  {DIFFERENTIATORS.map((item, i) => (
-                    <FadeItem key={item} text={item} delay={i * 100} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Col 3 — Event Types Marquee */}
-              <div className="bg-card rounded-2xl p-8 border border-border shadow-soft">
-                <div className="w-11 h-11 rounded-xl bg-purple-500/10 flex items-center justify-center mb-5">
-                  <Star size={20} className="text-purple-400" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-foreground mb-6">
-                  Event Types
-                </h3>
-                <EventMarquee />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── FEATURES ──────────────────────────────────────── */}
-        <section className="bg-background py-24" data-ocid="features.section">
-          <div className="container mx-auto px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55 }}
-              className="text-center mb-14"
-            >
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-3">
-                Built for real events
-              </h2>
-              <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                From intimate gatherings to grand galas — EventIQ handles the
-                complexity so you don't have to.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {FEATURES.map((feat, i) => (
+          <div className="container mx-auto px-6 lg:px-10 relative z-10">
+            <div className="grid lg:grid-cols-5 gap-10 lg:gap-14 items-center">
+              {/* LEFT: Carousel + headline */}
+              <div className="lg:col-span-3 flex flex-col gap-6">
                 <motion.div
-                  key={feat.title}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.12 }}
-                  className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-elevated hover:scale-[1.02] transition-smooth"
-                  data-ocid={`features.card.${i + 1}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${feat.color}`}
+                  <Badge
+                    variant="outline"
+                    className="mb-3 px-3 py-1 text-xs font-medium border-primary/30 text-primary bg-primary/5"
                   >
-                    <feat.icon size={22} />
-                  </div>
-                  <h3 className="font-display font-semibold text-xl text-foreground mb-3">
-                    {feat.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed text-sm">
-                    {feat.desc}
+                    <Zap size={10} className="mr-1.5" />
+                    Dehradun's Smart Event Planner
+                  </Badge>
+
+                  <h1 className="font-display font-bold text-4xl lg:text-5xl xl:text-6xl text-foreground leading-[1.08] tracking-tight mb-3">
+                    Plan Smart.
+                    <br />
+                    <span className="text-primary">Execute Perfect.</span>
+                  </h1>
+                  <p className="text-base text-muted-foreground leading-relaxed max-w-lg mb-5">
+                    Your dream event, perfectly planned with local Dehradun
+                    vendors. Instant matching, transparent pricing.
                   </p>
+
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    <Link to="/planning" data-ocid="hero.start_planning_button">
+                      <Button
+                        size="lg"
+                        className="gap-2 px-7 shadow-elevated font-semibold"
+                      >
+                        Start Planning <ArrowRight size={17} />
+                      </Button>
+                    </Link>
+                    <Link to="/signup" data-ocid="hero.create_account_button">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="gap-2 px-7"
+                      >
+                        See How It Works
+                      </Button>
+                    </Link>
+                  </div>
                 </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
+                >
+                  <HeroCarousel />
+                </motion.div>
+              </div>
+
+              {/* RIGHT: How It Works steps */}
+              <motion.div
+                className="lg:col-span-2 flex flex-col gap-4"
+                initial={{ opacity: 0, x: 28 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <div className="mb-1">
+                  <h2 className="font-display font-bold text-xl text-foreground">
+                    How it Works
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Four simple steps to your perfect event
+                  </p>
+                </div>
+
+                {HOW_IT_WORKS_CARDS.map((card, i) => (
+                  <motion.div
+                    key={card.step}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.45, delay: 0.3 + i * 0.1 }}
+                    className="flex items-start gap-4 bg-card border border-border rounded-xl p-4 shadow-soft hover:shadow-elevated hover:border-primary/20 transition-smooth"
+                    data-ocid={`how_it_works.card.${i + 1}`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}
+                    >
+                      <card.icon size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-bold text-muted-foreground/60 tracking-widest uppercase">
+                          Step {card.step}
+                        </span>
+                      </div>
+                      <p className="font-display font-semibold text-sm text-foreground">
+                        {card.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                        {card.desc}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── QUICK PLAN FORM SECTION ────────────────────────── */}
+        <section
+          className="bg-muted/30 py-16 border-y border-border"
+          data-ocid="quick_plan.section"
+        >
+          <div className="container mx-auto px-6 lg:px-10">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-8"
+            >
+              <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-2">
+                Get your 3 Tailored Plans — Instantly!
+              </h2>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                Tell us about your event and we'll match you with the best
+                Dehradun vendors in seconds.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: 0.1 }}
+              className="bg-card border border-border rounded-2xl p-6 shadow-elevated max-w-3xl mx-auto"
+            >
+              {/* Quick info pills */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                {[
+                  {
+                    icon: Calendar,
+                    label: "Event Type",
+                    value: "Birthday, Wedding…",
+                  },
+                  {
+                    icon: Coins,
+                    label: "Budget Range",
+                    value: "₹3K – Unlimited",
+                  },
+                  { icon: Users, label: "Guest Count", value: "10 to 1000+" },
+                  {
+                    icon: MapPin,
+                    label: "Venue Location",
+                    value: "10 Dehradun Areas",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex flex-col gap-1 bg-muted/50 rounded-xl p-3 border border-border"
+                  >
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <item.icon size={13} />
+                      <span className="text-[11px] font-medium uppercase tracking-wide">
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground truncate">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <Link
+                to="/planning"
+                data-ocid="quick_plan.get_plans_button"
+                className="block"
+              >
+                <Button
+                  size="lg"
+                  className="w-full gap-2 shadow-elevated font-semibold text-base py-6"
+                >
+                  <Sparkles size={18} />
+                  Get 3 Tailored Plans Instantly
+                  <ArrowRight size={18} />
+                </Button>
+              </Link>
+
+              {/* Plan type preview cards */}
+              <div className="flex gap-3 mt-5">
+                <PlanMiniCard
+                  icon={Star}
+                  label="Premium"
+                  badge="★ Recommended"
+                  badgeColor="bg-green-500/20 text-green-600 dark:text-green-400"
+                />
+                <PlanMiniCard
+                  icon={Scale}
+                  label="Balanced"
+                  badge="⚖ Best Value"
+                  badgeColor="bg-primary/10 text-primary"
+                />
+                <PlanMiniCard
+                  icon={Flame}
+                  label="Budget"
+                  badge="🔥 Most Savings"
+                  badgeColor="bg-orange-500/10 text-orange-500"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── LOCAL SPOTLIGHT ───────────────────────────────── */}
+        <section className="bg-background py-16" data-ocid="spotlight.section">
+          <div className="container mx-auto px-6 lg:px-10">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mb-8"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin size={18} className="text-primary" />
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">
+                  Local Spotlight
+                </span>
+              </div>
+              <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground">
+                Top-Rated Dehradun Events & Venues
+              </h2>
+              <p className="text-muted-foreground text-sm mt-1">
+                Handpicked venues trusted by hundreds of event planners across
+                Dehradun
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
+              {LOCAL_SPOTLIGHT.map((venue, i) => (
+                <SpotlightCard key={venue.name} venue={venue} index={i} />
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── CTA BANNER ────────────────────────────────────── */}
-        <section className="bg-muted/30 py-20" data-ocid="cta.section">
-          <div className="container mx-auto px-8 text-center">
+        {/* ── OUR EDGE ──────────────────────────────────────── */}
+        <section
+          className="bg-muted/30 py-16 border-y border-border"
+          data-ocid="our_edge.section"
+        >
+          <div className="container mx-auto px-6 lg:px-10">
             <motion.div
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-10"
+            >
+              <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-2">
+                Our Edge
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Why thousands choose EventIQ for their events
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {[
+                {
+                  icon: Handshake,
+                  color: "bg-primary/10 text-primary",
+                  title: "Local Vendors",
+                  desc: "Carefully curated vendors from Dehradun — real businesses, real reviews, real results.",
+                  ocid: "our_edge.local_vendors_card",
+                },
+                {
+                  icon: Zap,
+                  color: "bg-green-500/10 text-green-500",
+                  title: "Zero Fees",
+                  desc: "No booking fees or commissions ever. EventIQ is completely free to use for everyone.",
+                  ocid: "our_edge.zero_fees_card",
+                },
+              ].map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.12 }}
+                  className="bg-card border border-border rounded-2xl p-7 shadow-soft hover:shadow-elevated hover:border-primary/20 transition-smooth"
+                  data-ocid={card.ocid}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${card.color}`}
+                  >
+                    <card.icon size={22} />
+                  </div>
+                  <h3 className="font-display font-bold text-xl text-foreground mb-2">
+                    {card.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {card.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Differentiators strip */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-wrap justify-center gap-3 mt-10"
+            >
+              {DIFFERENTIATORS.map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border bg-card text-sm text-muted-foreground"
+                >
+                  <Star size={11} className="text-primary" />
+                  {item}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── FIND BY CATEGORY ──────────────────────────────── */}
+        <section className="bg-background py-16" data-ocid="categories.section">
+          <div className="container mx-auto px-6 lg:px-10">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-8"
+            >
+              <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-2">
+                Find by Category
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Browse events that match your occasion
+              </p>
+            </motion.div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              {CATEGORY_TAGS.map((tag, i) => (
+                <motion.button
+                  key={tag.label}
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: i * 0.06 }}
+                  onClick={handleTagClick}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-semibold cursor-pointer transition-smooth ${tag.color}`}
+                  data-ocid={`categories.tag.${i + 1}`}
+                >
+                  <span>{tag.emoji}</span>
+                  {tag.label}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Marquee below tags */}
+            <div className="mt-10 overflow-hidden relative" aria-hidden="true">
+              <div
+                className="flex gap-2 w-max"
+                style={{ animation: "marquee-scroll 20s linear infinite" }}
+              >
+                {[...EVENT_TAGS, ...EVENT_TAGS].map((tag, i) => (
+                  <span
+                    key={`fwd-${tag.label}-${i}`}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap ${tag.color}`}
+                  >
+                    {tag.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FINAL CTA ─────────────────────────────────────── */}
+        <section
+          className="bg-muted/30 py-16 border-t border-border"
+          data-ocid="cta.section"
+        >
+          <div className="container mx-auto px-6 lg:px-10 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-4">
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-3">
                 Ready to start planning?
               </h2>
-              <p className="text-muted-foreground text-lg mb-8 max-w-sm mx-auto">
+              <p className="text-muted-foreground text-base mb-7 max-w-sm mx-auto">
                 We Welcome You — start planning your perfect event today.
               </p>
-              <Link to="/signup" data-ocid="cta.get_started_button">
-                <Button
-                  size="lg"
-                  className="gap-2 px-10 shadow-elevated font-semibold"
-                >
-                  Get Started Free <ArrowRight size={18} />
-                </Button>
-              </Link>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link to="/signup" data-ocid="cta.get_started_button">
+                  <Button
+                    size="lg"
+                    className="gap-2 px-10 shadow-elevated font-semibold"
+                  >
+                    Get Started Free <ArrowRight size={18} />
+                  </Button>
+                </Link>
+                <Link to="/planning" data-ocid="cta.start_planning_button">
+                  <Button size="lg" variant="outline" className="gap-2 px-8">
+                    Start Planning
+                  </Button>
+                </Link>
+              </div>
             </motion.div>
           </div>
         </section>

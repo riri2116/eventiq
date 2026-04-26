@@ -34,10 +34,28 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 /* ─── helpers ────────────────────────────────────────────────── */
-function formatBudget(amount: number): string {
+function formatToLakh(amount: number): string {
   if (amount >= 1_00_00_000) return `₹${(amount / 1_00_00_000).toFixed(1)} Cr`;
   if (amount >= 1_00_000) return `₹${(amount / 1_00_000).toFixed(1)} L`;
+  if (amount >= 1_000) return `₹${(amount / 1_000).toFixed(1)} K`;
   return `₹${amount.toLocaleString()}`;
+}
+
+const EVENT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
+  wedding: { bg: "from-pink-500 to-rose-600", text: "text-white" },
+  birthday: { bg: "from-violet-500 to-purple-600", text: "text-white" },
+  corporate: { bg: "from-blue-500 to-blue-700", text: "text-white" },
+  engagement: { bg: "from-amber-400 to-orange-500", text: "text-white" },
+  party: { bg: "from-indigo-500 to-blue-600", text: "text-white" },
+  anniversary: { bg: "from-rose-500 to-pink-600", text: "text-white" },
+};
+
+function getEventTypeStyle(type: string) {
+  const key = (type ?? "").toLowerCase();
+  for (const k of Object.keys(EVENT_TYPE_COLORS)) {
+    if (key.includes(k)) return EVENT_TYPE_COLORS[k];
+  }
+  return { bg: "from-blue-500 to-blue-700", text: "text-white" };
 }
 
 /* ─── Plan Card ──────────────────────────────────────────────── */
@@ -57,19 +75,30 @@ function PlanCard({
   const apiPlan = isApiPlan ? (planSet as ApiSavedPlanSet) : null;
   const offlinePlan = isApiPlan ? null : (planSet as SavedPlanSet);
 
-  // For offline plans: vendor keys from bestFit; for API plans: vendor names from first plan
   const vendorKeys = offlinePlan?.plans?.bestFit?.selectedVendorKeys ?? [];
   const apiVendorNames =
-    apiPlan?.plans?.[0]?.vendors?.slice(0, 6).map((v) => v.name) ?? [];
+    apiPlan?.plans?.[0]?.vendors?.slice(0, 5).map((v) => v.name) ?? [];
+
+  const eventStyle = getEventTypeStyle(planSet.eventType ?? "");
 
   function handleCardClick() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     navigate({ to: "/plan-details" as any, search: { id: planSet.id } as any });
   }
 
+  // Summary costs
+  const premiumCost = apiPlan?.plans?.find(
+    (p) => p.plan_type === "premium",
+  )?.total_cost;
+  const balancedCost = apiPlan?.plans?.find(
+    (p) => p.plan_type === "balanced",
+  )?.total_cost;
+  const budgetCost = apiPlan?.plans?.find(
+    (p) => p.plan_type === "budget",
+  )?.total_cost;
+
   return (
     <>
-      {/* Delete confirmation — rendered outside the card to avoid stacking context issues */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent data-ocid="dashboard.delete_dialog">
           <AlertDialogHeader>
@@ -101,164 +130,205 @@ function PlanCard({
       </AlertDialog>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.08 }}
-        className="bg-card border border-border rounded-2xl p-6 shadow-soft hover:shadow-elevated hover:scale-[1.02] transition-smooth group cursor-pointer"
+        className="group bg-card rounded-2xl border border-border overflow-hidden shadow-soft hover:shadow-elevated hover:border-primary/30 transition-smooth cursor-pointer"
         data-ocid={`dashboard.plan_card.${index + 1}`}
         data-plan-id={planSet.id}
         onClick={handleCardClick}
       >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="min-w-0 flex-1">
-            <h3
-              className="font-display font-semibold text-lg text-foreground truncate"
-              title={planSet.eventName}
-            >
-              {planSet.eventName}
-            </h3>
-            <Badge variant="secondary" className="mt-1 text-xs">
-              {planSet.eventType || "Event"}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1.5 ml-3 shrink-0">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                navigate({
-                  to: "/plan-details" as any,
-                  search: { id: planSet.id } as any,
-                });
-              }}
-              className="p-2 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-smooth"
-              aria-label="View plan details"
-              data-ocid={`dashboard.view_plan_button.${index + 1}`}
-            >
-              <Eye size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setDeleteOpen(true);
-              }}
-              className="p-2 rounded-lg bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-smooth"
-              aria-label="Delete plan"
-              data-ocid={`dashboard.delete_button.${index + 1}`}
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
-        </div>
+        {/* Colorful header stripe */}
+        <div className={`h-1.5 w-full bg-gradient-to-r ${eventStyle.bg}`} />
 
-        {/* Meta row */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground mb-4">
-          <span className="flex items-center gap-1.5">
-            <Wallet size={12} className="text-primary" />
-            Budget:{" "}
-            <span className="font-medium text-foreground">
-              {formatBudget(planSet.budget)}
+        <div className="p-5">
+          {/* Top row: event type badge + date + actions */}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <span
+                className={`inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${eventStyle.bg} ${eventStyle.text} capitalize shadow-sm`}
+              >
+                🎉 {planSet.eventType || "Event"}
+              </span>
+              <h3
+                className="font-display font-bold text-base text-foreground truncate"
+                title={planSet.eventName}
+              >
+                {planSet.eventName}
+              </h3>
+            </div>
+            <div className="flex items-center gap-1 shrink-0 mt-0.5">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  navigate({
+                    to: "/plan-details" as any,
+                    search: { id: planSet.id } as any,
+                  });
+                }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted hover:bg-primary/15 hover:text-primary text-muted-foreground transition-smooth"
+                aria-label="View plan details"
+                data-ocid={`dashboard.view_plan_button.${index + 1}`}
+              >
+                <Eye size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDeleteOpen(true);
+                }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-smooth"
+                aria-label="Delete plan"
+                data-ocid={`dashboard.delete_button.${index + 1}`}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Budget prominence */}
+          <div className="mb-4">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-0.5">
+              Budget
+            </p>
+            <p className="font-display font-bold text-2xl text-primary leading-none">
+              {formatToLakh(planSet.budget)}
+            </p>
+          </div>
+
+          {/* Meta row */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+            <span className="flex items-center gap-1.5">
+              <Calendar size={12} className="shrink-0" />
+              {new Date(planSet.savedAt).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
             </span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Calendar size={12} className="text-secondary" />
-            {new Date(planSet.savedAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </span>
+            {vendorKeys.length > 0 && (
+              <span className="flex items-center gap-1.5">
+                <Store size={12} className="shrink-0 text-green-500" />
+                <span className="font-medium text-foreground">
+                  {vendorKeys.length} vendor{vendorKeys.length !== 1 ? "s" : ""}
+                </span>
+              </span>
+            )}
+            {isApiPlan && (apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 0 && (
+              <span className="flex items-center gap-1.5">
+                <Store size={12} className="shrink-0 text-green-500" />
+                <span className="font-medium text-foreground">
+                  {apiPlan?.plans?.[0]?.vendors?.length} vendor
+                  {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) !== 1 ? "s" : ""}
+                </span>
+              </span>
+            )}
+          </div>
+
+          {/* Vendor name chips */}
           {vendorKeys.length > 0 && (
-            <span className="flex items-center gap-1.5">
-              <Store size={12} className="text-green-500" />
-              <span className="font-medium text-foreground">
-                {vendorKeys.length} vendor{vendorKeys.length !== 1 ? "s" : ""}
-              </span>
-            </span>
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {vendorKeys.slice(0, 5).map((key) => (
+                <span
+                  key={key}
+                  className="px-2 py-0.5 rounded-full bg-primary/8 text-primary border border-primary/15 text-[11px] font-medium capitalize"
+                >
+                  {key.replace(/s$/, "")}
+                </span>
+              ))}
+              {vendorKeys.length > 5 && (
+                <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[11px]">
+                  +{vendorKeys.length - 5} more
+                </span>
+              )}
+            </div>
           )}
-          {isApiPlan && (apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 0 && (
-            <span className="flex items-center gap-1.5">
-              <Store size={12} className="text-green-500" />
-              <span className="font-medium text-foreground">
-                {apiPlan?.plans?.[0]?.vendors?.length} vendor
-                {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) !== 1 ? "s" : ""}
-              </span>
-            </span>
+          {apiVendorNames.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {apiVendorNames.map((name) => (
+                <span
+                  key={name}
+                  className="px-2 py-0.5 rounded-full bg-primary/8 text-primary border border-primary/15 text-[11px] font-medium truncate max-w-[120px]"
+                  title={name}
+                >
+                  {name}
+                </span>
+              ))}
+              {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 5 && (
+                <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[11px]">
+                  +{(apiPlan?.plans?.[0]?.vendors?.length ?? 0) - 5} more
+                </span>
+              )}
+            </div>
           )}
-        </div>
 
-        {/* Vendor tags — offline plans show category keys; API plans show vendor names */}
-        {vendorKeys.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {vendorKeys.slice(0, 6).map((key) => (
-              <span
-                key={key}
-                className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs capitalize"
-              >
-                {key.replace(/s$/, "")}
-              </span>
-            ))}
-            {vendorKeys.length > 6 && (
-              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
-                +{vendorKeys.length - 6} more
-              </span>
-            )}
-          </div>
-        )}
-        {apiVendorNames.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {apiVendorNames.map((name) => (
-              <span
-                key={name}
-                className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
-              >
-                {name}
-              </span>
-            ))}
-            {(apiPlan?.plans?.[0]?.vendors?.length ?? 0) > 6 && (
-              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
-                +{(apiPlan?.plans?.[0]?.vendors?.length ?? 0) - 6} more
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Cost breakdown — offline: bestFit/standard/leastFit; API: budget/balanced/premium */}
-        <div className="pt-4 border-t border-border grid grid-cols-3 gap-2 text-center">
-          {offlinePlan &&
-            (["bestFit", "standard", "leastFit"] as const).map((k) => (
-              <div key={k}>
-                <p className="text-xs text-muted-foreground">
-                  {k === "bestFit"
-                    ? "Best"
-                    : k === "standard"
-                      ? "Standard"
-                      : "Economy"}
-                </p>
-                <p className="font-display font-semibold text-sm text-foreground">
-                  {formatBudget(offlinePlan.plans[k].totalCost)}
-                </p>
-              </div>
-            ))}
-          {apiPlan &&
-            (["premium", "balanced", "budget"] as const).map((pt) => {
-              const p = apiPlan.plans.find((pl) => pl.plan_type === pt);
-              return (
-                <div key={pt}>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {pt}
+          {/* Cost breakdown footer */}
+          <div className="pt-3.5 border-t border-border/60 grid grid-cols-3 gap-1 text-center">
+            {offlinePlan &&
+              (["bestFit", "standard", "leastFit"] as const).map((k) => (
+                <div key={k} className="py-1">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">
+                    {k === "bestFit"
+                      ? "Best"
+                      : k === "standard"
+                        ? "Standard"
+                        : "Economy"}
                   </p>
-                  <p className="font-display font-semibold text-sm text-foreground">
-                    {p ? formatBudget(p.total_cost) : "—"}
+                  <p className="font-display font-bold text-sm text-foreground">
+                    {formatToLakh(offlinePlan.plans[k].totalCost)}
                   </p>
                 </div>
-              );
-            })}
+              ))}
+            {apiPlan && (
+              <>
+                <div className="py-1">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">
+                    Premium
+                  </p>
+                  <p className="font-display font-bold text-sm text-foreground">
+                    {premiumCost !== undefined
+                      ? formatToLakh(premiumCost)
+                      : "—"}
+                  </p>
+                </div>
+                <div className="py-1">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">
+                    Balanced
+                  </p>
+                  <p className="font-display font-bold text-sm text-foreground">
+                    {balancedCost !== undefined
+                      ? formatToLakh(balancedCost)
+                      : "—"}
+                  </p>
+                </div>
+                <div className="py-1">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">
+                    Budget
+                  </p>
+                  <p className="font-display font-bold text-sm text-foreground">
+                    {budgetCost !== undefined ? formatToLakh(budgetCost) : "—"}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom CTA band */}
+        <div className="px-5 pb-4">
+          <button
+            type="button"
+            onClick={handleCardClick}
+            className="w-full py-2 rounded-xl text-xs font-semibold text-primary border border-primary/25 bg-primary/5 hover:bg-primary/10 transition-smooth flex items-center justify-center gap-1.5"
+            data-ocid={`dashboard.view_details_button.${index + 1}`}
+          >
+            <Eye size={12} /> View Details
+          </button>
         </div>
       </motion.div>
     </>
@@ -280,22 +350,25 @@ function StatsBar({ plans }: { plans: (SavedPlanSet | ApiSavedPlanSet)[] }) {
   const stats = [
     {
       icon: BarChart3,
-      color: "text-primary",
-      bg: "bg-primary/10",
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-500/10",
+      border: "border-blue-100 dark:border-blue-500/20",
       label: "Total Plans Saved",
       value: String(plans.length),
     },
     {
       icon: Wallet,
-      color: "text-secondary",
-      bg: "bg-secondary/10",
+      color: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-50 dark:bg-violet-500/10",
+      border: "border-violet-100 dark:border-violet-500/20",
       label: "Total Budget Planned",
-      value: plans.length > 0 ? `₹${totalBudget.toLocaleString()}` : "₹0",
+      value: plans.length > 0 ? formatToLakh(totalBudget) : "₹0",
     },
     {
       icon: TrendingUp,
-      color: "text-green-500",
-      bg: "bg-green-500/10",
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-500/10",
+      border: "border-emerald-100 dark:border-emerald-500/20",
       label: "Last Activity",
       value: lastActivity,
     },
@@ -309,17 +382,19 @@ function StatsBar({ plans }: { plans: (SavedPlanSet | ApiSavedPlanSet)[] }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: i * 0.1 }}
-          className="bg-card border border-border rounded-2xl p-5 shadow-soft flex items-center gap-4"
+          className={`bg-card border ${s.border} rounded-2xl p-5 shadow-soft flex items-center gap-4`}
           data-ocid={`dashboard.stat_card.${i + 1}`}
         >
           <div
-            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.bg}`}
+            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${s.bg} border ${s.border}`}
           >
-            <s.icon size={20} className={s.color} />
+            <s.icon size={22} className={s.color} />
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-muted-foreground mb-0.5">{s.label}</p>
-            <p className="font-display font-bold text-lg text-foreground truncate">
+            <p className="text-xs text-muted-foreground mb-0.5 font-medium">
+              {s.label}
+            </p>
+            <p className="font-display font-bold text-xl text-foreground truncate">
               {s.value}
             </p>
           </div>
@@ -358,7 +433,6 @@ function ProfileTab({
       data-ocid="dashboard.profile_section"
     >
       <div className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden">
-        {/* Avatar band */}
         <div className="gradient-accent h-24 flex items-end px-6 pb-0">
           <div className="w-16 h-16 rounded-2xl bg-card border-4 border-card flex items-center justify-center shadow-elevated translate-y-8">
             <User size={28} className="text-primary" />
@@ -410,7 +484,6 @@ export function DashboardPage() {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("plans");
-  // Load all plans (both offline SavedPlanSet and API ApiSavedPlanSet) from localStorage
   const [plans, setPlans] = useState<(SavedPlanSet | ApiSavedPlanSet)[]>(() =>
     isLoggedIn && currentUser
       ? (loadPlansFromStorage(currentUser.email) as (
@@ -420,11 +493,9 @@ export function DashboardPage() {
       : [],
   );
 
-  // Must be defined before any conditional returns to obey React's rules of hooks
   function handleDelete(id: string) {
     if (!currentUser) return;
     const updated = plans.filter((p) => p.id !== id);
-    // Write to localStorage synchronously BEFORE updating React state to avoid race conditions
     localStorage.setItem(
       `eventiq_plans_${currentUser.email}`,
       JSON.stringify(updated),
@@ -433,7 +504,6 @@ export function DashboardPage() {
     toast.success("Plan deleted successfully.");
   }
 
-  /* ── Not logged in ── */
   if (!isLoggedIn) {
     return (
       <Layout>
@@ -475,21 +545,23 @@ export function DashboardPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-8 py-12">
-        {/* Page header */}
+      <div className="container mx-auto px-4 sm:px-8 py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Page header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="font-display font-bold text-4xl text-foreground mb-1">
-                Welcome back,{" "}
-                <span className="text-primary">{currentUser?.name}!</span>
+              <h1 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-1">
+                My Event Plans
               </h1>
-              <p className="text-muted-foreground">
-                Manage your saved event plans and profile.
+              <p className="text-muted-foreground text-sm">
+                All your saved event plans in one place.{" "}
+                <span className="text-primary font-medium">
+                  Welcome back, {currentUser?.name}!
+                </span>
               </p>
             </div>
             <Button
@@ -507,7 +579,7 @@ export function DashboardPage() {
 
           {/* Tabs */}
           <div
-            className="flex gap-1 bg-muted/40 p-1 rounded-xl w-fit mb-8 border border-border"
+            className="flex gap-1 bg-muted/50 p-1 rounded-xl w-fit mb-8 border border-border"
             data-ocid="dashboard.tabs"
           >
             {tabs.map((tab) => (
@@ -524,6 +596,11 @@ export function DashboardPage() {
               >
                 <tab.icon size={15} />
                 {tab.label}
+                {tab.id === "plans" && plans.length > 0 && (
+                  <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {plans.length}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -535,14 +612,14 @@ export function DashboardPage() {
                 className="flex flex-col items-center justify-center gap-6 py-24 text-center bg-card border border-border rounded-2xl"
                 data-ocid="dashboard.empty_state"
               >
-                <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center">
-                  <Calendar size={32} className="text-muted-foreground" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-500/10 dark:to-indigo-500/10 flex items-center justify-center">
+                  <Calendar size={32} className="text-primary" />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-xl text-foreground mb-2">
                     No saved plans yet
                   </h3>
-                  <p className="text-muted-foreground max-w-sm">
+                  <p className="text-muted-foreground max-w-sm text-sm">
                     Generate your first event plan and save it here for easy
                     reference.
                   </p>
@@ -558,7 +635,7 @@ export function DashboardPage() {
               </div>
             ) : (
               <div
-                className="grid md:grid-cols-2 xl:grid-cols-3 gap-6"
+                className="grid md:grid-cols-2 xl:grid-cols-3 gap-5"
                 data-ocid="dashboard.plans_list"
               >
                 {plans.map((plan, i) => (

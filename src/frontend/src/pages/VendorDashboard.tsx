@@ -10,13 +10,13 @@ import {
   AlertCircle,
   Building2,
   CheckCircle,
+  DollarSign,
   Edit3,
   Mail,
   MapPin,
   Phone,
   Store,
   Tag,
-  TrendingUp,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -35,9 +35,9 @@ const SERVICE_CATEGORIES = [
 ];
 
 const PRICING_TIERS = [
-  { value: "$", label: "$ Budget", desc: "Under ₹5,000" },
-  { value: "$$", label: "$$ Mid-Range", desc: "₹5,000–₹15,000" },
-  { value: "$$$", label: "$$$ Premium", desc: "₹15,000+" },
+  { value: "$", label: "Budget", desc: "Under ₹5,000" },
+  { value: "$$", label: "Mid-Range", desc: "₹5,000–₹15,000" },
+  { value: "$$$", label: "Premium", desc: "₹15,000+" },
 ] as const;
 
 type PricingTier = "$" | "$$" | "$$$";
@@ -105,7 +105,38 @@ function saveProfile(profile: FullVendorProfile): void {
   );
 }
 
-/* ─── Sub-components ──────────────────────────────────────────── */
+/* ─── Info card for profile grid ─────────────────────────────── */
+function ProfileCard({
+  icon,
+  label,
+  value,
+  full = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  full?: boolean;
+}) {
+  return (
+    <div
+      className={`bg-card border border-border rounded-xl p-5 shadow-card ${full ? "col-span-full" : ""}`}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <span className="text-primary">{icon}</span>
+        </div>
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          {label}
+        </p>
+      </div>
+      <p className="text-sm font-semibold text-foreground break-words leading-relaxed">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/* ─── Field error ─────────────────────────────────────────────── */
 function FieldError({ msg }: { msg: string }) {
   return (
     <motion.p
@@ -117,32 +148,6 @@ function FieldError({ msg }: { msg: string }) {
       <AlertCircle size={11} className="shrink-0" />
       {msg}
     </motion.p>
-  );
-}
-
-function InfoCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-3 p-4 bg-muted/40 rounded-xl border border-border">
-      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-        <span className="text-primary">{icon}</span>
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-0.5">
-          {label}
-        </p>
-        <p className="text-sm font-medium text-foreground break-words">
-          {value}
-        </p>
-      </div>
-    </div>
   );
 }
 
@@ -634,196 +639,202 @@ export function VendorDashboardPage() {
   }
 
   const tierLabel = {
-    $: "$ Budget",
-    $$: "$$ Mid-Range",
-    $$$: "$$$ Premium",
+    $: "Budget",
+    $$: "Mid-Range",
+    $$$: "Premium",
   };
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 sm:px-8 py-10">
-        {/* Page header */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-soft shrink-0">
-              <Store size={26} className="text-primary" />
-            </div>
+      <div className="bg-muted/30 min-h-screen">
+        <div className="container mx-auto px-4 sm:px-8 py-10">
+          {/* Page header */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
+          >
             <div>
               <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground leading-tight">
-                Vendor Dashboard
+                My Vendor Profile
               </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Manage your business profile on EventIQ
-              </p>
-            </div>
-          </div>
-
-          {profile && (
-            <Button
-              onClick={() => setEditOpen(true)}
-              className="gap-2 shadow-soft shrink-0"
-              data-ocid="vendor_dashboard.edit_profile_button"
-            >
-              <Edit3 size={15} />
-              Edit Profile
-            </Button>
-          )}
-        </motion.div>
-
-        {/* No profile — empty state */}
-        {!profile ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-col items-center justify-center text-center py-20 px-6 bg-card border border-border rounded-2xl shadow-soft"
-            data-ocid="vendor_dashboard.empty_state"
-          >
-            <div className="w-20 h-20 rounded-3xl bg-muted flex items-center justify-center mb-5">
-              <Store size={36} className="text-muted-foreground" />
-            </div>
-            <h2 className="font-display font-bold text-xl text-foreground mb-2">
-              No vendor profile yet
-            </h2>
-            <p className="text-muted-foreground text-sm max-w-sm mb-6">
-              Set up your business profile to get discovered by event planners
-              in Dehradun.
-            </p>
-            <Link to="/vendor-setup">
-              <Button
-                className="gap-2 shadow-soft"
-                data-ocid="vendor_dashboard.setup_cta_button"
-              >
-                <Store size={15} />
-                Set Up Vendor Profile
-              </Button>
-            </Link>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-6"
-          >
-            {/* Status badge */}
-            <div
-              className="flex items-center gap-2"
-              data-ocid="vendor_dashboard.status_badge"
-            >
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <Badge variant="secondary" className="gap-1.5 text-xs py-1 px-3">
-                <CheckCircle size={11} />
-                Profile Active
-              </Badge>
-              <span className="text-xs text-muted-foreground">
-                Last updated{" "}
-                {new Date(profile.savedAt).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-
-            {/* Business name hero card */}
-            <div className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden">
-              <div className="h-2 gradient-accent" />
-              <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Store size={30} className="text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h2
-                    className="font-display font-bold text-2xl text-foreground truncate"
-                    data-ocid="vendor_dashboard.business_name"
-                  >
-                    {profile.businessName}
-                  </h2>
-                  <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
-                    {profile.description}
-                  </p>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="border-primary/40 text-primary text-xs px-3 py-1 shrink-0"
-                  data-ocid="vendor_dashboard.pricing_tier_badge"
-                >
-                  <TrendingUp size={11} className="mr-1" />
-                  {tierLabel[profile.pricingTier]}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Details grid */}
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-              data-ocid="vendor_dashboard.profile_grid"
-            >
-              <InfoCard
-                icon={<Tag size={14} />}
-                label="Service Category"
-                value={profile.serviceCategory}
-              />
-              <InfoCard
-                icon={<MapPin size={14} />}
-                label="Locality"
-                value={`${profile.locality}, Dehradun`}
-              />
-              <InfoCard
-                icon={<Mail size={14} />}
-                label="Contact Email"
-                value={profile.contactEmail}
-              />
-              <InfoCard
-                icon={<Phone size={14} />}
-                label="Contact Phone"
-                value={profile.contactPhone}
-              />
-              <InfoCard
-                icon={<TrendingUp size={14} />}
-                label="Price Range"
-                value={`₹${profile.minPrice.toLocaleString("en-IN")} – ₹${profile.maxPrice.toLocaleString("en-IN")}`}
-              />
-              <InfoCard
-                icon={<Store size={14} />}
-                label="Pricing Tier"
-                value={tierLabel[profile.pricingTier]}
-              />
-            </div>
-
-            {/* Description card */}
-            <div className="bg-card border border-border rounded-2xl shadow-soft p-6">
-              <h3 className="font-display font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">
-                Business Description
-              </h3>
-              <p
-                className="text-sm text-foreground leading-relaxed"
-                data-ocid="vendor_dashboard.description"
-              >
-                {profile.description}
+              <p className="text-sm text-muted-foreground mt-1">
+                {profile
+                  ? profile.businessName
+                  : "Manage your business profile on EventIQ"}
               </p>
             </div>
 
-            {/* Edit CTA at bottom */}
-            <div className="flex justify-end pt-2">
+            {profile && (
               <Button
-                variant="outline"
                 onClick={() => setEditOpen(true)}
-                className="gap-2"
-                data-ocid="vendor_dashboard.edit_profile_secondary_button"
+                className="gap-2 shadow-soft shrink-0"
+                data-ocid="vendor_dashboard.edit_profile_button"
               >
-                <Edit3 size={14} />
+                <Edit3 size={15} />
                 Edit Profile
               </Button>
-            </div>
+            )}
           </motion.div>
-        )}
+
+          {/* No profile — empty state */}
+          {!profile ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center justify-center text-center py-20 px-6 bg-card border border-border rounded-2xl shadow-soft"
+              data-ocid="vendor_dashboard.empty_state"
+            >
+              <div className="w-20 h-20 rounded-3xl bg-muted flex items-center justify-center mb-5">
+                <Store size={36} className="text-muted-foreground" />
+              </div>
+              <h2 className="font-display font-bold text-xl text-foreground mb-2">
+                No vendor profile yet
+              </h2>
+              <p className="text-muted-foreground text-sm max-w-sm mb-6">
+                Set up your business profile to get discovered by event planners
+                in Dehradun.
+              </p>
+              <Link to="/vendor-setup">
+                <Button
+                  className="gap-2 shadow-soft"
+                  data-ocid="vendor_dashboard.setup_cta_button"
+                >
+                  <Store size={15} />
+                  Set Up Vendor Profile
+                </Button>
+              </Link>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
+              {/* Status row */}
+              <div
+                className="flex items-center gap-3"
+                data-ocid="vendor_dashboard.status_badge"
+              >
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <Badge
+                  variant="secondary"
+                  className="gap-1.5 text-xs py-1 px-3"
+                >
+                  <CheckCircle size={11} />
+                  Profile Active
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  Last updated{" "}
+                  {new Date(profile.savedAt).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+
+              {/* Business hero card */}
+              <div className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden">
+                <div className="h-1.5 gradient-accent" />
+                <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Store size={30} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h2
+                      className="font-display font-bold text-2xl text-foreground truncate"
+                      data-ocid="vendor_dashboard.business_name"
+                    >
+                      {profile.businessName}
+                    </h2>
+                    <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
+                      {profile.description}
+                    </p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="border-primary/40 text-primary text-xs px-3 py-1 shrink-0"
+                    data-ocid="vendor_dashboard.pricing_tier_badge"
+                  >
+                    {tierLabel[profile.pricingTier]} tier
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Profile 2-column grid */}
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                data-ocid="vendor_dashboard.profile_grid"
+              >
+                <ProfileCard
+                  icon={<Tag size={13} />}
+                  label="Service Category"
+                  value={profile.serviceCategory}
+                />
+                <ProfileCard
+                  icon={<MapPin size={13} />}
+                  label="Locality"
+                  value={`${profile.locality}, Dehradun`}
+                />
+                <ProfileCard
+                  icon={<Mail size={13} />}
+                  label="Contact Email"
+                  value={profile.contactEmail}
+                />
+                <ProfileCard
+                  icon={<Phone size={13} />}
+                  label="Contact Phone"
+                  value={profile.contactPhone}
+                />
+                <ProfileCard
+                  icon={<DollarSign size={13} />}
+                  label="Price Range"
+                  value={`₹${profile.minPrice.toLocaleString("en-IN")} – ₹${profile.maxPrice.toLocaleString("en-IN")}`}
+                />
+                <ProfileCard
+                  icon={<Store size={13} />}
+                  label="Pricing Tier"
+                  value={tierLabel[profile.pricingTier]}
+                />
+              </div>
+
+              {/* Description card (full width) */}
+              <div className="bg-card border border-border rounded-xl p-6 shadow-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Tag size={13} className="text-primary" />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                    Business Description
+                  </p>
+                </div>
+                <p
+                  className="text-sm text-foreground leading-relaxed"
+                  data-ocid="vendor_dashboard.description"
+                >
+                  {profile.description}
+                </p>
+              </div>
+
+              {/* Edit CTA at bottom */}
+              <div className="flex justify-end pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditOpen(true)}
+                  className="gap-2"
+                  data-ocid="vendor_dashboard.edit_profile_secondary_button"
+                >
+                  <Edit3 size={14} />
+                  Edit Profile
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Edit Modal */}

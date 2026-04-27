@@ -1,18 +1,18 @@
 # Design Brief: EventIQ
 
 ## Aesthetic Direction
-Zoho-inspired calm SaaS productivity interface. Refined minimalism with purposeful motion. Premium modern tech aesthetic balancing clarity with refinement.
+BookMyShow/District-inspired dark-themed event platform. Bold, high-contrast cinema aesthetic with warm red-orange accents. Premium modern entertainment design balancing cinematic drama with functional clarity.
 
 ## Color Palette
 
 | Role | Light | Dark |
 |------|-------|------|
-| Background | oklch(0.99 0 0) #FFFFFF | oklch(0.05 0 0) #0F172A |
+| Background | oklch(0.99 0 0) #FFFFFF | oklch(0.1 0.02 250) #0F172A |
 | Foreground | oklch(0.16 0 0) #1E293B | oklch(0.96 0 0) #F8FAFC |
-| Primary (Blue) | oklch(0.55 0.11 261) #3B82F6 | oklch(0.62 0.14 261) #4FC3F7 |
-| Secondary (Orange) | oklch(0.65 0.19 40) #F97316 | oklch(0.58 0.21 40) #FF8A65 |
+| Primary (Red-Orange) | oklch(0.59 0.19 34) #FF6B35 | oklch(0.64 0.2 34) #F97316 |
+| Secondary | oklch(0.94 0.03 34) | oklch(0.22 0.04 34) |
 | Success | oklch(0.68 0.13 142) #22C55E | oklch(0.72 0.12 141) #4ADE80 |
-| Muted | oklch(0.92 0 0) | oklch(0.2 0 0) |
+| Muted | oklch(0.94 0 0) | oklch(0.2 0 0) |
 | Border | oklch(0.88 0 0) | oklch(0.22 0 0) |
 
 ## Typography
@@ -22,7 +22,7 @@ Zoho-inspired calm SaaS productivity interface. Refined minimalism with purposef
 
 ## Shape Language
 - **Radius**: 0.625rem (10px) base for UI components
-- **Blob Animation**: `border-radius: 71% 29% 70% 30% / 30% 54% 46% 70%`, radial-gradient with accent colors, opacity 0.1, 20s infinite float animation
+- **Carousel 3D**: rotateY/rotateX infinite perspective rotation, 8s cycle, transforms image depth on slide transitions
 - **Shadows**: Soft (0 10px 25px -5px rgba(0,0,0,0.05)) for cards, Elevated (0 20px 40px -10px rgba(0,0,0,0.08)) for modals
 
 ## Structural Zones
@@ -50,10 +50,11 @@ Zoho-inspired calm SaaS productivity interface. Refined minimalism with purposef
 - Vertical rhythm: 1.5rem increments
 
 ## Differentiation
-Abstract floating blob animations with organic border-radius throughout dashboard and landing pages. Warm orange + cool blue accent interplay creates visual interest without clutter. Intentional surface hierarchy using card layers, not just color.
+Cinema-inspired 3D carousel rotations on hero images convey motion and depth without floating decorations. Warm red-orange (#FF6B35 / #F97316) on navy background echoes entertainment ticketing platforms. High-contrast dark theme prioritizes event discovery clarity.
 
 ## Constraints
-- No external images — only generated SVG blobs and CSS gradients
+- No floating blob animations — removed entirely for cleaner, bolder look
+- 3D carousel transforms on hero images for visual drama
 - AA+ contrast maintained across light/dark modes
+- Dark mode as primary aesthetic direction
 - Large touch targets (minimum 44px), accessible focus states
-- Floating elements positioned fixed with low opacity, never interfering with content

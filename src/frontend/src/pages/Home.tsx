@@ -1,4 +1,3 @@
-import { FloatingBlobs } from "@/components/FloatingBlobs";
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ─── Data ─────────────────────────────────────────────────── */
 
@@ -107,21 +106,47 @@ const HOW_IT_WORKS_CARDS = [
   },
 ];
 
+/* 8-slide carousel — diverse event images from Unsplash */
 const HERO_SLIDES = [
   {
-    img: "/assets/generated/hero-slide-1.dim_900x600.jpg",
+    img: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&h=600&fit=crop&auto=format",
     label: "Wedding Ceremony",
     tag: "Premium Venues",
   },
   {
-    img: "/assets/generated/hero-slide-2.dim_900x600.jpg",
-    label: "Corporate Gala",
+    img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900&h=600&fit=crop&auto=format",
+    label: "Music Festival",
+    tag: "Music & Concerts",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&h=600&fit=crop&auto=format",
+    label: "Corporate Conference",
     tag: "Corporate Events",
   },
   {
-    img: "/assets/generated/hero-slide-3.dim_900x600.jpg",
-    label: "Birthday Celebration",
+    img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&h=600&fit=crop&auto=format",
+    label: "Kids Birthday Party",
     tag: "Birthday Parties",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&h=600&fit=crop&auto=format",
+    label: "Anniversary Gala",
+    tag: "Anniversary Events",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&h=600&fit=crop&auto=format",
+    label: "Indian Wedding Reception",
+    tag: "Weddings & Sangeet",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=900&h=600&fit=crop&auto=format",
+    label: "Outdoor Sports Event",
+    tag: "Sports & Marathons",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=900&h=600&fit=crop&auto=format",
+    label: "Luxury Cocktail Night",
+    tag: "Night Events",
   },
 ];
 
@@ -130,37 +155,37 @@ const LOCAL_SPOTLIGHT = [
     name: "The Grand Himalayan Hall",
     category: "Banquet Hall",
     rating: 4.8,
-    img: "/assets/generated/venue-wedding.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1519167758481-83f29c8a4a27?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Rajpur Road Convention",
     category: "Convention Centre",
     rating: 4.7,
-    img: "/assets/generated/venue-corporate.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Sahastradhara Garden",
     category: "Garden Venue",
     rating: 4.9,
-    img: "/assets/generated/venue-garden.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Paltan Bazaar Terrace",
     category: "Rooftop Party",
     rating: 4.6,
-    img: "/assets/generated/venue-birthday.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Dehradun Cantt Club",
     category: "Club Venue",
     rating: 4.8,
-    img: "/assets/generated/venue-concert.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Clement Town Lawns",
     category: "Outdoor Venue",
     rating: 4.5,
-    img: "/assets/generated/venue-garden.dim_800x500.jpg",
+    img: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&h=500&fit=crop&auto=format",
   },
 ];
 
@@ -222,8 +247,8 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: "rgba(4, 9, 20, 0.92)",
-        backdropFilter: "blur(6px)",
+        background: "rgba(4, 4, 4, 0.95)",
+        backdropFilter: "blur(8px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
         opacity: hiding ? 0 : 1,
         transform: hiding ? "scale(0.97)" : "scale(1)",
@@ -232,56 +257,36 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
       data-ocid="curtain.overlay"
     >
       <div
-        className="absolute w-96 h-96 rounded-full opacity-10 pointer-events-none"
-        style={{
-          background: "radial-gradient(circle at 30% 30%, #4FC3F7, #3B82F6)",
-          top: "10%",
-          left: "5%",
-          filter: "blur(60px)",
-          animation: "blob-float 18s infinite alternate ease-in-out",
-        }}
-      />
-      <div
-        className="absolute w-80 h-80 rounded-full opacity-10 pointer-events-none"
-        style={{
-          background: "radial-gradient(circle at 70% 70%, #FF8A65, #F97316)",
-          bottom: "12%",
-          right: "8%",
-          filter: "blur(50px)",
-          animation: "blob-float 22s infinite alternate-reverse ease-in-out",
-        }}
-      />
-      <div
         className="relative flex flex-col items-center text-center px-12 py-12 rounded-3xl max-w-md mx-4"
         style={{
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.12)",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.1)",
           backdropFilter: "blur(20px)",
           boxShadow:
-            "0 32px 64px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+            "0 32px 64px -12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
       >
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
           style={{
             background: "rgba(59,130,246,0.15)",
-            border: "1px solid rgba(59,130,246,0.3)",
+            border: "1px solid rgba(59,130,246,0.35)",
           }}
         >
-          <Zap size={26} style={{ color: "#4FC3F7" }} />
+          <Zap size={26} style={{ color: "#3B82F6" }} />
         </div>
         <h1
           className="font-display font-bold text-3xl mb-2"
-          style={{ color: "#F8FAFC" }}
+          style={{ color: "#F9F9F9" }}
         >
           EventIQ
         </h1>
-        <p className="text-sm mb-1" style={{ color: "rgba(248,250,252,0.6)" }}>
+        <p className="text-sm mb-1" style={{ color: "rgba(249,249,249,0.6)" }}>
           Plan Smart. Execute Perfect.
         </p>
         <p
           className="text-xs mb-8 leading-relaxed"
-          style={{ color: "rgba(248,250,252,0.4)" }}
+          style={{ color: "rgba(249,249,249,0.38)" }}
         >
           Dehradun's intelligent event planning companion
         </p>
@@ -291,7 +296,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           onClick={handleStart}
           className="flex items-center gap-2.5 px-8 py-3.5 rounded-2xl font-display font-semibold text-base transition-all duration-300 hover:scale-105 active:scale-95"
           style={{
-            background: "linear-gradient(135deg, #3B82F6, #4FC3F7)",
+            background: "linear-gradient(135deg, #2563EB, #3B82F6)",
             color: "#fff",
             boxShadow: "0 8px 24px -4px rgba(59,130,246,0.5)",
             border: "none",
@@ -299,7 +304,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         >
           Start Planning <ArrowRight size={18} />
         </button>
-        <p className="text-xs mt-5" style={{ color: "rgba(248,250,252,0.3)" }}>
+        <p className="text-xs mt-5" style={{ color: "rgba(249,249,249,0.28)" }}>
           We Welcome You
         </p>
       </div>
@@ -307,56 +312,173 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
-/* ─── Hero Carousel ─────────────────────────────────────────── */
+/* ─── 3D Coverflow Carousel ─────────────────────────────────── */
+
+/** Returns the visual position offset from the active index */
+function getSlideStyle(
+  index: number,
+  current: number,
+  total: number,
+): React.CSSProperties {
+  // Calculate offset, wrapping correctly for circular navigation
+  let offset = index - current;
+  if (offset > total / 2) offset -= total;
+  if (offset < -total / 2) offset += total;
+
+  const absOffset = Math.abs(offset);
+
+  if (offset === 0) {
+    // Active — front center, full size, no blur
+    return {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      transform: "translateX(0%) translateZ(0px) rotateY(0deg) scale(1)",
+      opacity: 1,
+      zIndex: 10,
+      filter: undefined,
+      transition:
+        "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
+      cursor: "default",
+      willChange: "transform, opacity, filter",
+    };
+  }
+
+  if (absOffset === 1) {
+    // Adjacent prev/next — visible behind, slightly to the side, blurred
+    const translateX = offset < 0 ? "-18%" : "18%";
+    const rotateY = offset < 0 ? "18deg" : "-18deg";
+    return {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      transform: `translateX(${translateX}) translateZ(-120px) rotateY(${rotateY}) scale(0.82)`,
+      opacity: 0.48,
+      zIndex: 5,
+      filter: "blur(3.5px)",
+      transition:
+        "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
+      cursor: "pointer",
+      willChange: "transform, opacity, filter",
+    };
+  }
+
+  // All further slides — fully hidden behind
+  return {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    transform: `translateX(${offset < 0 ? "-18%" : "18%"}) translateZ(-200px) rotateY(${offset < 0 ? "18deg" : "-18deg"}) scale(0.65)`,
+    opacity: 0,
+    zIndex: 1,
+    filter: "blur(6px)",
+    transition:
+      "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
+    cursor: "default",
+    willChange: "transform, opacity, filter",
+  };
+}
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
       setCurrent((c) => (c + 1) % HERO_SLIDES.length);
     }, 4500);
-    return () => clearInterval(timer);
   }, []);
 
-  const prev = () =>
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [resetTimer]);
+
+  const prev = () => {
     setCurrent((c) => (c - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  const next = () => setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    resetTimer();
+  };
+
+  const next = () => {
+    setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    resetTimer();
+  };
+
+  const goTo = (i: number) => {
+    setCurrent(i);
+    resetTimer();
+  };
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden shadow-elevated"
-      style={{ aspectRatio: "9/6" }}
+      className="relative w-full select-none overflow-hidden"
+      style={{ aspectRatio: "9/6", perspective: "1200px" }}
     >
-      {HERO_SLIDES.map((slide, i) => (
-        <div
-          key={slide.label}
-          className="absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: i === current ? 1 : 0 }}
-        >
-          <img
-            src={slide.img}
-            alt={slide.label}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-4 left-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/80 text-white backdrop-blur-sm">
-              <Tag size={10} />
-              {slide.tag}
-            </span>
-            <p className="text-white font-display font-semibold text-lg mt-1 drop-shadow-lg">
-              {slide.label}
-            </p>
-          </div>
-        </div>
-      ))}
+      {/* 3D stage — preserve-3d enables translateZ depth on child slides */}
+      <div
+        className="relative w-full h-full"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {HERO_SLIDES.map((slide, i) => {
+          const style = getSlideStyle(i, current, HERO_SLIDES.length);
+          const isActive = i === current;
+
+          return (
+            <div
+              key={slide.label}
+              style={style}
+              onClick={() => !isActive && goTo(i)}
+              onKeyDown={(e) =>
+                (e.key === "Enter" || e.key === " ") && !isActive && goTo(i)
+              }
+              role={isActive ? undefined : "button"}
+              tabIndex={isActive ? undefined : 0}
+              data-ocid={isActive ? "hero.carousel_active_slide" : undefined}
+            >
+              <div className="w-full h-full rounded-2xl overflow-hidden shadow-elevated">
+                <img
+                  src={slide.img}
+                  alt={slide.label}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                {isActive && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.25 }}
+                    className="absolute bottom-4 left-4"
+                  >
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm">
+                      <Tag size={10} />
+                      {slide.tag}
+                    </span>
+                    <p className="text-white font-display font-semibold text-lg mt-1 drop-shadow-lg">
+                      {slide.label}
+                    </p>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {/* Arrows */}
       <button
         type="button"
         onClick={prev}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-smooth"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-primary/80 text-white flex items-center justify-center backdrop-blur-sm transition-smooth z-30"
         aria-label="Previous slide"
         data-ocid="hero.carousel_prev"
       >
@@ -365,7 +487,7 @@ function HeroCarousel() {
       <button
         type="button"
         onClick={next}
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-smooth"
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-primary/80 text-white flex items-center justify-center backdrop-blur-sm transition-smooth z-30"
         aria-label="Next slide"
         data-ocid="hero.carousel_next"
       >
@@ -373,13 +495,13 @@ function HeroCarousel() {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-3 right-4 flex gap-1.5">
+      <div className="absolute bottom-3 right-4 flex gap-1.5 z-30">
         {HERO_SLIDES.map((slide, i) => (
           <button
             key={`dot-${slide.label}`}
             type="button"
-            onClick={() => setCurrent(i)}
-            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/50"}`}
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-primary" : "w-2 h-2 bg-white/50 hover:bg-white/80"}`}
             aria-label={`Go to slide ${i + 1}`}
             data-ocid={`hero.carousel_dot.${i + 1}`}
           />
@@ -424,10 +546,7 @@ function PlanMiniCard({
 function SpotlightCard({
   venue,
   index,
-}: {
-  venue: (typeof LOCAL_SPOTLIGHT)[0];
-  index: number;
-}) {
+}: { venue: (typeof LOCAL_SPOTLIGHT)[0]; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -496,8 +615,6 @@ export function HomePage() {
           className="relative overflow-hidden bg-background pt-8 pb-16"
           data-ocid="hero.section"
         >
-          <FloatingBlobs />
-
           <div className="container mx-auto px-6 lg:px-10 relative z-10">
             <div className="grid lg:grid-cols-5 gap-10 lg:gap-14 items-center">
               {/* LEFT: Carousel + headline */}
@@ -563,10 +680,7 @@ export function HomePage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <div className="mb-1">
-                  <h2 className="font-display font-bold text-xl text-foreground">
-                    How it Works
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-sm font-bold text-muted-foreground mt-0.5">
                     Four simple steps to your perfect event
                   </p>
                 </div>
@@ -729,7 +843,7 @@ export function HomePage() {
                 </span>
               </div>
               <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground">
-                Top-Rated Dehradun Events & Venues
+                Top-Rated Dehradun Events &amp; Venues
               </h2>
               <p className="text-muted-foreground text-sm mt-1">
                 Handpicked venues trusted by hundreds of event planners across

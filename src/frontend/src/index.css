@@ -9,93 +9,93 @@
     --font-mono: "JetBrains Mono";
     --radius: 0.75rem;
 
-    /* Light mode — clean white SaaS palette */
-    --background: 0.975 0 0; /* #F8FAFC-like near white */
-    --foreground: 0.13 0.02 250; /* rich dark navy */
-    --card: 1 0 0; /* pure white cards */
-    --card-foreground: 0.13 0.02 250;
+    /* Light mode — clean blue palette */
+    --background: 1 0 0; /* #FFFFFF pure white */
+    --foreground: 0.18 0.02 240; /* #1E293B dark text */
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.02 240;
     --popover: 1 0 0;
-    --popover-foreground: 0.13 0.02 250;
+    --popover-foreground: 0.18 0.02 240;
 
     /* Blue primary — #3B82F6 */
-    --primary: 0.58 0.18 261;
-    --primary-foreground: 0.99 0 0;
+    --primary: 0.56 0.2 240;
+    --primary-foreground: 1 0 0;
 
-    --secondary: 0.94 0.03 261;
-    --secondary-foreground: 0.2 0.05 261;
-    --muted: 0.94 0 0;
-    --muted-foreground: 0.5 0.02 250;
+    --secondary: 0.94 0.02 240;
+    --secondary-foreground: 0.18 0.02 240;
 
-    --accent: 0.93 0.05 261;
-    --accent-foreground: 0.2 0.08 261;
+    --muted: 0.96 0.01 240;
+    --muted-foreground: 0.55 0.05 240;
 
-    /* Red destructive */
-    --destructive: 0.52 0.22 25;
-    --destructive-foreground: 0.99 0 0;
+    --accent: 0.56 0.2 240; /* same blue as primary */
+    --accent-foreground: 1 0 0;
 
-    --border: 0.9 0.01 250;
-    --input: 0.92 0.01 250;
-    --ring: 0.58 0.18 261;
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 1 0 0;
 
-    /* Chart colors */
-    --chart-1: 0.58 0.18 261; /* blue */
-    --chart-2: 0.6 0.17 162; /* teal */
-    --chart-3: 0.68 0.22 150; /* green */
-    --chart-4: 0.78 0.18 84; /* amber */
-    --chart-5: 0.65 0.22 22; /* orange */
+    --border: 0.9 0.01 240;
+    --input: 0.9 0.01 240;
+    --ring: 0.56 0.2 240;
 
-    --sidebar: 0.975 0 0;
-    --sidebar-foreground: 0.13 0.02 250;
-    --sidebar-primary: 0.58 0.18 261;
-    --sidebar-primary-foreground: 0.99 0 0;
-    --sidebar-accent: 0.92 0 0;
-    --sidebar-accent-foreground: 0.2 0 0;
-    --sidebar-border: 0.9 0.01 250;
-    --sidebar-ring: 0.58 0.18 261;
+    --chart-1: 0.56 0.2 240; /* blue */
+    --chart-2: 0.62 0.18 142; /* green */
+    --chart-3: 0.72 0.18 80; /* amber */
+    --chart-4: 0.65 0.2 290; /* purple */
+    --chart-5: 0.55 0.22 25; /* red */
+
+    --sidebar: 0.98 0.01 240;
+    --sidebar-foreground: 0.18 0.02 240;
+    --sidebar-primary: 0.56 0.2 240;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.94 0.02 240;
+    --sidebar-accent-foreground: 0.18 0.02 240;
+    --sidebar-border: 0.9 0.01 240;
+    --sidebar-ring: 0.56 0.2 240;
   }
 
   .dark {
-    /* Dark mode — deep navy, not pitch black */
-    --background: 0.1 0.02 250; /* #0F172A deep navy */
-    --foreground: 0.95 0.01 250; /* near white */
-    --card: 0.16 0.03 250; /* #1E293B slate card */
-    --card-foreground: 0.95 0.01 250;
-    --popover: 0.13 0.02 250;
-    --popover-foreground: 0.95 0.01 250;
+    /* Dark mode — comfortable grey #23272F */
+    --background: 0.18 0.01 240; /* #23272F lighter grey */
+    --foreground: 0.97 0.01 240; /* #F8FAFC near white */
+    --card: 0.22 0.02 240; /* #1E293B surface */
+    --card-foreground: 0.97 0.01 240;
+    --popover: 0.22 0.02 240;
+    --popover-foreground: 0.97 0.01 240;
 
-    /* Blue primary brighter in dark */
-    --primary: 0.63 0.19 261;
-    --primary-foreground: 0.05 0 0;
+    /* Keep blue primary */
+    --primary: 0.56 0.2 240;
+    --primary-foreground: 1 0 0;
 
-    --secondary: 0.22 0.04 261;
-    --secondary-foreground: 0.9 0.02 261;
-    --muted: 0.2 0.03 250;
-    --muted-foreground: 0.62 0.03 250;
+    --secondary: 0.22 0.02 240;
+    --secondary-foreground: 0.97 0.01 240;
 
-    --accent: 0.24 0.06 261;
-    --accent-foreground: 0.9 0.04 261;
+    --muted: 0.22 0.02 240;
+    --muted-foreground: 0.65 0.05 240;
 
-    --destructive: 0.62 0.22 22;
-    --destructive-foreground: 0.99 0 0;
+    --accent: 0.56 0.2 240;
+    --accent-foreground: 1 0 0;
 
-    --border: 0.22 0.03 250;
-    --input: 0.19 0.03 250;
-    --ring: 0.63 0.19 261;
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 1 0 0;
 
-    --chart-1: 0.55 0.22 261;
-    --chart-2: 0.68 0.19 162;
-    --chart-3: 0.72 0.22 150;
-    --chart-4: 0.82 0.19 84;
-    --chart-5: 0.7 0.24 16;
+    --border: 0.3 0.02 240;
+    --input: 0.3 0.02 240;
+    --ring: 0.56 0.2 240;
 
-    --sidebar: 0.13 0.02 250;
-    --sidebar-foreground: 0.95 0.01 250;
-    --sidebar-primary: 0.63 0.19 261;
-    --sidebar-primary-foreground: 0.05 0 0;
-    --sidebar-accent: 0.2 0.03 250;
-    --sidebar-accent-foreground: 0.88 0 0;
-    --sidebar-border: 0.22 0.03 250;
-    --sidebar-ring: 0.63 0.19 261;
+    --chart-1: 0.56 0.2 240;
+    --chart-2: 0.62 0.18 142;
+    --chart-3: 0.72 0.18 80;
+    --chart-4: 0.65 0.2 290;
+    --chart-5: 0.55 0.22 25;
+
+    --sidebar: 0.2 0.01 240;
+    --sidebar-foreground: 0.97 0.01 240;
+    --sidebar-primary: 0.56 0.2 240;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.25 0.02 240;
+    --sidebar-accent-foreground: 0.97 0.01 240;
+    --sidebar-border: 0.3 0.02 240;
+    --sidebar-ring: 0.56 0.2 240;
   }
 
   * {
@@ -133,17 +133,12 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Blob float animation utility */
-  .blob-float {
-    animation: blob-float 20s infinite alternate ease-in-out;
-  }
-
-  /* Gradient accent utility */
+  /* Gradient accent utility — blue */
   .gradient-accent {
     background: linear-gradient(
       135deg,
-      oklch(0.63 0.19 261),
-      oklch(0.48 0.18 261)
+      oklch(0.56 0.2 240),
+      oklch(0.65 0.2 240)
     );
   }
 
@@ -206,19 +201,6 @@
 
   .bg-amber-muted {
     background-color: oklch(0.96 0.06 84);
-  }
-}
-
-@keyframes blob-float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(-20px, 20px) scale(1.05);
-  }
-  66% {
-    transform: translate(20px, -15px) scale(0.97);
   }
 }
 

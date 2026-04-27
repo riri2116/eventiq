@@ -1472,67 +1472,30 @@ export function PlanningPage() {
                   </div>
 
                   <div
-                    className="vendor-grid grid gap-3 grid-cols-1"
+                    className="vendor-grid grid gap-4 grid-cols-1"
                     data-ocid="planning.vendors_grid"
                   >
                     <style>{`
                       @media (min-width: 480px) { .vendor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
                       @media (min-width: 768px) { .vendor-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
                       @media (min-width: 1024px) { .vendor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+                      .vendor-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 16px 16px; background: #fff; border: 1.5px solid #E8EDF4; border-radius: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06); }
+                      .vendor-card:hover { border-color: #93C5FD; box-shadow: 0 4px 14px rgba(59,130,246,0.10); transform: translateY(-2px); }
+                      .vendor-card.selected { border-color: #3B82F6; border-width: 2px; background: rgba(59,130,246,0.04); box-shadow: 0 4px 16px rgba(59,130,246,0.12); }
+                      .vendor-icon-circle { width: 50px; height: 50px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; flex-shrink: 0; transition: background 0.2s ease; }
+                      .vendor-card.selected .vendor-icon-circle { background: rgba(59,130,246,0.12); }
+                      .vendor-badge { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: #3B82F6; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.6); transition: all 0.2s ease; }
+                      .vendor-card.selected .vendor-badge { opacity: 1; transform: scale(1); }
+                      .vendor-label { font-size: 12.5px; font-weight: 600; color: #1E293B; line-height: 1.35; word-break: break-word; }
+                      .vendor-card.selected .vendor-label { color: #3B82F6; }
                     `}</style>
 
                     {VENDOR_CATEGORIES_16.map((key) => {
                       const isChecked = selectedVendors.has(key);
-                      const hasError = !!(touched.vendors && errors.vendors);
                       return (
                         <label
                           key={key}
-                          className="cursor-pointer"
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "10px",
-                            padding: "16px 12px",
-                            background: isChecked
-                              ? "rgba(59,130,246,0.08)"
-                              : "var(--card)",
-                            border: isChecked
-                              ? "1.5px solid #3B82F6"
-                              : hasError
-                                ? "1.5px solid var(--destructive)"
-                                : "1.5px solid var(--border)",
-                            borderRadius: "14px",
-                            transition: "all 0.2s ease",
-                            boxShadow: isChecked
-                              ? "0 4px 16px rgba(59,130,246,0.15)"
-                              : "none",
-                            textAlign: "center",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isChecked) {
-                              (
-                                e.currentTarget as HTMLElement
-                              ).style.borderColor = "#3B82F6";
-                              (e.currentTarget as HTMLElement).style.transform =
-                                "translateY(-2px)";
-                              (e.currentTarget as HTMLElement).style.boxShadow =
-                                "0 4px 16px rgba(59,130,246,0.12)";
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isChecked) {
-                              (
-                                e.currentTarget as HTMLElement
-                              ).style.borderColor = hasError
-                                ? "var(--destructive)"
-                                : "var(--border)";
-                              (e.currentTarget as HTMLElement).style.transform =
-                                "translateY(0)";
-                              (e.currentTarget as HTMLElement).style.boxShadow =
-                                "none";
-                            }
-                          }}
+                          className={`vendor-card${isChecked ? " selected" : ""}`}
                           data-ocid={`planning.vendor_${key}_checkbox`}
                         >
                           <input
@@ -1543,63 +1506,37 @@ export function PlanningPage() {
                             onChange={() => toggleVendor(key)}
                           />
 
-                          {/* Emoji */}
-                          <span style={{ fontSize: "26px", lineHeight: "1" }}>
+                          {/* Checkmark badge — top-right */}
+                          <span className="vendor-badge" aria-hidden="true">
+                            <svg
+                              viewBox="0 0 16 16"
+                              width="11"
+                              height="11"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                              role="presentation"
+                            >
+                              <polyline
+                                points="2,8 6,12 14,4"
+                                stroke="white"
+                                strokeWidth="2.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+
+                          {/* Pale circular icon area */}
+                          <span className="vendor-icon-circle">
                             {VENDOR_EMOJI_16[key]}
                           </span>
 
-                          {/* Label */}
-                          <span
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 500,
-                              color: isChecked
-                                ? "#3B82F6"
-                                : "var(--foreground)",
-                              lineHeight: "1.3",
-                              wordBreak: "break-word",
-                            }}
-                          >
+                          {/* Service label */}
+                          <span className="vendor-label">
                             {VENDOR_LABELS_16[key]
                               .replace(/^[^\w]+/, "")
                               .trim()}
-                          </span>
-
-                          {/* Checkmark indicator */}
-                          <span
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              width: "20px",
-                              height: "20px",
-                              borderRadius: "6px",
-                              border: isChecked
-                                ? "2px solid #3B82F6"
-                                : "2px solid var(--border)",
-                              background: isChecked ? "#3B82F6" : "transparent",
-                              transition: "all 0.2s ease",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {isChecked && (
-                              <svg
-                                viewBox="0 0 16 16"
-                                width="11"
-                                height="11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                              >
-                                <polyline
-                                  points="2,8 6,12 14,4"
-                                  stroke="white"
-                                  strokeWidth="2.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
                           </span>
                         </label>
                       );

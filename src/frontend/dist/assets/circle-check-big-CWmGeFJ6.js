@@ -1,0 +1,32 @@
+import { c as createLucideIcon } from "./button-CZOz3NL5.js";
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$1 = [
+  ["path", { d: "M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z", key: "1b4qmf" }],
+  ["path", { d: "M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2", key: "i71pzd" }],
+  ["path", { d: "M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2", key: "10jefs" }],
+  ["path", { d: "M10 6h4", key: "1itunk" }],
+  ["path", { d: "M10 10h4", key: "tcdvrf" }],
+  ["path", { d: "M10 14h4", key: "kelpxr" }],
+  ["path", { d: "M10 18h4", key: "1ulq68" }]
+];
+const Building2 = createLucideIcon("building-2", __iconNode$1);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode = [
+  ["path", { d: "M21.801 10A10 10 0 1 1 17 3.335", key: "yps3ct" }],
+  ["path", { d: "m9 11 3 3L22 4", key: "1pflzl" }]
+];
+const CircleCheckBig = createLucideIcon("circle-check-big", __iconNode);
+export {
+  Building2 as B,
+  CircleCheckBig as C
+};

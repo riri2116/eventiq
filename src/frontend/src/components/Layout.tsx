@@ -5,30 +5,12 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  Moon,
   Store,
-  Sun,
   User,
   X,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { type ReactNode, useState } from "react";
 import { ChatAssistant } from "./ChatAssistant";
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-smooth"
-      aria-label="Toggle theme"
-      data-ocid="theme.toggle"
-    >
-      {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-    </button>
-  );
-}
 
 export function Layout({ children }: { children: ReactNode }) {
   const { currentUser, isLoggedIn, logout } = useAuth();
@@ -96,8 +78,6 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <ThemeToggle />
-
             {isLoggedIn ? (
               <div className="hidden md:flex items-center gap-3">
                 <div className="flex items-center gap-2 text-sm">

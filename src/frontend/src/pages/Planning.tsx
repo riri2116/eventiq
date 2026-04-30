@@ -648,7 +648,7 @@ function OfflinePlanCard({
             {vendorEntries.map(([key, vendor]) => (
               <div
                 key={key}
-                className="flex items-center justify-between gap-3 py-2.5"
+                className="plan-vendor-row flex items-center justify-between gap-3 py-2.5 px-1 -mx-1 rounded-lg transition-all duration-150"
               >
                 <span className="text-xs text-muted-foreground capitalize truncate min-w-0 max-w-[45%]">
                   {key.replace(/([A-Z])/g, " $1").trim()}

@@ -521,7 +521,7 @@ function OfflinePlanCard({
       label: "Budget",
       badge: "🔥 Budget",
       hoverBorderColor: "#3B82F6",
-      baseBorderColor: "var(--border)",
+      baseBorderColor: "#3B82F6",
       badgeBg: "rgba(100,116,139,0.1)",
       badgeText: "var(--muted-foreground)",
       badgeBorder: "var(--border)",

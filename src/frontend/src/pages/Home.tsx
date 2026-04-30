@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -583,6 +584,7 @@ function SpotlightCard({
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
 
   const [curtainVisible, setCurtainVisible] = useState(() => {
     try {
@@ -651,15 +653,17 @@ export function HomePage() {
                         Start Planning <ArrowRight size={17} />
                       </Button>
                     </Link>
-                    <Link to="/signup" data-ocid="hero.create_account_button">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="gap-2 px-7"
-                      >
-                        See How It Works
-                      </Button>
-                    </Link>
+                    {!isLoggedIn && (
+                      <Link to="/signup" data-ocid="hero.create_account_button">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="gap-2 px-7"
+                        >
+                          See How It Works
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </motion.div>
 

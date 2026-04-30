@@ -4,20 +4,20 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
-  Calendar,
+  BarChart3,
   CheckCircle2,
   Eye,
   EyeOff,
-  MapPin,
   Sparkles,
-  Star,
+  Store,
+  TrendingUp,
+  Users,
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { type FormEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* ── Validation helpers ─────────────────────────────────────── */
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -29,7 +29,7 @@ function FieldError({ msg }: { msg: string }) {
       animate={{ opacity: 1, y: 0 }}
       className="text-[11px] text-destructive mt-1 leading-tight"
       role="alert"
-      data-ocid="login.field_error"
+      data-ocid="vendor_login.field_error"
     >
       {msg}
     </motion.p>
@@ -44,22 +44,21 @@ function FieldSuccess() {
   );
 }
 
-/* ── Left panel branding feature pills ─────────────────────── */
-const FEATURES = [
-  { icon: <Calendar size={14} />, text: "Smart event planning" },
-  { icon: <MapPin size={14} />, text: "Dehradun vendor network" },
-  { icon: <Star size={14} />, text: "AI-powered recommendations" },
+const VENDOR_FEATURES = [
+  { icon: <Store size={14} />, text: "Manage your storefront" },
+  { icon: <Users size={14} />, text: "Reach Dehradun event planners" },
+  { icon: <BarChart3 size={14} />, text: "Track bookings & insights" },
+  { icon: <TrendingUp size={14} />, text: "Grow your business" },
 ];
 
-export function LoginPage() {
-  const { login } = useAuth();
+export function VendorLoginPage() {
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
 
-  /* Per-field touched + error state */
   const [emailVal, setEmailVal] = useState("");
   const [passwordVal, setPasswordVal] = useState("");
   const [touched, setTouched] = useState({ email: false, password: false });
@@ -84,16 +83,12 @@ export function LoginPage() {
     touched.password && passwordVal.trim() !== "" && passwordVal.length >= 6;
 
   function validateAll() {
-    const errors = {
-      email: !isValidEmail(emailVal),
-      password: passwordVal.trim() === "" || passwordVal.length < 6,
-    };
     setTouched({ email: true, password: true });
-    if (errors.email) {
+    if (!isValidEmail(emailVal)) {
       emailRef.current?.focus();
       return false;
     }
-    if (errors.password) {
+    if (passwordVal.trim() === "" || passwordVal.length < 6) {
       passwordRef.current?.focus();
       return false;
     }
@@ -104,15 +99,33 @@ export function LoginPage() {
     e.preventDefault();
     setServerError("");
     if (!validateAll()) return;
+
     setLoading(true);
     const result = login(emailVal.trim(), passwordVal);
     setLoading(false);
-    if (result.success) {
-      toast.success("Welcome back!");
-      navigate({ to: "/dashboard" });
-    } else {
+
+    if (!result.success) {
       setServerError(result.error ?? "Invalid email or password");
+      return;
     }
+
+    // Confirm the freshly-logged-in user has a vendor account
+    try {
+      const raw = localStorage.getItem("eventiq_session");
+      const user = raw ? JSON.parse(raw) : null;
+      if (!user?.isVendor) {
+        logout();
+        setServerError(
+          "This account is not a vendor account. Use the customer sign-in or create a vendor account.",
+        );
+        return;
+      }
+    } catch {
+      // fall through to navigate
+    }
+
+    toast.success("Welcome back, vendor!");
+    navigate({ to: "/vendor-dashboard" });
   }
 
   function handleForgotPassword() {
@@ -132,29 +145,27 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel — gradient branding ───────────────────── */}
+      {/* ── Left panel — vendor branding ─────────────────────── */}
       <div
         className="hidden lg:flex lg:w-[42%] flex-col justify-between p-12 relative overflow-hidden"
         style={{
           background:
-            "linear-gradient(145deg, oklch(0.45 0.22 261) 0%, oklch(0.35 0.2 275) 50%, oklch(0.28 0.18 280) 100%)",
+            "linear-gradient(145deg, oklch(0.42 0.20 155) 0%, oklch(0.35 0.18 200) 50%, oklch(0.28 0.18 240) 100%)",
         }}
       >
-        {/* Background decorative circles */}
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-10"
-          style={{ background: "oklch(0.9 0.05 261)" }}
+          style={{ background: "oklch(0.9 0.05 155)" }}
         />
         <div
           className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full opacity-10"
-          style={{ background: "oklch(0.9 0.05 261)" }}
+          style={{ background: "oklch(0.9 0.05 155)" }}
         />
         <div
           className="absolute top-1/2 right-8 w-40 h-40 rounded-full opacity-5"
-          style={{ background: "oklch(0.9 0.05 261)" }}
+          style={{ background: "oklch(0.9 0.05 155)" }}
         />
 
-        {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -163,10 +174,12 @@ export function LoginPage() {
             <span className="font-display font-bold text-2xl text-white">
               EventIQ
             </span>
+            <span className="ml-1 text-[10px] font-semibold uppercase tracking-widest bg-white/20 text-white px-2 py-1 rounded-md">
+              Vendors
+            </span>
           </div>
         </div>
 
-        {/* Hero copy */}
         <div className="relative z-10 space-y-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -174,14 +187,14 @@ export function LoginPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-3">
-              Welcome back
+              Vendor portal
             </p>
             <h1 className="font-display font-bold text-4xl xl:text-5xl text-white leading-tight">
-              Plan perfect
+              Grow your
               <br />
-              events with
+              business with
               <br />
-              <span className="text-white/80">confidence.</span>
+              <span className="text-white/80">EventIQ.</span>
             </h1>
           </motion.div>
 
@@ -191,18 +204,17 @@ export function LoginPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-white/60 text-base leading-relaxed max-w-xs"
           >
-            Connect with top vendors in Dehradun and create unforgettable
-            experiences.
+            Sign in to manage your services, respond to inquiries, and reach
+            event planners across Dehradun.
           </motion.p>
 
-          {/* Feature pills */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col gap-3"
           >
-            {FEATURES.map((f) => (
+            {VENDOR_FEATURES.map((f) => (
               <div
                 key={f.text}
                 className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2.5"
@@ -216,13 +228,12 @@ export function LoginPage() {
           </motion.div>
         </div>
 
-        {/* Bottom quote */}
         <div className="relative z-10">
           <div className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-2xl p-4">
             <Sparkles size={16} className="text-white/70 shrink-0 mt-0.5" />
             <p className="text-white/70 text-xs leading-relaxed">
-              "EventIQ transformed how we plan events — from vendor selection to
-              budget tracking, everything in one place."
+              "Joining EventIQ doubled our weekend bookings — every inquiry is a
+              real, ready-to-plan customer."
             </p>
           </div>
         </div>
@@ -230,12 +241,11 @@ export function LoginPage() {
 
       {/* ── Right panel — form ───────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-background">
-        {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-border">
           <Link
             to="/"
             className="flex items-center gap-2"
-            data-ocid="login.home_link"
+            data-ocid="vendor_login.home_link"
           >
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
               <Zap size={16} className="text-primary-foreground" />
@@ -243,21 +253,22 @@ export function LoginPage() {
             <span className="font-display font-bold text-lg text-foreground">
               EventIQ
             </span>
+            <span className="ml-1 text-[9px] font-semibold uppercase tracking-widest bg-primary/15 text-primary px-1.5 py-0.5 rounded">
+              Vendors
+            </span>
           </Link>
         </div>
 
-        {/* Desktop back link */}
         <div className="hidden lg:flex items-center justify-end px-10 py-6">
           <Link
             to="/"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-ocid="login.home_link"
+            data-ocid="vendor_login.home_link"
           >
             ← Back to home
           </Link>
         </div>
 
-        {/* Form container */}
         <div className="flex-1 flex items-center justify-center px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -265,35 +276,36 @@ export function LoginPage() {
             transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="w-full max-w-md"
           >
-            {/* Heading */}
             <div className="mb-8">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full mb-3">
+                <Store size={12} />
+                Vendor sign-in
+              </div>
               <h2 className="font-display font-bold text-3xl text-foreground mb-2">
-                Sign In
+                Vendor Sign In
               </h2>
               <p className="text-muted-foreground text-sm">
-                Don't have an account?{" "}
+                New to EventIQ?{" "}
                 <Link
                   to="/signup"
                   className="text-primary font-medium hover:underline transition-colors"
-                  data-ocid="login.signup_link"
+                  data-ocid="vendor_login.signup_link"
                 >
-                  Create one free
+                  Create a vendor account
                 </Link>
               </p>
             </div>
 
-            {/* Card */}
             <div className="bg-card border border-border rounded-2xl shadow-elevated p-8">
               <form
                 onSubmit={handleSubmit}
                 className="space-y-5"
                 noValidate
-                data-ocid="login.form"
+                data-ocid="vendor_login.form"
               >
-                {/* Email */}
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-sm font-medium">
-                    Email address
+                    Vendor email
                   </Label>
                   <div className="relative">
                     <Input
@@ -302,21 +314,19 @@ export function LoginPage() {
                       name="email"
                       type="email"
                       autoComplete="email"
-                      placeholder="you@example.com"
+                      placeholder="vendor@example.com"
                       value={emailVal}
                       onChange={(e) => setEmailVal(e.target.value)}
                       onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                       className={inputCls(!!emailError, emailOk)}
                       aria-invalid={!!emailError}
-                      aria-describedby={emailError ? "email-error" : undefined}
-                      data-ocid="login.email_input"
+                      data-ocid="vendor_login.email_input"
                     />
                     {emailOk && <FieldSuccess />}
                   </div>
                   {emailError && <FieldError msg={emailError} />}
                 </div>
 
-                {/* Password */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="text-sm font-medium">
@@ -326,7 +336,7 @@ export function LoginPage() {
                       type="button"
                       onClick={handleForgotPassword}
                       className="text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
-                      data-ocid="login.forgot_password_button"
+                      data-ocid="vendor_login.forgot_password_button"
                     >
                       Forgot password?
                     </button>
@@ -352,7 +362,7 @@ export function LoginPage() {
                             : ""
                       }`}
                       aria-invalid={!!passwordError}
-                      data-ocid="login.password_input"
+                      data-ocid="vendor_login.password_input"
                     />
                     {passwordOk && (
                       <span className="absolute right-9 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
@@ -366,7 +376,7 @@ export function LoginPage() {
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
-                      data-ocid="login.toggle_password_button"
+                      data-ocid="vendor_login.toggle_password_button"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -374,25 +384,23 @@ export function LoginPage() {
                   {passwordError && <FieldError msg={passwordError} />}
                 </div>
 
-                {/* Forgot password message */}
                 {forgotSent && (
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 rounded-lg px-4 py-3"
-                    data-ocid="login.forgot_success_state"
+                    data-ocid="vendor_login.forgot_success_state"
                   >
                     ✓ Password reset link sent! Check your inbox.
                   </motion.div>
                 )}
 
-                {/* Server error */}
                 {serverError && (
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3"
-                    data-ocid="login.error_state"
+                    data-ocid="vendor_login.error_state"
                   >
                     {serverError}
                   </motion.div>
@@ -402,21 +410,21 @@ export function LoginPage() {
                   type="submit"
                   className="w-full h-11 font-semibold text-base"
                   disabled={loading}
-                  data-ocid="login.submit_button"
+                  data-ocid="vendor_login.submit_button"
                 >
-                  {loading ? "Signing in…" : "Sign In"}
+                  {loading ? "Signing in…" : "Sign In as Vendor"}
                 </Button>
               </form>
 
               <div className="mt-5 pt-5 border-t border-border text-center">
                 <p className="text-xs text-muted-foreground">
-                  Are you a vendor?{" "}
+                  Looking for the customer sign-in?{" "}
                   <Link
-                    to="/vendor-login"
+                    to="/login"
                     className="text-primary font-medium hover:underline"
-                    data-ocid="login.vendor_login_link"
+                    data-ocid="vendor_login.customer_login_link"
                   >
-                    Sign in to the vendor portal
+                    Customer sign-in
                   </Link>
                 </p>
               </div>

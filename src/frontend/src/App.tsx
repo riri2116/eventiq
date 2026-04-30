@@ -23,6 +23,9 @@ const PlanningPage = lazy(() =>
 const LoginPage = lazy(() =>
   import("@/pages/Login").then((m) => ({ default: m.LoginPage })),
 );
+const VendorLoginPage = lazy(() =>
+  import("@/pages/VendorLogin").then((m) => ({ default: m.VendorLoginPage })),
+);
 const SignupPage = lazy(() =>
   import("@/pages/Signup").then((m) => ({ default: m.SignupPage })),
 );
@@ -74,6 +77,11 @@ const loginRoute = createRoute({
   path: "/login",
   component: LoginPage,
 });
+const vendorLoginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/vendor-login",
+  component: VendorLoginPage,
+});
 const signupRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/signup",
@@ -107,6 +115,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   planningRoute,
   loginRoute,
+  vendorLoginRoute,
   signupRoute,
   dashboardRoute,
   vendorSetupRoute,

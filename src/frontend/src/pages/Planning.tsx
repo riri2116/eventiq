@@ -869,14 +869,20 @@ function ApiPlanCard({
           <div
             className="rounded-xl px-4 py-3 flex items-center justify-between"
             style={{
-              background: "rgba(34,197,94,0.08)",
-              border: "1px solid rgba(34,197,94,0.2)",
+              background: `${config.baseBorderColor}10`,
+              border: `1px solid ${config.baseBorderColor}30`,
             }}
           >
-            <span className="text-xs font-medium text-green-700 dark:text-green-400">
+            <span
+              className="text-xs font-medium"
+              style={{ color: config.badgeText }}
+            >
               Remaining
             </span>
-            <span className="font-display font-bold text-sm text-green-600 dark:text-green-400">
+            <span
+              className="font-display font-bold text-sm"
+              style={{ color: config.badgeText }}
+            >
               {formatToLakh(plan.remaining_budget)}
             </span>
           </div>
@@ -886,7 +892,7 @@ function ApiPlanCard({
             {plan.vendors.map((vendor: BackendVendor) => (
               <div
                 key={vendor.vendor_id}
-                className="flex items-center justify-between gap-3 py-2.5"
+                className="flex items-center justify-between gap-3 py-2.5 px-1 -mx-1 rounded-lg transition-all duration-150 border border-transparent hover:shadow-[0_0_10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] hover:border-border/50"
               >
                 <span className="text-xs text-muted-foreground capitalize truncate min-w-0 max-w-[40%]">
                   {vendor.category}

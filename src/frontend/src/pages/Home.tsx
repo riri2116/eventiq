@@ -156,7 +156,7 @@ const LOCAL_SPOTLIGHT = [
     name: "The Grand Himalayan Hall",
     category: "Banquet Hall",
     rating: 4.8,
-    img: "https://images.unsplash.com/photo-1519167758481-83f29c8a4a27?w=800&h=500&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&h=500&fit=crop&auto=format",
   },
   {
     name: "Rajpur Road Convention",
@@ -561,6 +561,15 @@ function SpotlightCard({
       <img
         src={venue.img}
         alt={venue.name}
+        loading="lazy"
+        onError={(e) => {
+          const target = e.currentTarget;
+          if (target.dataset.fallback !== "1") {
+            target.dataset.fallback = "1";
+            target.src =
+              "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&h=500&fit=crop&auto=format";
+          }
+        }}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

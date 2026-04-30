@@ -68,8 +68,19 @@ export default {
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "serif"],
-        body: ["var(--font-body)", "sans-serif"],
+        display: [
+          "var(--font-display)",
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+        body: [
+          "var(--font-body)",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
         mono: ["var(--font-mono)", "monospace"],
       },
       borderRadius: {

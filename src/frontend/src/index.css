@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --font-display: "Space Grotesk";
-    --font-body: "Satoshi";
+    --font-display: "Satoshi";
+    --font-body: "Inter";
     --font-mono: "JetBrains Mono";
     --radius: 0.75rem;
 

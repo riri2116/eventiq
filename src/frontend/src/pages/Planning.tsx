@@ -1180,13 +1180,7 @@ export function PlanningPage() {
     <Layout>
       <div className="min-h-screen bg-background">
         {/* Page header band */}
-        <div
-          className="border-b border-border"
-          style={{
-            background:
-              "linear-gradient(135deg, oklch(0.97 0.01 261), oklch(0.99 0 0))",
-          }}
-        >
+        <div className="border-b border-border bg-gradient-to-br from-[oklch(0.97_0.01_261)] to-[oklch(0.99_0_0)] dark:from-[oklch(0.22_0.02_240)] dark:to-[oklch(0.18_0.01_240)]">
           <div className="container mx-auto px-4 sm:px-8 py-10">
             <motion.div
               initial={{ opacity: 0, y: 16 }}

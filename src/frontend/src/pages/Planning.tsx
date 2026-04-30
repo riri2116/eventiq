@@ -634,8 +634,18 @@ function OfflinePlanCard({
           <div
             className="rounded-xl px-4 py-3 flex items-center justify-between"
             style={{
-              background: `${config.baseBorderColor}10`,
-              border: `1px solid ${config.baseBorderColor}30`,
+              background:
+                planKey === "bestFit"
+                  ? "rgba(245,158,11,0.08)"
+                  : planKey === "standard"
+                    ? "rgba(16,185,129,0.08)"
+                    : "rgba(59,130,246,0.08)",
+              border:
+                planKey === "bestFit"
+                  ? "1px solid rgba(245,158,11,0.2)"
+                  : planKey === "standard"
+                    ? "1px solid rgba(16,185,129,0.2)"
+                    : "1px solid rgba(59,130,246,0.2)",
             }}
           >
             <span

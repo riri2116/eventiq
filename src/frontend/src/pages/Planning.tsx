@@ -1553,6 +1553,14 @@ export function PlanningPage() {
                       .vendor-card.selected .vendor-badge { opacity: 1; transform: scale(1); }
                       .vendor-label { font-size: 12.5px; font-weight: 600; color: #1E293B; line-height: 1.35; word-break: break-word; }
                       .vendor-card.selected .vendor-label { color: #3B82F6; }
+
+                      .dark .vendor-card { background: oklch(0.22 0.02 240); border-color: oklch(0.32 0.02 240); box-shadow: 0 1px 4px 0 rgba(0,0,0,0.4); }
+                      .dark .vendor-card:hover { border-color: #3B82F6; box-shadow: 0 4px 14px rgba(59,130,246,0.25); }
+                      .dark .vendor-card.selected { border-color: #3B82F6; background: rgba(59,130,246,0.12); box-shadow: 0 4px 16px rgba(59,130,246,0.30); }
+                      .dark .vendor-icon-circle { background: oklch(0.28 0.03 240); }
+                      .dark .vendor-card.selected .vendor-icon-circle { background: rgba(59,130,246,0.22); }
+                      .dark .vendor-label { color: oklch(0.95 0.01 240); }
+                      .dark .vendor-card.selected .vendor-label { color: #93C5FD; }
                     `}</style>
 
                     {VENDOR_CATEGORIES_16.map((key) => {

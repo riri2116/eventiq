@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { SavedPlanToast } from "@/components/SavedPlanToast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,6 +32,12 @@ import {
   generatePlans,
   savePlanToStorage,
 } from "@/lib/planGenerator";
+import {
+  type SavedPlanRecord,
+  type SavedPlanType,
+  savePlan,
+  showSavedPlanToast,
+} from "@/lib/savedPlansStore";
 import type {
   ApiSavedPlanSet,
   BackendResponse,
@@ -407,6 +414,26 @@ function SaveLoginDialog({
   );
 }
 
+// ─── Plan variant border/glow spec ───────────────────────────────────────────
+type PlanVariant = "best" | "recommended" | "budget";
+
+const PLAN_VARIANT_STYLE: Record<
+  PlanVariant,
+  { border: string; glow: string; type: SavedPlanType }
+> = {
+  best: { border: "#F59E0B", glow: "rgba(245,158,11,0.5)", type: "Best Fit" },
+  recommended: {
+    border: "#10B981",
+    glow: "rgba(16,185,129,0.5)",
+    type: "Recommended",
+  },
+  budget: { border: "#3B82F6", glow: "rgba(59,130,246,0.5)", type: "Budget" },
+};
+
+// Vendor row: subtle glow on hover (dark glow in light mode, light glow in dark)
+const VENDOR_ROW_HOVER_CLASS =
+  "rounded-md -mx-1 px-1 transition-shadow duration-150 ease-out hover:shadow-[0_0_8px_rgba(0,0,0,0.18)] dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.18)]";
+
 // ─── Offline Plan Card (existing offline-generated plans) ────────────────────
 function OfflinePlanCard({
   planSet,
@@ -422,27 +449,31 @@ function OfflinePlanCard({
   const [loginOpen, setLoginOpen] = useState(false);
   const plan = planSet.plans[planKey];
 
+  const variantKey: PlanVariant =
+    planKey === "bestFit"
+      ? "best"
+      : planKey === "standard"
+        ? "recommended"
+        : "budget";
+  const variant = PLAN_VARIANT_STYLE[variantKey];
+
   const config = {
     bestFit: {
       label: "Best Fit",
       badge: "⭐ Best Fit",
-      hoverBorderColor: "#22C55E",
-      baseBorderColor: "rgba(34,197,94,0.35)",
-      badgeBg: "rgba(34,197,94,0.1)",
-      badgeText: "#16A34A",
-      badgeBorder: "rgba(34,197,94,0.3)",
-      accentBar: "linear-gradient(90deg, transparent, #22C55E, transparent)",
+      badgeBg: "rgba(245,158,11,0.1)",
+      badgeText: "#F59E0B",
+      badgeBorder: "rgba(245,158,11,0.3)",
+      accentBar: `linear-gradient(90deg, transparent, ${variant.border}, transparent)`,
       isHighlight: true,
       btnVariant: "default" as const,
     },
     standard: {
-      label: "Standard",
-      badge: "⚖️ Balanced",
-      hoverBorderColor: "#F97316",
-      baseBorderColor: "var(--border)",
-      badgeBg: "rgba(59,130,246,0.1)",
-      badgeText: "#3B82F6",
-      badgeBorder: "rgba(59,130,246,0.3)",
+      label: "Recommended",
+      badge: "⚖️ Recommended",
+      badgeBg: "rgba(16,185,129,0.1)",
+      badgeText: "#10B981",
+      badgeBorder: "rgba(16,185,129,0.3)",
       accentBar: null,
       isHighlight: false,
       btnVariant: "outline" as const,
@@ -450,11 +481,9 @@ function OfflinePlanCard({
     leastFit: {
       label: "Budget",
       badge: "🔥 Budget",
-      hoverBorderColor: "#3B82F6",
-      baseBorderColor: "var(--border)",
-      badgeBg: "rgba(100,116,139,0.1)",
-      badgeText: "var(--muted-foreground)",
-      badgeBorder: "var(--border)",
+      badgeBg: "rgba(59,130,246,0.1)",
+      badgeText: "#3B82F6",
+      badgeBorder: "rgba(59,130,246,0.3)",
       accentBar: null,
       isHighlight: false,
       btnVariant: "outline" as const,
@@ -471,10 +500,29 @@ function OfflinePlanCard({
       setLoginOpen(true);
       return;
     }
+    // Preserve existing dashboard storage so the Dashboard page keeps working
     savePlanToStorage(planSet, currentUser!.email);
-    toast.success("Plan saved to your dashboard!", {
-      description: `${planSet.eventName} — ${config.label} plan saved.`,
-    });
+
+    // New "savedPlans" storage per spec
+    const record: SavedPlanRecord = {
+      id: `offline_${planSet.id}_${planKey}`,
+      type: variant.type,
+      cost: plan.totalCost,
+      vendors: vendorEntries.map(([key, v]) => ({
+        category: key.replace(/([A-Z])/g, " $1").trim(),
+        name: v.name,
+        cost: v.cost,
+        rating: (v as VendorItemFull & { rating?: number }).rating,
+      })),
+      eventName: planSet.eventName,
+      savedAt: new Date().toISOString(),
+    };
+    const result = savePlan(record);
+    showSavedPlanToast(
+      result === "duplicate"
+        ? "Plan already saved"
+        : "Your plan saved to dashboard",
+    );
   }
 
   return (
@@ -483,26 +531,25 @@ function OfflinePlanCard({
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: index * 0.12 }}
-        className="rounded-2xl flex flex-col transition-all duration-300 relative overflow-hidden"
+        className="flex flex-col relative overflow-hidden"
         style={{
           background: "var(--card)",
-          border: `2px solid ${config.baseBorderColor}`,
-          boxShadow: config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
-            : "0 4px 20px rgba(0,0,0,0.06)",
+          border: `2px solid ${variant.border}`,
+          borderRadius: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          transformOrigin: "center",
+          willChange: "transform",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.hoverBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            `0 8px 32px ${config.hoverBorderColor}30`;
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1.01)";
+          el.style.boxShadow = `0 0 24px ${variant.glow}`;
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.baseBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow = config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
-            : "0 4px 20px rgba(0,0,0,0.06)";
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1)";
+          el.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
         }}
         data-ocid={`plan.${planKey}_card`}
       >
@@ -566,7 +613,8 @@ function OfflinePlanCard({
             {vendorEntries.map(([key, vendor]) => (
               <div
                 key={key}
-                className="flex items-center justify-between gap-3 py-2.5"
+                className={`flex items-center justify-between gap-3 py-2.5 ${VENDOR_ROW_HOVER_CLASS}`}
+                data-ocid={`plan.${planKey}_vendor_row`}
               >
                 <span className="text-xs text-muted-foreground capitalize truncate min-w-0 max-w-[45%]">
                   {key.replace(/([A-Z])/g, " $1").trim()}
@@ -625,39 +673,39 @@ function OfflinePlanCard({
 }
 
 // ─── API Plan Card (plans from backend API) ───────────────────────────────────
+const API_TYPE_TO_VARIANT: Record<string, PlanVariant> = {
+  premium: "best",
+  balanced: "recommended",
+  budget: "budget",
+};
+
 const PLAN_TYPE_CONFIG = {
   premium: {
-    label: "Premium Plan",
-    badge: "⭐ Premium",
-    hoverBorderColor: "#22C55E",
-    baseBorderColor: "rgba(34,197,94,0.35)",
-    badgeBg: "rgba(34,197,94,0.1)",
-    badgeText: "#16A34A",
-    badgeBorder: "rgba(34,197,94,0.3)",
-    accentBar: "linear-gradient(90deg, transparent, #22C55E, transparent)",
+    label: "Best Fit",
+    badge: "⭐ Best Fit",
+    badgeBg: "rgba(245,158,11,0.1)",
+    badgeText: "#F59E0B",
+    badgeBorder: "rgba(245,158,11,0.3)",
+    accentBar: "linear-gradient(90deg, transparent, #F59E0B, transparent)",
     isHighlight: true,
     btnVariant: "default" as const,
   },
   balanced: {
-    label: "Balanced Plan",
-    badge: "⚖️ Balanced",
-    hoverBorderColor: "#F97316",
-    baseBorderColor: "var(--border)",
-    badgeBg: "rgba(59,130,246,0.1)",
-    badgeText: "#3B82F6",
-    badgeBorder: "rgba(59,130,246,0.3)",
+    label: "Recommended",
+    badge: "⚖️ Recommended",
+    badgeBg: "rgba(16,185,129,0.1)",
+    badgeText: "#10B981",
+    badgeBorder: "rgba(16,185,129,0.3)",
     accentBar: null,
     isHighlight: false,
     btnVariant: "outline" as const,
   },
   budget: {
-    label: "Budget Plan",
+    label: "Budget",
     badge: "🔥 Budget",
-    hoverBorderColor: "#3B82F6",
-    baseBorderColor: "var(--border)",
-    badgeBg: "rgba(100,116,139,0.1)",
-    badgeText: "var(--muted-foreground)",
-    badgeBorder: "var(--border)",
+    badgeBg: "rgba(59,130,246,0.1)",
+    badgeText: "#3B82F6",
+    badgeBorder: "rgba(59,130,246,0.3)",
     accentBar: null,
     isHighlight: false,
     btnVariant: "outline" as const,
@@ -681,15 +729,18 @@ function ApiPlanCard({
   const [loginOpen, setLoginOpen] = useState(false);
 
   const config = PLAN_TYPE_CONFIG[plan.plan_type] ?? PLAN_TYPE_CONFIG.balanced;
+  const variantKey: PlanVariant =
+    API_TYPE_TO_VARIANT[plan.plan_type] ?? "recommended";
+  const variant = PLAN_VARIANT_STYLE[variantKey];
 
   function handleSave() {
     if (!isLoggedIn) {
       setLoginOpen(true);
       return;
     }
-    // Save the full API response structure to localStorage — no transformation
+    // Preserve existing dashboard storage so the Dashboard page keeps working
     const apiPlanSet: ApiSavedPlanSet = {
-      id: `api_${apiResponse.event_id}_${plan.plan_type}_${Date.now()}`,
+      id: `api_${apiResponse.event_id}_${plan.plan_type}`,
       eventName,
       eventType,
       budget: plan.total_cost + plan.remaining_budget,
@@ -702,11 +753,31 @@ function ApiPlanCard({
     const existing: (SavedPlanSet | ApiSavedPlanSet)[] = JSON.parse(
       localStorage.getItem(key) ?? "[]",
     );
-    existing.unshift(apiPlanSet);
-    localStorage.setItem(key, JSON.stringify(existing));
-    toast.success("Plan saved to your dashboard!", {
-      description: `${eventName} — ${config.label} saved.`,
-    });
+    if (!existing.some((p) => p.id === apiPlanSet.id)) {
+      existing.unshift(apiPlanSet);
+      localStorage.setItem(key, JSON.stringify(existing));
+    }
+
+    // New "savedPlans" storage per spec
+    const record: SavedPlanRecord = {
+      id: `api_${apiResponse.event_id}_${plan.plan_type}`,
+      type: variant.type,
+      cost: plan.total_cost,
+      vendors: plan.vendors.map((v: BackendVendor) => ({
+        category: v.category,
+        name: v.name,
+        cost: v.allocated_budget,
+        rating: v.rating,
+      })),
+      eventName,
+      savedAt: new Date().toISOString(),
+    };
+    const result = savePlan(record);
+    showSavedPlanToast(
+      result === "duplicate"
+        ? "Plan already saved"
+        : "Your plan saved to dashboard",
+    );
   }
 
   return (
@@ -715,26 +786,25 @@ function ApiPlanCard({
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: index * 0.12 }}
-        className="rounded-2xl flex flex-col transition-all duration-300 relative overflow-hidden"
+        className="flex flex-col relative overflow-hidden"
         style={{
           background: "var(--card)",
-          border: `2px solid ${config.baseBorderColor}`,
-          boxShadow: config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
-            : "0 4px 20px rgba(0,0,0,0.06)",
+          border: `2px solid ${variant.border}`,
+          borderRadius: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          transformOrigin: "center",
+          willChange: "transform",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.hoverBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            `0 8px 32px ${config.hoverBorderColor}30`;
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1.01)";
+          el.style.boxShadow = `0 0 24px ${variant.glow}`;
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.baseBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow = config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
-            : "0 4px 20px rgba(0,0,0,0.06)";
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1)";
+          el.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
         }}
         data-ocid={`plan.${plan.plan_type}_card`}
       >
@@ -798,7 +868,8 @@ function ApiPlanCard({
             {plan.vendors.map((vendor: BackendVendor) => (
               <div
                 key={vendor.vendor_id}
-                className="flex items-center justify-between gap-3 py-2.5"
+                className={`flex items-center justify-between gap-3 py-2.5 ${VENDOR_ROW_HOVER_CLASS}`}
+                data-ocid={`plan.${plan.plan_type}_vendor_row`}
               >
                 <span className="text-xs text-muted-foreground capitalize truncate min-w-0 max-w-[40%]">
                   {vendor.category}
@@ -1741,6 +1812,7 @@ export function PlanningPage() {
           )}
         </div>
       </div>
+      <SavedPlanToast />
     </Layout>
   );
 }

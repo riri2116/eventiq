@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { ChatAssistant } from "./ChatAssistant";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { currentUser, isLoggedIn, logout } = useAuth();
@@ -78,6 +79,9 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             {isLoggedIn ? (
               <div className="hidden md:flex items-center gap-3">
                 <div className="flex items-center gap-2 text-sm">
@@ -156,6 +160,10 @@ export function Layout({ children }: { children: ReactNode }) {
               </Link>
             ))}
             <div className="border-t border-border pt-2 mt-1 flex flex-col gap-1.5">
+              <ThemeToggle
+                variant="menu"
+                onToggle={() => setMobileOpen(false)}
+              />
               {isLoggedIn ? (
                 <button
                   type="button"

@@ -496,8 +496,8 @@ function OfflinePlanCard({
     bestFit: {
       label: "Best Fit",
       badge: "⭐ Best Fit",
-      hoverBorderColor: "#22C55E",
-      baseBorderColor: "rgba(34,197,94,0.35)",
+      hoverBorderColor: "#F59E0B",
+      baseBorderColor: "#F59E0B",
       badgeBg: "rgba(34,197,94,0.1)",
       badgeText: "#16A34A",
       badgeBorder: "rgba(34,197,94,0.3)",

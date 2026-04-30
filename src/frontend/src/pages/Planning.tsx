@@ -45,6 +45,7 @@ import type {
   SelectedVendors16,
   VendorItemFull,
 } from "@/types";
+import planningBannerImg from "@assets/ChatGPT_Image_Apr_30,_2026,_01_13_57_PM_1777535130367.png";
 import {
   AlertCircle,
   Loader2,
@@ -1179,368 +1180,357 @@ export function PlanningPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-background">
-        {/* Page header band */}
-        <div className="border-b border-border bg-gradient-to-br from-[oklch(0.97_0.01_261)] to-[oklch(0.99_0_0)] dark:from-[oklch(0.22_0.02_240)] dark:to-[oklch(0.18_0.01_240)]">
-          <div className="container mx-auto px-4 sm:px-8 py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-              data-ocid="planning.page"
-            >
-              <div
-                className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-4 border"
-                style={{
-                  background: "rgba(59,130,246,0.08)",
-                  color: "#3B82F6",
-                  borderColor: "rgba(59,130,246,0.2)",
-                }}
-              >
-                <Sparkles size={12} />
-                Smart Event Planner
-              </div>
-              <h1 className="font-display font-bold text-4xl md:text-5xl text-foreground mb-3 leading-tight">
-                Plan Your Event
-              </h1>
-              <p className="text-muted-foreground text-lg max-w-2xl">
-                Tell us about your event and we'll generate three intelligent
-                plans — Budget, Balanced, and Premium — tailored to your needs.
-              </p>
-            </motion.div>
-          </div>
-        </div>
+        {/* Page header banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="border-b border-border bg-gradient-to-br from-[oklch(0.97_0.01_261)] to-[oklch(0.99_0_0)] dark:from-[oklch(0.22_0.02_240)] dark:to-[oklch(0.18_0.01_240)]"
+          data-ocid="planning.page"
+        >
+          <img
+            src={planningBannerImg}
+            alt="Plan Your Event — Dream it. Plan it. Make it unforgettable."
+            className="w-full h-auto block object-cover max-h-[260px] md:max-h-[300px]"
+          />
+        </motion.div>
 
         <div className="container mx-auto px-4 sm:px-8 py-10">
-          {/* Form card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-          >
-            <div
-              className="rounded-2xl border border-border max-w-4xl"
-              style={{
-                background: "var(--card)",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-              }}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Form card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="lg:col-span-2"
             >
-              {/* Card header */}
               <div
-                className="px-8 py-5 border-b border-border rounded-t-2xl"
-                style={{ background: "rgba(59,130,246,0.04)" }}
+                className="rounded-2xl border border-border"
+                style={{
+                  background: "var(--card)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+                }}
               >
-                <h2 className="font-display font-semibold text-lg text-foreground">
-                  Event Details
-                </h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Fill in the details below to generate customised event plans
-                </p>
-              </div>
-
-              <form
-                onSubmit={handleSubmit}
-                className="p-8 space-y-8"
-                noValidate
-                data-ocid="planning.form"
-              >
-                {/* Row 1: Event Name + Type */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="eventName"
-                      className="font-semibold text-sm"
-                    >
-                      Event Name
-                    </Label>
-                    <Input
-                      id="eventName"
-                      name="eventName"
-                      placeholder="e.g. Priya's Wedding Reception"
-                      className={`h-11 rounded-xl ${touched.eventName && errors.eventName ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
-                      value={eventNameVal}
-                      onChange={(e) => setEventNameVal(e.target.value)}
-                      onBlur={() => touch("eventName")}
-                      aria-invalid={!!errors.eventName}
-                      data-ocid="planning.event_name_input"
-                    />
-                    {errors.eventName && (
-                      <FieldError
-                        msg={errors.eventName}
-                        ocid="planning.event_name_error"
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="eventType"
-                      className="font-semibold text-sm"
-                    >
-                      Event Type
-                    </Label>
-                    <StyledSelect
-                      id="eventType"
-                      name="event_type"
-                      value={eventTypeVal}
-                      onChange={(v) => {
-                        setEventTypeVal(v);
-                        touch("eventType");
-                      }}
-                      onBlur={() => touch("eventType")}
-                      hasError={!!errors.eventType}
-                      ocid="planning.event_type_select"
-                    >
-                      <option value="">Select event type</option>
-                      {EVENT_TYPES.map((t) => (
-                        <option key={t} value={t.toLowerCase()}>
-                          {t}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                    {errors.eventType && (
-                      <FieldError
-                        msg={errors.eventType}
-                        ocid="planning.event_type_error"
-                      />
-                    )}
-                  </div>
+                {/* Card header */}
+                <div
+                  className="px-8 py-5 border-b border-border rounded-t-2xl"
+                  style={{ background: "rgba(59,130,246,0.04)" }}
+                >
+                  <h2 className="font-display font-semibold text-lg text-foreground">
+                    Event Details
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Fill in the details below to generate customised event plans
+                  </p>
                 </div>
 
-                {/* Row 2: Date + Locality */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="eventDate"
-                      className="font-semibold text-sm"
-                    >
-                      Event Date{" "}
-                      <span className="text-muted-foreground font-normal text-xs">
-                        (auto-sets month)
-                      </span>
-                    </Label>
-                    <Input
-                      id="eventDate"
-                      type="date"
-                      name="event_date"
-                      className={`h-11 rounded-xl ${touched.eventDate && errors.eventDate ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
-                      value={eventDateVal}
-                      onChange={(e) => handleDateChange(e.target.value)}
-                      onBlur={() => touch("eventDate")}
-                      aria-invalid={!!errors.eventDate}
-                      data-ocid="planning.event_date_input"
-                    />
-                    {errors.eventDate && (
-                      <FieldError
-                        msg={errors.eventDate}
-                        ocid="planning.event_date_error"
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="locality" className="font-semibold text-sm">
-                      Locality{" "}
-                      <span className="text-muted-foreground font-normal">
-                        (Dehradun)
-                      </span>
-                    </Label>
-                    <StyledSelect
-                      id="locality"
-                      name="locality"
-                      value={localityVal}
-                      onChange={(v) => {
-                        setLocalityVal(v);
-                        touch("locality");
-                      }}
-                      onBlur={() => touch("locality")}
-                      hasError={!!errors.locality}
-                      ocid="planning.locality_select"
-                    >
-                      <option value="">Select locality</option>
-                      {DEHRADUN_LOCALITIES.map((l) => (
-                        <option key={l} value={l.toLowerCase()}>
-                          {l}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                    {errors.locality && (
-                      <FieldError
-                        msg={errors.locality}
-                        ocid="planning.locality_error"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Row 3: Month + Audience Scale + Target Audience */}
-                <div className="grid sm:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="eventMonth"
-                      className="font-semibold text-sm"
-                    >
-                      Month{" "}
-                      <span className="text-muted-foreground font-normal text-xs">
-                        (auto-filled)
-                      </span>
-                    </Label>
-                    <StyledSelect
-                      id="eventMonth"
-                      name="eventMonth"
-                      value={eventMonthVal}
-                      onChange={(v) => {
-                        setEventMonthVal(v);
-                        touch("eventMonth");
-                      }}
-                      onBlur={() => touch("eventMonth")}
-                      hasError={!!errors.eventMonth}
-                      ocid="planning.month_select"
-                    >
-                      <option value="">Select month</option>
-                      {EVENT_MONTHS.map((m) => (
-                        <option key={m} value={m}>
-                          {m}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                    {errors.eventMonth && (
-                      <FieldError
-                        msg={errors.eventMonth}
-                        ocid="planning.month_error"
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="audienceScale"
-                      className="font-semibold text-sm"
-                    >
-                      Audience Scale{" "}
-                      <span className="text-muted-foreground font-normal text-xs">
-                        (guest count)
-                      </span>
-                    </Label>
-                    <StyledSelect
-                      id="audienceScale"
-                      name="audienceScale"
-                      value={audienceScaleVal}
-                      onChange={(v) => {
-                        setAudienceScaleVal(v);
-                        touch("audienceScale");
-                      }}
-                      onBlur={() => touch("audienceScale")}
-                      hasError={!!errors.audienceScale}
-                      ocid="planning.audience_scale_select"
-                    >
-                      <option value="">Select scale</option>
-                      {AUDIENCE_SCALES.map((a) => (
-                        <option key={a} value={a}>
-                          {a}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                    {errors.audienceScale && (
-                      <FieldError
-                        msg={errors.audienceScale}
-                        ocid="planning.audience_scale_error"
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="targetAudience"
-                      className="font-semibold text-sm"
-                    >
-                      Target Audience
-                    </Label>
-                    <StyledSelect
-                      id="targetAudience"
-                      name="targetAudience"
-                      value={targetAudienceVal}
-                      onChange={(v) => {
-                        setTargetAudienceVal(v);
-                        touch("targetAudience");
-                      }}
-                      onBlur={() => touch("targetAudience")}
-                      hasError={!!errors.targetAudience}
-                      ocid="planning.target_audience_select"
-                    >
-                      <option value="">Select audience</option>
-                      {TARGET_AUDIENCES.map((a) => (
-                        <option key={a} value={a}>
-                          {a}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                    {errors.targetAudience && (
-                      <FieldError
-                        msg={errors.targetAudience}
-                        ocid="planning.target_audience_error"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Budget Range */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="font-semibold text-sm">
-                      Budget Range
-                    </Label>
-                    <div
-                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 border text-sm font-display font-bold"
-                      style={{
-                        background: "rgba(59,130,246,0.06)",
-                        borderColor: "rgba(59,130,246,0.2)",
-                        color: "#3B82F6",
-                      }}
-                    >
-                      {formatBudget(budgetMin)}
-                      <span className="text-muted-foreground font-normal text-xs">
-                        —
-                      </span>
-                      {formatBudget(budgetMax)}
-                    </div>
-                  </div>
-                  <DualRangeSlider
-                    minVal={budgetMin}
-                    maxVal={budgetMax}
-                    onChange={handleBudgetChange}
-                  />
-                </div>
-
-                {/* Vendor Selection */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="font-semibold text-sm">
-                        Select Services
+                <form
+                  onSubmit={handleSubmit}
+                  className="p-8 space-y-8"
+                  noValidate
+                  data-ocid="planning.form"
+                >
+                  {/* Row 1: Event Name + Type */}
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="eventName"
+                        className="font-semibold text-sm"
+                      >
+                        Event Name
                       </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Choose all vendor categories you need
-                      </p>
+                      <Input
+                        id="eventName"
+                        name="eventName"
+                        placeholder="e.g. Priya's Wedding Reception"
+                        className={`h-11 rounded-xl ${touched.eventName && errors.eventName ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
+                        value={eventNameVal}
+                        onChange={(e) => setEventNameVal(e.target.value)}
+                        onBlur={() => touch("eventName")}
+                        aria-invalid={!!errors.eventName}
+                        data-ocid="planning.event_name_input"
+                      />
+                      {errors.eventName && (
+                        <FieldError
+                          msg={errors.eventName}
+                          ocid="planning.event_name_error"
+                        />
+                      )}
                     </div>
-                    {selectedVendors.size > 0 && (
-                      <span
-                        className="text-xs font-semibold rounded-full px-3 py-1 border"
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="eventType"
+                        className="font-semibold text-sm"
+                      >
+                        Event Type
+                      </Label>
+                      <StyledSelect
+                        id="eventType"
+                        name="event_type"
+                        value={eventTypeVal}
+                        onChange={(v) => {
+                          setEventTypeVal(v);
+                          touch("eventType");
+                        }}
+                        onBlur={() => touch("eventType")}
+                        hasError={!!errors.eventType}
+                        ocid="planning.event_type_select"
+                      >
+                        <option value="">Select event type</option>
+                        {EVENT_TYPES.map((t) => (
+                          <option key={t} value={t.toLowerCase()}>
+                            {t}
+                          </option>
+                        ))}
+                      </StyledSelect>
+                      {errors.eventType && (
+                        <FieldError
+                          msg={errors.eventType}
+                          ocid="planning.event_type_error"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Date + Locality */}
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="eventDate"
+                        className="font-semibold text-sm"
+                      >
+                        Event Date{" "}
+                        <span className="text-muted-foreground font-normal text-xs">
+                          (auto-sets month)
+                        </span>
+                      </Label>
+                      <Input
+                        id="eventDate"
+                        type="date"
+                        name="event_date"
+                        className={`h-11 rounded-xl ${touched.eventDate && errors.eventDate ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
+                        value={eventDateVal}
+                        onChange={(e) => handleDateChange(e.target.value)}
+                        onBlur={() => touch("eventDate")}
+                        aria-invalid={!!errors.eventDate}
+                        data-ocid="planning.event_date_input"
+                      />
+                      {errors.eventDate && (
+                        <FieldError
+                          msg={errors.eventDate}
+                          ocid="planning.event_date_error"
+                        />
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="locality"
+                        className="font-semibold text-sm"
+                      >
+                        Locality{" "}
+                        <span className="text-muted-foreground font-normal">
+                          (Dehradun)
+                        </span>
+                      </Label>
+                      <StyledSelect
+                        id="locality"
+                        name="locality"
+                        value={localityVal}
+                        onChange={(v) => {
+                          setLocalityVal(v);
+                          touch("locality");
+                        }}
+                        onBlur={() => touch("locality")}
+                        hasError={!!errors.locality}
+                        ocid="planning.locality_select"
+                      >
+                        <option value="">Select locality</option>
+                        {DEHRADUN_LOCALITIES.map((l) => (
+                          <option key={l} value={l.toLowerCase()}>
+                            {l}
+                          </option>
+                        ))}
+                      </StyledSelect>
+                      {errors.locality && (
+                        <FieldError
+                          msg={errors.locality}
+                          ocid="planning.locality_error"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 3: Month + Audience Scale + Target Audience */}
+                  <div className="grid sm:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="eventMonth"
+                        className="font-semibold text-sm"
+                      >
+                        Month{" "}
+                        <span className="text-muted-foreground font-normal text-xs">
+                          (auto-filled)
+                        </span>
+                      </Label>
+                      <StyledSelect
+                        id="eventMonth"
+                        name="eventMonth"
+                        value={eventMonthVal}
+                        onChange={(v) => {
+                          setEventMonthVal(v);
+                          touch("eventMonth");
+                        }}
+                        onBlur={() => touch("eventMonth")}
+                        hasError={!!errors.eventMonth}
+                        ocid="planning.month_select"
+                      >
+                        <option value="">Select month</option>
+                        {EVENT_MONTHS.map((m) => (
+                          <option key={m} value={m}>
+                            {m}
+                          </option>
+                        ))}
+                      </StyledSelect>
+                      {errors.eventMonth && (
+                        <FieldError
+                          msg={errors.eventMonth}
+                          ocid="planning.month_error"
+                        />
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="audienceScale"
+                        className="font-semibold text-sm"
+                      >
+                        Audience Scale{" "}
+                        <span className="text-muted-foreground font-normal text-xs">
+                          (guest count)
+                        </span>
+                      </Label>
+                      <StyledSelect
+                        id="audienceScale"
+                        name="audienceScale"
+                        value={audienceScaleVal}
+                        onChange={(v) => {
+                          setAudienceScaleVal(v);
+                          touch("audienceScale");
+                        }}
+                        onBlur={() => touch("audienceScale")}
+                        hasError={!!errors.audienceScale}
+                        ocid="planning.audience_scale_select"
+                      >
+                        <option value="">Select scale</option>
+                        {AUDIENCE_SCALES.map((a) => (
+                          <option key={a} value={a}>
+                            {a}
+                          </option>
+                        ))}
+                      </StyledSelect>
+                      {errors.audienceScale && (
+                        <FieldError
+                          msg={errors.audienceScale}
+                          ocid="planning.audience_scale_error"
+                        />
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="targetAudience"
+                        className="font-semibold text-sm"
+                      >
+                        Target Audience
+                      </Label>
+                      <StyledSelect
+                        id="targetAudience"
+                        name="targetAudience"
+                        value={targetAudienceVal}
+                        onChange={(v) => {
+                          setTargetAudienceVal(v);
+                          touch("targetAudience");
+                        }}
+                        onBlur={() => touch("targetAudience")}
+                        hasError={!!errors.targetAudience}
+                        ocid="planning.target_audience_select"
+                      >
+                        <option value="">Select audience</option>
+                        {TARGET_AUDIENCES.map((a) => (
+                          <option key={a} value={a}>
+                            {a}
+                          </option>
+                        ))}
+                      </StyledSelect>
+                      {errors.targetAudience && (
+                        <FieldError
+                          msg={errors.targetAudience}
+                          ocid="planning.target_audience_error"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Budget Range */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="font-semibold text-sm">
+                        Budget Range
+                      </Label>
+                      <div
+                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 border text-sm font-display font-bold"
                         style={{
-                          background: "rgba(59,130,246,0.08)",
-                          color: "#3B82F6",
+                          background: "rgba(59,130,246,0.06)",
                           borderColor: "rgba(59,130,246,0.2)",
+                          color: "#3B82F6",
                         }}
                       >
-                        {selectedVendors.size} selected
-                      </span>
-                    )}
+                        {formatBudget(budgetMin)}
+                        <span className="text-muted-foreground font-normal text-xs">
+                          —
+                        </span>
+                        {formatBudget(budgetMax)}
+                      </div>
+                    </div>
+                    <DualRangeSlider
+                      minVal={budgetMin}
+                      maxVal={budgetMax}
+                      onChange={handleBudgetChange}
+                    />
                   </div>
 
-                  <div
-                    className="vendor-grid grid gap-4 grid-cols-1"
-                    data-ocid="planning.vendors_grid"
-                  >
-                    <style>{`
+                  {/* Vendor Selection */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="font-semibold text-sm">
+                          Select Services
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Choose all vendor categories you need
+                        </p>
+                      </div>
+                      {selectedVendors.size > 0 && (
+                        <span
+                          className="text-xs font-semibold rounded-full px-3 py-1 border"
+                          style={{
+                            background: "rgba(59,130,246,0.08)",
+                            color: "#3B82F6",
+                            borderColor: "rgba(59,130,246,0.2)",
+                          }}
+                        >
+                          {selectedVendors.size} selected
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      className="vendor-grid grid gap-4 grid-cols-1"
+                      data-ocid="planning.vendors_grid"
+                    >
+                      <style>{`
                       @media (min-width: 480px) { .vendor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
                       @media (min-width: 768px) { .vendor-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
                       @media (min-width: 1024px) { .vendor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -1563,96 +1553,170 @@ export function PlanningPage() {
                       .dark .vendor-card.selected .vendor-label { color: #93C5FD; }
                     `}</style>
 
-                    {VENDOR_CATEGORIES_16.map((key) => {
-                      const isChecked = selectedVendors.has(key);
-                      return (
-                        <label
-                          key={key}
-                          className={`vendor-card${isChecked ? " selected" : ""}`}
-                          data-ocid={`planning.vendor_${key}_checkbox`}
-                        >
-                          <input
-                            type="checkbox"
-                            className="sr-only"
-                            value={key}
-                            checked={isChecked}
-                            onChange={() => toggleVendor(key)}
-                          />
+                      {VENDOR_CATEGORIES_16.map((key) => {
+                        const isChecked = selectedVendors.has(key);
+                        return (
+                          <label
+                            key={key}
+                            className={`vendor-card${isChecked ? " selected" : ""}`}
+                            data-ocid={`planning.vendor_${key}_checkbox`}
+                          >
+                            <input
+                              type="checkbox"
+                              className="sr-only"
+                              value={key}
+                              checked={isChecked}
+                              onChange={() => toggleVendor(key)}
+                            />
 
-                          {/* Checkmark badge — top-right */}
-                          <span className="vendor-badge" aria-hidden="true">
-                            <svg
-                              viewBox="0 0 16 16"
-                              width="11"
-                              height="11"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                              role="presentation"
-                            >
-                              <polyline
-                                points="2,8 6,12 14,4"
-                                stroke="white"
-                                strokeWidth="2.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </span>
+                            {/* Checkmark badge — top-right */}
+                            <span className="vendor-badge" aria-hidden="true">
+                              <svg
+                                viewBox="0 0 16 16"
+                                width="11"
+                                height="11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                                role="presentation"
+                              >
+                                <polyline
+                                  points="2,8 6,12 14,4"
+                                  stroke="white"
+                                  strokeWidth="2.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
 
-                          {/* Pale circular icon area */}
-                          <span className="vendor-icon-circle">
-                            {VENDOR_EMOJI_16[key]}
-                          </span>
+                            {/* Pale circular icon area */}
+                            <span className="vendor-icon-circle">
+                              {VENDOR_EMOJI_16[key]}
+                            </span>
 
-                          {/* Service label */}
-                          <span className="vendor-label">
-                            {VENDOR_LABELS_16[key]
-                              .replace(/^[^\w]+/, "")
-                              .trim()}
-                          </span>
-                        </label>
-                      );
-                    })}
+                            {/* Service label */}
+                            <span className="vendor-label">
+                              {VENDOR_LABELS_16[key]
+                                .replace(/^[^\w]+/, "")
+                                .trim()}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {errors.vendors && (
+                      <FieldError
+                        msg={errors.vendors}
+                        ocid="planning.vendors_error"
+                      />
+                    )}
                   </div>
 
-                  {errors.vendors && (
-                    <FieldError
-                      msg={errors.vendors}
-                      ocid="planning.vendors_error"
-                    />
-                  )}
-                </div>
+                  {/* Submit */}
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={isGenerating}
+                    className="w-full gap-2 text-base font-semibold h-12 rounded-xl"
+                    style={{
+                      background: isGenerating ? undefined : "#3B82F6",
+                      boxShadow: isGenerating
+                        ? undefined
+                        : "0 4px 16px rgba(59,130,246,0.35)",
+                    }}
+                    data-ocid="planning.generate_plans_button"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        Generating Plans…
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={18} />
+                        Generate My Plans
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </div>
+            </motion.div>
 
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={isGenerating}
-                  className="w-full gap-2 text-base font-semibold h-12 rounded-xl"
+            {/* Side panel — plan summary */}
+            <motion.aside
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.45, delay: 0.18 }}
+              className="lg:col-span-1 lg:sticky lg:top-24"
+              aria-label="What you'll get"
+            >
+              <div
+                className="rounded-2xl border border-border p-6"
+                style={{
+                  background: "var(--card)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+                }}
+              >
+                <div
+                  className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-4 border"
                   style={{
-                    background: isGenerating ? undefined : "#3B82F6",
-                    boxShadow: isGenerating
-                      ? undefined
-                      : "0 4px 16px rgba(59,130,246,0.35)",
+                    background: "rgba(59,130,246,0.08)",
+                    color: "#3B82F6",
+                    borderColor: "rgba(59,130,246,0.2)",
                   }}
-                  data-ocid="planning.generate_plans_button"
                 >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" />
-                      Generating Plans…
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles size={18} />
-                      Generate My Plans
-                    </>
-                  )}
-                </Button>
-              </form>
-            </div>
-          </motion.div>
+                  <Sparkles size={12} />
+                  What you'll get
+                </div>
+                <p className="text-foreground text-base leading-relaxed mb-5">
+                  Tell us about your event and we'll generate three intelligent
+                  plans —{" "}
+                  <span className="font-semibold text-[#3B82F6]">Budget</span>,{" "}
+                  <span className="font-semibold text-[#10B981]">Balanced</span>
+                  , and{" "}
+                  <span className="font-semibold text-[#F59E0B]">Premium</span>{" "}
+                  — tailored to your needs.
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    {
+                      color: "#3B82F6",
+                      label: "Budget",
+                      desc: "Most cost-efficient vendor mix.",
+                    },
+                    {
+                      color: "#10B981",
+                      label: "Balanced",
+                      desc: "Best blend of price and quality.",
+                    },
+                    {
+                      color: "#F59E0B",
+                      label: "Premium",
+                      desc: "Top-rated vendors for a flagship event.",
+                    },
+                  ].map((p) => (
+                    <li key={p.label} className="flex items-start gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="mt-1.5 w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ background: p.color }}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground leading-snug">
+                          {p.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-snug">
+                          {p.desc}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.aside>
+          </div>
 
           {/* Loading skeleton */}
           {isGenerating && <ResultsSkeleton />}

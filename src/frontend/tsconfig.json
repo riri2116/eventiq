@@ -21,7 +21,8 @@
     "types": ["vite/client", "node"],
     "paths": {
       "declarations/*": ["../declarations/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@assets/*": ["../../attached_assets/*"]
     }
   },
   "include": ["src"],

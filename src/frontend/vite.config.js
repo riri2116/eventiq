@@ -64,6 +64,12 @@ export default defineConfig({
         find: "@",
         replacement: fileURLToPath(new URL("./src", import.meta.url)),
       },
+      {
+        find: "@assets",
+        replacement: fileURLToPath(
+          new URL("../../attached_assets", import.meta.url),
+        ),
+      },
     ],
     dedupe: ["@dfinity/agent"]
   },

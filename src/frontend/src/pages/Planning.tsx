@@ -126,6 +126,76 @@ function formatToLakh(amount: number): string {
   return `₹${amount}`;
 }
 
+/* ─── Custom Toast ─────────────────────────────────────────────── */
+function showCustomToast(message: string) {
+  const existing = document.getElementById("plan-save-toast");
+  if (existing) existing.remove();
+
+  const toastEl = document.createElement("div");
+  toastEl.id = "plan-save-toast";
+  toastEl.textContent = message;
+  toastEl.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    font-family: inherit;
+    max-width: 90vw;
+    white-space: nowrap;
+  `;
+
+  document.body.appendChild(toastEl);
+  requestAnimationFrame(() => {
+    toastEl.style.opacity = "1";
+    toastEl.style.transform = "translateX(-50%) translateY(0)";
+  });
+
+  setTimeout(() => {
+    toastEl.style.opacity = "0";
+    toastEl.style.transform = "translateX(-50%) translateY(10px)";
+    setTimeout(() => toastEl.remove(), 200);
+  }, 3000);
+}
+
+/* ─── Save plan to localStorage "savedPlans" ─────────────────── */
+function saveToSavedPlans(planData: {
+  id: string;
+  type: string;
+  cost: number;
+  vendors: Array<{ name: string; cost: number; category?: string }>;
+  eventName?: string;
+}) {
+  const existing: Array<typeof planData & { timestamp: string }> = JSON.parse(
+    localStorage.getItem("savedPlans") ?? "[]",
+  );
+  const isDuplicate = existing.some(
+    (p) =>
+      p.id === planData.id ||
+      (p.type === planData.type &&
+        p.eventName === planData.eventName &&
+        Math.abs(p.cost - planData.cost) < 1),
+  );
+  if (isDuplicate) {
+    showCustomToast("Plan already saved");
+    return false;
+  }
+  existing.unshift({ ...planData, timestamp: new Date().toISOString() });
+  localStorage.setItem("savedPlans", JSON.stringify(existing));
+  showCustomToast("Your plan saved to dashboard");
+  return true;
+}
+
 // ─── DualRangeSlider ─────────────────────────────────────────────────────────
 const SLIDER_MIN = 3000;
 const SLIDER_MAX = 500000000;

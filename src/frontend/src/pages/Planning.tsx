@@ -496,25 +496,23 @@ function OfflinePlanCard({
     bestFit: {
       label: "Best Fit",
       badge: "⭐ Best Fit",
-      hoverBorderColor: "#F59E0B",
-      baseBorderColor: "#F59E0B",
-      glowColor: "rgba(245,158,11,0.5)",
-      badgeBg: "rgba(245,158,11,0.1)",
-      badgeText: "#D97706",
-      badgeBorder: "rgba(245,158,11,0.3)",
-      accentBar: "linear-gradient(90deg, transparent, #F59E0B, transparent)",
+      hoverBorderColor: "#22C55E",
+      baseBorderColor: "rgba(34,197,94,0.35)",
+      badgeBg: "rgba(34,197,94,0.1)",
+      badgeText: "#16A34A",
+      badgeBorder: "rgba(34,197,94,0.3)",
+      accentBar: "linear-gradient(90deg, transparent, #22C55E, transparent)",
       isHighlight: true,
       btnVariant: "default" as const,
     },
     standard: {
       label: "Standard",
       badge: "⚖️ Balanced",
-      hoverBorderColor: "#10B981",
-      baseBorderColor: "#10B981",
-      glowColor: "rgba(16,185,129,0.5)",
-      badgeBg: "rgba(16,185,129,0.1)",
-      badgeText: "#059669",
-      badgeBorder: "rgba(16,185,129,0.3)",
+      hoverBorderColor: "#F97316",
+      baseBorderColor: "var(--border)",
+      badgeBg: "rgba(59,130,246,0.1)",
+      badgeText: "#3B82F6",
+      badgeBorder: "rgba(59,130,246,0.3)",
       accentBar: null,
       isHighlight: false,
       btnVariant: "outline" as const,
@@ -523,11 +521,10 @@ function OfflinePlanCard({
       label: "Budget",
       badge: "🔥 Budget",
       hoverBorderColor: "#3B82F6",
-      baseBorderColor: "#3B82F6",
-      glowColor: "rgba(59,130,246,0.5)",
-      badgeBg: "rgba(59,130,246,0.1)",
-      badgeText: "#2563EB",
-      badgeBorder: "rgba(59,130,246,0.3)",
+      baseBorderColor: "var(--border)",
+      badgeBg: "rgba(100,116,139,0.1)",
+      badgeText: "var(--muted-foreground)",
+      badgeBorder: "var(--border)",
       accentBar: null,
       isHighlight: false,
       btnVariant: "outline" as const,
@@ -556,25 +553,28 @@ function OfflinePlanCard({
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: index * 0.12 }}
-        className="rounded-2xl flex flex-col transition-all duration-300 relative overflow-hidden"
+        className="plan-card-enhanced rounded-2xl flex flex-col relative overflow-hidden"
         style={{
           background: "var(--card)",
           border: `2px solid ${config.baseBorderColor}`,
+          borderRadius: "16px",
           boxShadow: config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
+            ? `0 8px 32px ${config.glowColor}25`
             : "0 4px 20px rgba(0,0,0,0.06)",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.hoverBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            `0 8px 32px ${config.hoverBorderColor}30`;
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1.01)";
+          el.style.borderColor = config.hoverBorderColor;
+          el.style.boxShadow = `0 0 15px ${config.glowColor}`;
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            config.baseBorderColor;
-          (e.currentTarget as HTMLElement).style.boxShadow = config.isHighlight
-            ? "0 8px 32px rgba(34,197,94,0.15)"
+          const el = e.currentTarget as HTMLElement;
+          el.style.transform = "scale(1)";
+          el.style.borderColor = config.baseBorderColor;
+          el.style.boxShadow = config.isHighlight
+            ? `0 8px 32px ${config.glowColor}25`
             : "0 4px 20px rgba(0,0,0,0.06)";
         }}
         data-ocid={`plan.${planKey}_card`}

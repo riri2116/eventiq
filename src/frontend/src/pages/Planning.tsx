@@ -542,8 +542,17 @@ function OfflinePlanCard({
       return;
     }
     savePlanToStorage(planSet, currentUser!.email);
-    toast.success("Plan saved to your dashboard!", {
-      description: `${planSet.eventName} — ${config.label} plan saved.`,
+    // Also save to "savedPlans" for dashboard toast notification
+    saveToSavedPlans({
+      id: `${planSet.id}_${planKey}`,
+      type: config.label,
+      cost: plan.totalCost,
+      eventName: planSet.eventName,
+      vendors: vendorEntries.map(([k, v]) => ({
+        name: v.name,
+        cost: v.cost,
+        category: k,
+      })),
     });
   }
 
@@ -639,20 +648,7 @@ function OfflinePlanCard({
             {vendorEntries.map(([key, vendor]) => (
               <div
                 key={key}
-                className="vendor-row-plan flex items-center justify-between gap-3 py-2.5 px-1 -mx-1 rounded-lg transition-all duration-150"
-                style={{
-                  transition: "box-shadow 0.15s ease, border-color 0.15s ease",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.boxShadow = "0 0 10px rgba(0,0,0,0.08)";
-                  el.style.border = "1px solid rgba(0,0,0,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.boxShadow = "none";
-                  el.style.border = "1px solid transparent";
-                }}
+                className="flex items-center justify-between gap-3 py-2.5"
               >
                 <span className="text-xs text-muted-foreground capitalize truncate min-w-0 max-w-[45%]">
                   {key.replace(/([A-Z])/g, " $1").trim()}

@@ -1167,10 +1167,7 @@ export function PlanningPage() {
     try {
       const response: BackendResponse = await submitEventPlan(request);
 
-      if (response.status !== "success") {
-        throw new Error(`Backend returned status: ${response.status}`);
-      }
-
+      // Both "success" and "adjusted_plan" are valid — display the API result
       setApiResult({ response, eventName: eventNameVal.trim() });
       setIsGenerating(false);
       setTimeout(() => {

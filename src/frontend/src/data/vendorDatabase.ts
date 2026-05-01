@@ -231,7 +231,7 @@ export const VENDOR_LABELS_16: Record<string, string> = {
   tentHouse: "⛺ Tent House",
   weddingBand: "🎺 Wedding Band",
   weddingLawn: "🌳 Wedding Lawn",
-  weddingPhotographer: "📸 Wedding Photographer",
+  weddingPhotographer: "📸 Photographer",
   weddingResort: "🏰 Wedding Resort",
 };
 

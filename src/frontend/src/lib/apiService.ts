@@ -50,6 +50,9 @@ export interface BackendPlan {
   vendors: BackendVendor[];
   total_cost: number;
   remaining_budget: number;
+  budget_gap?: number;
+  status?: string;
+  message?: string;
   optimization_score: number;
 }
 
@@ -122,8 +125,9 @@ export async function submitEventPlan(
     throw new Error("Received an invalid response from the planning service.");
   }
 
-  // Validate backend status field
-  if (data.status !== "success") {
+  // Accept both "success" and "adjusted_plan" as valid statuses
+  const VALID_STATUSES = ["success", "adjusted_plan"];
+  if (!VALID_STATUSES.includes(data.status)) {
     throw new Error(
       `Planning service returned an error status: "${data.status}". Please try again.`,
     );

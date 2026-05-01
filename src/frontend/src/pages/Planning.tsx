@@ -848,7 +848,7 @@ function ApiPlanCard({
             </p>
           </div>
 
-          {/* Remaining budget box */}
+          {/* Remaining budget box — always shown, even when 0 */}
           <div
             className="rounded-xl px-4 py-3 flex items-center justify-between"
             style={{
@@ -860,9 +860,40 @@ function ApiPlanCard({
               Remaining
             </span>
             <span className="font-display font-bold text-sm text-green-600 dark:text-green-400">
-              {formatToLakh(plan.remaining_budget)}
+              {formatToLakh(plan.remaining_budget ?? 0)}
             </span>
           </div>
+
+          {/* Shortfall row — only when budget_gap > 0 */}
+          {(plan.budget_gap ?? 0) > 0 && (
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-medium text-red-500/80">
+                Shortfall
+              </span>
+              <span className="text-xs font-semibold text-red-500">
+                ₹{((plan.budget_gap ?? 0) / 1).toLocaleString("en-IN")}
+              </span>
+            </div>
+          )}
+
+          {/* Subtle warning — shown when status is adjusted_plan or message exists */}
+          {(plan.status === "adjusted_plan" || plan.message) && (
+            <div
+              className="rounded-lg px-3 py-2.5"
+              style={{
+                background: "rgba(239,68,68,0.05)",
+                border: "1px solid rgba(239,68,68,0.15)",
+              }}
+            >
+              <p
+                className="text-[11px] leading-relaxed"
+                style={{ color: "rgba(185,28,28,0.85)", fontWeight: 450 }}
+              >
+                {plan.message?.replace(/^⚠️\s*/, "") ??
+                  "Budget too low. Showing closest possible plan."}
+              </p>
+            </div>
+          )}
 
           {/* Vendor rows */}
           <div className="flex-1 space-y-0 divide-y divide-border/40">

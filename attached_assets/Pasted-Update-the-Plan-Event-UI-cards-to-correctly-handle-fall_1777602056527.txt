@@ -1,0 +1,260 @@
+Update the Plan Event UI cards to correctly handle fallback scenarios when the budget is insufficient, while maintaining a clean, compact, and premium look.
+
+Core Requirements:
+Display Fallback Warning Message
+If the plan is adjusted due to low budget (status = adjusted_plan or message exists), show a warning message.
+Place it below Remaining/Shortfall and above the vendor list.
+The message should be visible in all such cases.
+Make Warning UI Subtle (IMPORTANT)
+The warning should NOT look harsh or like an error alert.
+Use a soft, premium style:
+Very light red background
+Soft red border
+Muted red text (not too bright)
+Reduce visual weight:
+Smaller font size (compact text)
+Medium font weight (not bold)
+Tight padding and spacing
+Overall feel should be minimal, clean, and non-intrusive
+Show Budget Shortfall
+If there is a budget gap (> 0), display it clearly.
+Place it just below the Remaining amount.
+Label it as:
+→ “Shortfall: ₹ amount”
+Style:
+Red color (but clean, not aggressive)
+Slightly emphasized but still compact
+Fix Remaining Budget Visibility
+Even if remaining budget is 0, it must still be shown.
+Do NOT hide or skip it due to falsy value issues.
+If remaining is 0 and shortfall exists, show both:
+Remaining: ₹0
+Shortfall below it
+Correct UI Hierarchy (Very Important)
+Maintain this exact order inside each card:
+Total Estimated Cost
+Remaining
+Shortfall (if exists)
+Warning Message (if exists)
+Vendor List
+Save Plan Button
+Ensure Data is Always Rendered
+Do not accidentally filter out values like 0
+Always render:
+remaining_budget
+budget_gap
+message
+Consistency Across All Plans
+Apply this logic to all plan types (Budget, Balanced, Premium)
+UI behavior must be identical for each card
+Goal
+The final UI should:
+Clearly communicate budget issues
+Stay visually elegant and premium
+Avoid loud or error-like styling
+Feel like a polished production product  this is our backend code logic and adjust the front end accordingly  : "status": "adjusted_plan",
+  "event_id": 83,
+  "plans": [
+    {
+      "plan_type": "budget",
+      "vendors": [
+        {
+          "vendor_id": "ChIJb8vcedErCTkRXd8alv3JlwA",
+          "name": "Kartik Event & Balloon Decoration in Dehradun",
+          "category": "event decorator",
+          "allocated_budget": 16274,
+          "score": 0.45094108596987903,
+          "address": "Shop No. 101, Kanwali Rd, Laxman Chowk, Dehradun",
+          "location": "https://maps.google.com/?cid=42724812465561437",
+          "latitude": 30.3192929,
+          "longitude": 78.0167437,
+          "contact": "073022 21897",
+          "website": "Not Available",
+          "rating": 4.9
+        },
+        {
+          "vendor_id": "ChIJASkJdn8rCTkRgB5iJomGlO8",
+          "name": "SJ PARADISE - Banquet Hall in Dehradun | Party Engagement Hall in Dehradun | Best Hotel Near ISBT GMS Road | Bar near ISBT",
+          "category": "venue",
+          "allocated_budget": 87540,
+          "score": 0.9319978745128648,
+          "address": "68, Saharanpur Rd, Sewla Kalan, Majra, Dehradun",
+          "location": "https://maps.google.com/?cid=17263571195230559872",
+          "latitude": 30.2976299,
+          "longitude": 78.0047437,
+          "contact": "0135 266 8888",
+          "website": "http://hotelsjparadise.com/",
+          "rating": 4.7
+        },
+        {
+          "vendor_id": "ChIJGQ7DzowpCTkRyc0e5UhkFuE",
+          "name": "Gupta Bandhu Tent & caterer - Caterers in Dehradun, tent house in Dehradun , catering service in dehradun",
+          "category": "caterer",
+          "allocated_budget": 15945,
+          "score": 0.5689387648786806,
+          "address": "37, 16, Kanwali Rd, Indresh Nagar, Tilak Nagar, Laxman Chowk, Dehradun",
+          "location": "https://maps.google.com/?cid=16219261372265844169",
+          "latitude": 30.3202698,
+          "longitude": 78.0271129,
+          "contact": "080773 32043",
+          "website": "https://gupta-bandhu-tent.grexa.site/",
+          "rating": 4.7
+        },
+        {
+          "vendor_id": "ChIJtbULtKQpCTkR7bUkj6WJBEI",
+          "name": "Vrinda party hall",
+          "category": "dj service",
+          "allocated_budget": 20049,
+          "score": 0.45285204403187584,
+          "address": "Om Vihar, 4, Mata Mandir Rd, Dharmpur, Ajabpur Kalan, Dehradun",
+          "location": "https://maps.google.com/?cid=4757078450574243309",
+          "latitude": 30.3006191,
+          "longitude": 78.0457257,
+          "contact": "075791 65125",
+          "website": "Not Available",
+          "rating": 4.8
+        }
+      ],
+      "total_cost": 139808,
+      "remaining_budget": 0,
+      "budget_gap": 49808,
+      "status": "adjusted_plan",
+      "message": "⚠️ Budget too low. Showing closest possible plan.",
+      "optimization_score": 0
+    },
+    {
+      "plan_type": "balanced",
+      "vendors": [
+        {
+          "vendor_id": "ChIJ8cXwxY4pCTkR0wD8St0cnME",
+          "name": "Mj Decorators - Balloon Decoration & Event Planner",
+          "category": "event decorator",
+          "allocated_budget": 22448,
+          "score": 0.4661345833313375,
+          "address": "Jhanda Bazar, Tilak Nagar, Khurbura Mohalla, Dehradun",
+          "location": "https://maps.google.com/?cid=13951057482458333395",
+          "latitude": 30.3203291,
+          "longitude": 78.0311131,
+          "contact": "083938 15249",
+          "website": "Not Available",
+          "rating": 4.9
+        },
+        {
+          "vendor_id": "ChIJjyZJ11IrCTkRcxq7BP7TvaU",
+          "name": "The Cocoon - Boutique Stay and Party Lawns",
+          "category": "venue",
+          "allocated_budget": 87967,
+          "score": 0.6449944234853958,
+          "address": "128, opposite Saanvi Hero Showroom, Shakti Enclave, Niranjanpur, Dehradun",
+          "location": "https://maps.google.com/?cid=11942934874810948211",
+          "latitude": 30.305964,
+          "longitude": 78.013554,
+          "contact": "073515 26628",
+          "website": "https://www.makemytrip.com/hotels/the_cocoon_boutique_stay-details-dehradun.html",
+          "rating": 4.6
+        },
+        {
+          "vendor_id": "ChIJMUNu2YcpCTkRPZd-aq4nFLs",
+          "name": "Sardaar Caterers",
+          "category": "caterer",
+          "allocated_budget": 16476,
+          "score": 0.5758124521544459,
+          "address": "House Number 263 East, Saharanpur Rd, near Ramlila Ground, Patel Nagar, Dehradun",
+          "location": "https://maps.google.com/?cid=13480443214691211069",
+          "latitude": 30.3088462,
+          "longitude": 78.0218296,
+          "contact": "095360 06001",
+          "website": "https://www.sardaarcaterers.com/",
+          "rating": 4.8
+        },
+        {
+          "vendor_id": "ChIJQSTGqiAqCTkRmnCq_AB8bso",
+          "name": "Rhythm Eventz",
+          "category": "dj service",
+          "allocated_budget": 21112,
+          "score": 0.45338208292117177,
+          "address": "87, D, Park Rd, opposite Wonderland Academy, near Patel Nagar, Laxman Chowk, Dehradun",
+          "location": "https://maps.google.com/?cid=14586732586780487834",
+          "latitude": 30.315576,
+          "longitude": 78.017872,
+          "contact": "098370 36304",
+          "website": "http://www.rhythmeventz.com/",
+          "rating": 4.7
+        }
+      ],
+      "total_cost": 148003,
+      "remaining_budget": 0,
+      "budget_gap": 58003,
+      "status": "adjusted_plan",
+      "message": "⚠️ Budget too low. Showing closest possible plan.",
+      "optimization_score": 0
+    },
+    {
+      "plan_type": "premium",
+      "vendors": [
+        {
+          "vendor_id": "ChIJfdl6qdopCTkRCquDhlsELX8",
+          "name": "Whistling Teel",
+          "category": "event decorator",
+          "allocated_budget": 23944,
+          "score": 0.4379780791331623,
+          "address": "44, Indira Nagar Colony Rd, near Asian School, Balliwala, Dehradun",
+          "location": "https://maps.google.com/?cid=9163985607914138378",
+          "latitude": 30.3219001,
+          "longitude": 78.0049589,
+          "contact": "098970 52232",
+          "website": "https://www.instagram.com/whistlingteel/",
+          "rating": 5
+        },
+        {
+          "vendor_id": "ChIJASkJdn8rCTkRgB5iJomGlO8",
+          "name": "SJ PARADISE - Banquet Hall in Dehradun | Party Engagement Hall in Dehradun | Best Hotel Near ISBT GMS Road | Bar near ISBT",
+          "category": "venue",
+          "allocated_budget": 87540,
+          "score": 0.9319978745128648,
+          "address": "68, Saharanpur Rd, Sewla Kalan, Majra, Dehradun",
+          "location": "https://maps.google.com/?cid=17263571195230559872",
+          "latitude": 30.2976299,
+          "longitude": 78.0047437,
+          "contact": "0135 266 8888",
+          "website": "http://hotelsjparadise.com/",
+          "rating": 4.7
+        },
+        {
+          "vendor_id": "ChIJJewvtSIqCTkR-_oIvBfh6Pw",
+          "name": "Jounsar Caterer's & Tent House",
+          "category": "caterer",
+          "allocated_budget": 23292,
+          "score": 0.48781604763666986,
+          "address": "Kanwali Rd, near GMS Road, Vyomprasth, phase - 2, Kanwali, Dehradun",
+          "location": "https://maps.google.com/?cid=18224063384209914619",
+          "latitude": 30.318536,
+          "longitude": 78.00872,
+          "contact": "084334 22944",
+          "website": "https://jounsarcaterers.com/",
+          "rating": 5
+        },
+        {
+          "vendor_id": "ChIJK3mNdz4rCTkRg5ZQ3aB0D3I",
+          "name": "Negi Sounds & Dj",
+          "category": "dj service",
+          "allocated_budget": 27897,
+          "score": 0.4577718418128947,
+          "address": "59/9 Park Road Laxman Chowk Kanwali Road, Park Rd, Dehradun",
+          "location": "https://maps.google.com/?cid=8218916079231080067",
+          "latitude": 30.3149081,
+          "longitude": 78.0177066,
+          "contact": "073513 52019",
+          "website": "http://negisoundsdj.online/",
+          "rating": 4.9
+        }
+      ],
+      "total_cost": 162673,
+      "remaining_budget": 0,
+      "budget_gap": 72673,
+      "status": "adjusted_plan",
+      "message": "⚠️ Budget too low. Showing closest possible plan.",
+      "optimization_score": 0
+    }
+  ]
+}

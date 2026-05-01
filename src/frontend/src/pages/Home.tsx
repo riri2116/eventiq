@@ -73,7 +73,6 @@ const DIFFERENTIATORS = [
   "Instant local vendor matching",
   "Transparent pricing breakdowns",
   "Dehradun-focused vendor network",
-  "Zero loading wait — fully offline",
 ];
 
 const HOW_IT_WORKS_CARDS = [
@@ -778,7 +777,7 @@ export function HomePage() {
                   {
                     icon: MapPin,
                     label: "Venue Location",
-                    value: "10 Dehradun Areas",
+                    value: "Dehradun Areas",
                   },
                 ].map((item) => (
                   <div

@@ -28,43 +28,43 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const EVENT_TAGS = [
   {
     label: "Weddings 💍",
-    color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+    color: "bg-pink-100 text-pink-700 border-pink-300",
   },
   {
     label: "Conferences 🎤",
-    color: "bg-primary/10 text-primary border-primary/20",
+    color: "bg-primary/20 text-primary border-primary/40",
   },
   {
     label: "Birthday Parties 🎂",
-    color: "bg-secondary/10 text-secondary border-secondary/20",
+    color: "bg-orange-100 text-orange-700 border-orange-300",
   },
   {
     label: "Corporate Events 🏢",
-    color: "bg-primary/10 text-primary border-primary/20",
+    color: "bg-primary/20 text-primary border-primary/40",
   },
   {
     label: "Cultural Programs 🎭",
-    color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    color: "bg-purple-100 text-purple-700 border-purple-300",
   },
   {
     label: "Reunions 🤝",
-    color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+    color: "bg-teal-100 text-teal-700 border-teal-300",
   },
   {
     label: "Baby Showers 👶",
-    color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+    color: "bg-pink-100 text-pink-700 border-pink-300",
   },
   {
     label: "Anniversary Parties 🥂",
-    color: "bg-secondary/10 text-secondary border-secondary/20",
+    color: "bg-rose-100 text-rose-700 border-rose-300",
   },
   {
     label: "Graduations 🎓",
-    color: "bg-primary/10 text-primary border-primary/20",
+    color: "bg-indigo-100 text-indigo-700 border-indigo-300",
   },
   {
     label: "Music Concerts 🎵",
-    color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    color: "bg-purple-100 text-purple-700 border-purple-300",
   },
 ];
 
@@ -193,43 +193,37 @@ const CATEGORY_TAGS = [
   {
     label: "Weddings",
     emoji: "💍",
-    color:
-      "bg-pink-500/10 text-pink-500 border-pink-500/20 hover:bg-pink-500/20",
+    color: "bg-pink-100 text-pink-700 border-pink-300 hover:bg-pink-200",
   },
   {
     label: "Birthdays",
     emoji: "🎂",
-    color:
-      "bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20",
+    color: "bg-orange-100 text-orange-700 border-orange-300 hover:bg-orange-200",
   },
   {
     label: "Corporate Events",
     emoji: "💼",
-    color: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20",
+    color: "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30",
   },
   {
     label: "Music Concerts",
     emoji: "🎵",
-    color:
-      "bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/20",
+    color: "bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200",
   },
   {
     label: "Cultural Programs",
     emoji: "🎭",
-    color:
-      "bg-teal-500/10 text-teal-500 border-teal-500/20 hover:bg-teal-500/20",
+    color: "bg-teal-100 text-teal-700 border-teal-300 hover:bg-teal-200",
   },
   {
     label: "Exhibitions",
     emoji: "🖼",
-    color:
-      "bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500/20",
+    color: "bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200",
   },
   {
     label: "Parties",
     emoji: "🎉",
-    color:
-      "bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20",
+    color: "bg-rose-100 text-rose-700 border-rose-300 hover:bg-rose-200",
   },
 ];
 

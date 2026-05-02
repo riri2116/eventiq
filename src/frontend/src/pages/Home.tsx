@@ -308,40 +308,49 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
+// Active slide occupies 74% of container width, centred.
+// Side slides use the same size but are shifted & 3-D rotated so they peek
+// in from the edges — translateX is % of the slide's own width.
+const CF_W = 74;   // active slide width as % of container
+const CF_L = (100 - CF_W) / 2; // left offset so it's centred = 13%
+
 function getCoverflowStyle(offset: number): React.CSSProperties {
   const t =
-    "transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.7s ease, filter 0.7s ease";
+    "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease";
   const abs = Math.abs(offset);
   const sign = offset < 0 ? -1 : 1;
 
-  if (offset === 0) {
-    return {
-      position: "absolute", inset: 0,
-      transform: "perspective(1100px) translateX(0) translateZ(0) rotateY(0deg) scale(1)",
-      opacity: 1, zIndex: 10, filter: "none",
-      transition: t, cursor: "default",
-    };
-  }
-  if (abs === 1) {
-    return {
-      position: "absolute", inset: 0,
-      transform: `perspective(1100px) translateX(${sign * 55}%) translateZ(-90px) rotateY(${-sign * 46}deg) scale(0.86)`,
-      opacity: 0.65, zIndex: 7, filter: "blur(1.5px)",
-      transition: t, cursor: "pointer",
-    };
-  }
-  if (abs === 2) {
-    return {
-      position: "absolute", inset: 0,
-      transform: `perspective(1100px) translateX(${sign * 90}%) translateZ(-180px) rotateY(${-sign * 62}deg) scale(0.66)`,
-      opacity: 0.28, zIndex: 4, filter: "blur(3px)",
-      transition: t, cursor: "pointer",
-    };
-  }
+  const base: React.CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: `${CF_L}%`,
+    width: `${CF_W}%`,
+    height: "100%",
+    transition: t,
+    willChange: "transform, opacity",
+  };
+
+  if (offset === 0) return {
+    ...base,
+    transform: "perspective(900px) rotateY(0deg) scale(1)",
+    opacity: 1, zIndex: 10, cursor: "default", filter: "none",
+  };
+  if (abs === 1) return {
+    ...base,
+    transform: `perspective(900px) translateX(${sign * 63}%) rotateY(${-sign * 44}deg) scale(0.87)`,
+    opacity: 0.78, zIndex: 7, filter: "brightness(0.72)",
+    cursor: "pointer",
+  };
+  if (abs === 2) return {
+    ...base,
+    transform: `perspective(900px) translateX(${sign * 110}%) rotateY(${-sign * 60}deg) scale(0.68)`,
+    opacity: 0.35, zIndex: 4, filter: "brightness(0.5)",
+    cursor: "pointer",
+  };
   return {
-    position: "absolute", inset: 0,
-    transform: `perspective(1100px) translateX(${sign * 130}%) scale(0.5)`,
-    opacity: 0, zIndex: 1, transition: t, pointerEvents: "none",
+    ...base,
+    transform: `translateX(${sign * 160}%) scale(0.5)`,
+    opacity: 0, zIndex: 1, pointerEvents: "none",
   };
 }
 
@@ -370,8 +379,8 @@ function HeroCarousel() {
     <div className="w-full select-none">
       {/* Slide track */}
       <div
-        className="relative w-full overflow-hidden rounded-2xl"
-        style={{ aspectRatio: "16/10" }}
+        className="relative w-full overflow-hidden"
+        style={{ height: "240px" }}
       >
       {HERO_SLIDES.map((slide, i) => {
         let offset = i - current;
@@ -634,7 +643,6 @@ export function HomePage() {
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.15 }}
-                  className="overflow-hidden rounded-2xl"
                 >
                   <HeroCarousel />
                 </motion.div>

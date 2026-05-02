@@ -308,9 +308,9 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
-const CYLINDER_RADIUS = 210;
-const SLIDE_W = 230;
-const SLIDE_H = 160;
+const CYLINDER_RADIUS = 240;
+const SLIDE_W = 265;
+const SLIDE_H = 185;
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);

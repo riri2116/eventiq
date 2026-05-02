@@ -311,7 +311,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 // Active slide occupies 74% of container width, centred.
 // Side slides use the same size but are shifted & 3-D rotated so they peek
 // in from the edges — translateX is % of the slide's own width.
-const CF_W = 74;   // active slide width as % of container
+const CF_W = 80;   // active slide width as % of container
 const CF_L = (100 - CF_W) / 2; // left offset so it's centred = 13%
 
 function getCoverflowStyle(offset: number): React.CSSProperties {
@@ -380,7 +380,7 @@ function HeroCarousel() {
       {/* Slide track */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: "240px" }}
+        style={{ height: "290px" }}
       >
       {HERO_SLIDES.map((slide, i) => {
         let offset = i - current;

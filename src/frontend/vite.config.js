@@ -35,7 +35,6 @@ export default defineConfig({
     port: 5000,
     strictPort: true,
     allowedHosts: true,
-    historyApiFallback: true,
     proxy: {
       "/api": {
         target: "http://127.0.0.1:4943",
@@ -55,6 +54,21 @@ export default defineConfig({
     environment(["II_URL"]),
     environment(["STORAGE_GATEWAY_URL"]),
     react(),
+    {
+      name: "spa-fallback",
+      configureServer(server) {
+        server.middlewares.use((req, _res, next) => {
+          const url = req.url ?? "/";
+          const isFile = url.includes(".");
+          const isApi = url.startsWith("/api");
+          const isInternal = url.startsWith("/@") || url.startsWith("/__");
+          if (!isFile && !isApi && !isInternal && url !== "/") {
+            req.url = "/index.html";
+          }
+          next();
+        });
+      },
+    },
   ],
   resolve: {
     alias: [

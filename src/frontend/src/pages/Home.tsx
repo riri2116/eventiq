@@ -308,9 +308,9 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
-const CYLINDER_RADIUS = 400;
-const SLIDE_W = 340;
-const SLIDE_H = 230;
+const CYLINDER_RADIUS = 210;
+const SLIDE_W = 230;
+const SLIDE_H = 160;
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
@@ -639,6 +639,7 @@ export function HomePage() {
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.15 }}
+                  className="overflow-hidden rounded-2xl"
                 >
                   <HeroCarousel />
                 </motion.div>

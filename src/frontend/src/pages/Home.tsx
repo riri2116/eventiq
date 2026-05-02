@@ -308,87 +308,22 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
-/** Returns the visual position offset from the active index */
-function getSlideStyle(
-  index: number,
-  current: number,
-  total: number,
-): React.CSSProperties {
-  // Calculate offset, wrapping correctly for circular navigation
-  let offset = index - current;
-  if (offset > total / 2) offset -= total;
-  if (offset < -total / 2) offset += total;
-
-  const absOffset = Math.abs(offset);
-
-  if (offset === 0) {
-    // Active — front center, full size, no blur
-    return {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      transform: "translateX(0%) translateZ(0px) rotateY(0deg) scale(1)",
-      opacity: 1,
-      zIndex: 10,
-      filter: undefined,
-      transition:
-        "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
-      cursor: "default",
-      willChange: "transform, opacity, filter",
-    };
-  }
-
-  if (absOffset === 1) {
-    // Adjacent prev/next — visible behind, slightly to the side, blurred
-    const translateX = offset < 0 ? "-18%" : "18%";
-    const rotateY = offset < 0 ? "18deg" : "-18deg";
-    return {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      transform: `translateX(${translateX}) translateZ(-120px) rotateY(${rotateY}) scale(0.82)`,
-      opacity: 0.48,
-      zIndex: 5,
-      filter: "blur(3.5px)",
-      transition:
-        "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
-      cursor: "pointer",
-      willChange: "transform, opacity, filter",
-    };
-  }
-
-  // All further slides — fully hidden behind
-  return {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    transform: `translateX(${offset < 0 ? "-18%" : "18%"}) translateZ(-200px) rotateY(${offset < 0 ? "18deg" : "-18deg"}) scale(0.65)`,
-    opacity: 0,
-    zIndex: 1,
-    filter: "blur(6px)",
-    transition:
-      "transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.65s ease, filter 0.65s ease",
-    cursor: "default",
-    willChange: "transform, opacity, filter",
-  };
-}
+const CYLINDER_RADIUS = 400;
+const SLIDE_W = 340;
+const SLIDE_H = 230;
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const n = HERO_SLIDES.length;
+  const angleStep = 360 / n;
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setCurrent((c) => (c + 1) % HERO_SLIDES.length);
-    }, 4500);
-  }, []);
+      setCurrent((c) => (c + 1) % n);
+    }, 4000);
+  }, [n]);
 
   useEffect(() => {
     resetTimer();
@@ -398,12 +333,12 @@ function HeroCarousel() {
   }, [resetTimer]);
 
   const prev = () => {
-    setCurrent((c) => (c - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrent((c) => (c - 1 + n) % n);
     resetTimer();
   };
 
   const next = () => {
-    setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    setCurrent((c) => (c + 1) % n);
     resetTimer();
   };
 
@@ -414,43 +349,74 @@ function HeroCarousel() {
 
   return (
     <div
-      className="relative w-full select-none overflow-hidden"
-      style={{ aspectRatio: "9/6", perspective: "1200px" }}
+      className="relative w-full select-none"
+      style={{ height: `${SLIDE_H + 80}px`, perspective: "1000px", perspectiveOrigin: "50% 48%" }}
     >
-      {/* 3D stage — preserve-3d enables translateZ depth on child slides */}
+      {/* Left + right fade masks so side slides blend out */}
+      <div
+        className="absolute inset-0 z-20 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to right, oklch(var(--background)) 0%, transparent 22%, transparent 78%, oklch(var(--background)) 100%)",
+        }}
+      />
+
+      {/* 3D cylinder stage — rotates as a whole to bring each slide to front */}
       <div
         className="relative w-full h-full"
-        style={{ transformStyle: "preserve-3d" }}
+        style={{
+          transformStyle: "preserve-3d",
+          transform: `rotateX(-6deg) rotateY(${-current * angleStep}deg)`,
+          transition: "transform 0.85s cubic-bezier(0.33, 1, 0.68, 1)",
+        }}
       >
         {HERO_SLIDES.map((slide, i) => {
-          const style = getSlideStyle(i, current, HERO_SLIDES.length);
           const isActive = i === current;
-
           return (
             <div
               key={slide.label}
-              style={style}
+              role={isActive ? undefined : "button"}
+              tabIndex={isActive ? undefined : 0}
+              data-ocid={isActive ? "hero.carousel_active_slide" : undefined}
               onClick={() => !isActive && goTo(i)}
               onKeyDown={(e) =>
                 (e.key === "Enter" || e.key === " ") && !isActive && goTo(i)
               }
-              role={isActive ? undefined : "button"}
-              tabIndex={isActive ? undefined : 0}
-              data-ocid={isActive ? "hero.carousel_active_slide" : undefined}
+              style={{
+                position: "absolute",
+                width: `${SLIDE_W}px`,
+                height: `${SLIDE_H}px`,
+                top: "50%",
+                left: "50%",
+                marginTop: `-${SLIDE_H / 2}px`,
+                marginLeft: `-${SLIDE_W / 2}px`,
+                transform: `rotateY(${i * angleStep}deg) translateZ(${CYLINDER_RADIUS}px)`,
+                backfaceVisibility: "hidden",
+                cursor: isActive ? "default" : "pointer",
+                willChange: "transform",
+              }}
             >
-              <div className="w-full h-full rounded-2xl overflow-hidden shadow-elevated">
+              <div
+                className="w-full h-full rounded-2xl overflow-hidden"
+                style={{
+                  boxShadow: isActive
+                    ? "0 30px 60px -10px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)"
+                    : "0 8px 24px -4px rgba(0,0,0,0.3)",
+                  transition: "box-shadow 0.5s ease",
+                }}
+              >
                 <img
                   src={slide.img}
                   alt={slide.label}
                   className="w-full h-full object-cover"
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 {isActive && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.25 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
                     className="absolute bottom-4 left-4"
                   >
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm">
@@ -489,13 +455,13 @@ function HeroCarousel() {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-3 right-4 flex gap-1.5 z-30">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
         {HERO_SLIDES.map((slide, i) => (
           <button
             key={`dot-${slide.label}`}
             type="button"
             onClick={() => goTo(i)}
-            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-primary" : "w-2 h-2 bg-white/50 hover:bg-white/80"}`}
+            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-primary" : "w-2 h-2 bg-foreground/25 hover:bg-foreground/50"}`}
             aria-label={`Go to slide ${i + 1}`}
             data-ocid={`hero.carousel_dot.${i + 1}`}
           />

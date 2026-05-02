@@ -308,131 +308,123 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
-const CYLINDER_RADIUS = 300;
-const SLIDE_W = 320;
-const SLIDE_H = 220;
+function getCoverflowStyle(offset: number): React.CSSProperties {
+  const t =
+    "transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.7s ease, filter 0.7s ease";
+  const abs = Math.abs(offset);
+  const sign = offset < 0 ? -1 : 1;
+
+  if (offset === 0) {
+    return {
+      position: "absolute", inset: 0,
+      transform: "perspective(1100px) translateX(0) translateZ(0) rotateY(0deg) scale(1)",
+      opacity: 1, zIndex: 10, filter: "none",
+      transition: t, cursor: "default",
+    };
+  }
+  if (abs === 1) {
+    return {
+      position: "absolute", inset: 0,
+      transform: `perspective(1100px) translateX(${sign * 55}%) translateZ(-90px) rotateY(${-sign * 46}deg) scale(0.86)`,
+      opacity: 0.65, zIndex: 7, filter: "blur(1.5px)",
+      transition: t, cursor: "pointer",
+    };
+  }
+  if (abs === 2) {
+    return {
+      position: "absolute", inset: 0,
+      transform: `perspective(1100px) translateX(${sign * 90}%) translateZ(-180px) rotateY(${-sign * 62}deg) scale(0.66)`,
+      opacity: 0.28, zIndex: 4, filter: "blur(3px)",
+      transition: t, cursor: "pointer",
+    };
+  }
+  return {
+    position: "absolute", inset: 0,
+    transform: `perspective(1100px) translateX(${sign * 130}%) scale(0.5)`,
+    opacity: 0, zIndex: 1, transition: t, pointerEvents: "none",
+  };
+}
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const n = HERO_SLIDES.length;
-  const angleStep = 360 / n;
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCurrent((c) => (c + 1) % n);
-    }, 4000);
+    }, 4200);
   }, [n]);
 
   useEffect(() => {
     resetTimer();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [resetTimer]);
 
-  const prev = () => {
-    setCurrent((c) => (c - 1 + n) % n);
-    resetTimer();
-  };
-
-  const next = () => {
-    setCurrent((c) => (c + 1) % n);
-    resetTimer();
-  };
-
-  const goTo = (i: number) => {
-    setCurrent(i);
-    resetTimer();
-  };
+  const prev = () => { setCurrent((c) => (c - 1 + n) % n); resetTimer(); };
+  const next = () => { setCurrent((c) => (c + 1) % n); resetTimer(); };
+  const goTo = (i: number) => { setCurrent(i); resetTimer(); };
 
   return (
     <div
-      className="relative w-full select-none"
-      style={{ height: `${SLIDE_H + 80}px`, perspective: "1000px", perspectiveOrigin: "50% 48%" }}
+      className="relative w-full select-none overflow-hidden rounded-2xl"
+      style={{ aspectRatio: "16/10" }}
     >
-      {/* Left + right fade masks so side slides blend out */}
-      <div
-        className="absolute inset-0 z-20 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to right, oklch(var(--background)) 0%, transparent 22%, transparent 78%, oklch(var(--background)) 100%)",
-        }}
-      />
+      {HERO_SLIDES.map((slide, i) => {
+        let offset = i - current;
+        if (offset > n / 2) offset -= n;
+        if (offset < -n / 2) offset += n;
+        const isActive = offset === 0;
+        const style = getCoverflowStyle(offset);
 
-      {/* 3D cylinder stage — rotates as a whole to bring each slide to front */}
-      <div
-        className="relative w-full h-full"
-        style={{
-          transformStyle: "preserve-3d",
-          transform: `rotateX(-6deg) rotateY(${-current * angleStep}deg)`,
-          transition: "transform 0.85s cubic-bezier(0.33, 1, 0.68, 1)",
-        }}
-      >
-        {HERO_SLIDES.map((slide, i) => {
-          const isActive = i === current;
-          return (
+        return (
+          <div
+            key={slide.label}
+            style={style}
+            onClick={() => !isActive && goTo(i)}
+            onKeyDown={(e) =>
+              (e.key === "Enter" || e.key === " ") && !isActive && goTo(i)
+            }
+            role={isActive ? undefined : "button"}
+            tabIndex={isActive ? undefined : 0}
+            data-ocid={isActive ? "hero.carousel_active_slide" : undefined}
+          >
             <div
-              key={slide.label}
-              role={isActive ? undefined : "button"}
-              tabIndex={isActive ? undefined : 0}
-              data-ocid={isActive ? "hero.carousel_active_slide" : undefined}
-              onClick={() => !isActive && goTo(i)}
-              onKeyDown={(e) =>
-                (e.key === "Enter" || e.key === " ") && !isActive && goTo(i)
-              }
+              className="w-full h-full rounded-2xl overflow-hidden"
               style={{
-                position: "absolute",
-                width: `${SLIDE_W}px`,
-                height: `${SLIDE_H}px`,
-                top: "50%",
-                left: "50%",
-                marginTop: `-${SLIDE_H / 2}px`,
-                marginLeft: `-${SLIDE_W / 2}px`,
-                transform: `rotateY(${i * angleStep}deg) translateZ(${CYLINDER_RADIUS}px)`,
-                backfaceVisibility: "hidden",
-                cursor: isActive ? "default" : "pointer",
-                willChange: "transform",
+                boxShadow: isActive
+                  ? "0 25px 50px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)"
+                  : "0 6px 20px -4px rgba(0,0,0,0.35)",
               }}
             >
-              <div
-                className="w-full h-full rounded-2xl overflow-hidden"
-                style={{
-                  boxShadow: isActive
-                    ? "0 30px 60px -10px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)"
-                    : "0 8px 24px -4px rgba(0,0,0,0.3)",
-                  transition: "box-shadow 0.5s ease",
-                }}
-              >
-                <img
-                  src={slide.img}
-                  alt={slide.label}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                {isActive && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                    className="absolute bottom-3 left-0 right-0 px-4"
-                  >
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm max-w-full truncate">
-                      <Tag size={10} className="shrink-0" />
-                      {slide.tag}
-                    </span>
-                    <p className="text-white font-display font-semibold text-base mt-1 drop-shadow-lg truncate">
-                      {slide.label}
-                    </p>
-                  </motion.div>
-                )}
-              </div>
+              <img
+                src={slide.img}
+                alt={slide.label}
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              {isActive && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.25 }}
+                  className="absolute bottom-4 left-4 right-4"
+                >
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm">
+                    <Tag size={10} className="shrink-0" />
+                    <span className="truncate">{slide.tag}</span>
+                  </span>
+                  <p className="text-white font-display font-semibold text-lg mt-1.5 drop-shadow-lg truncate">
+                    {slide.label}
+                  </p>
+                </motion.div>
+              )}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
 
       {/* Arrows */}
       <button
@@ -455,13 +447,13 @@ function HeroCarousel() {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
         {HERO_SLIDES.map((slide, i) => (
           <button
             key={`dot-${slide.label}`}
             type="button"
             onClick={() => goTo(i)}
-            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-primary" : "w-2 h-2 bg-foreground/25 hover:bg-foreground/50"}`}
+            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/40 hover:bg-white/70"}`}
             aria-label={`Go to slide ${i + 1}`}
             data-ocid={`hero.carousel_dot.${i + 1}`}
           />

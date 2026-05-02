@@ -604,7 +604,7 @@ function ApiVendorCard({
               href={vendor.location}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
               data-ocid={`plan_details.api_vendor_maps_${index}`}
             >
               <Navigation size={12} />
@@ -725,7 +725,7 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
     balanced: {
       label: "Balanced Plan",
       icon: "⚖️",
-      color: "text-blue-600 dark:text-blue-400",
+      color: "text-primary",
     },
     budget: {
       label: "Budget Plan",
@@ -1092,7 +1092,7 @@ export function PlanDetailsPage() {
           data-ocid="plan_details.event_header"
         >
           {/* Gradient header band */}
-          <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+          <div className="h-2 w-full bg-gradient-to-r from-primary via-primary/80 to-primary/60" />
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
               <div>

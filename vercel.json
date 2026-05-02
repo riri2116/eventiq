@@ -1,8 +1,8 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm --filter @caffeine/template-frontend build",
   "outputDirectory": "src/frontend/dist",
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

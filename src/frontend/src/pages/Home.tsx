@@ -77,32 +77,32 @@ const DIFFERENTIATORS = [
 
 const HOW_IT_WORKS_CARDS = [
   {
-    icon: FileText,
+    emoji: "🗣️",
     step: "01",
     title: "Tell Us",
     desc: "Share your event type, date and location",
-    color: "bg-primary/10 text-primary",
+    color: "bg-primary/20",
   },
   {
-    icon: Coins,
+    emoji: "💰",
     step: "02",
     title: "Set Budget",
     desc: "Define your min and max budget range",
-    color: "bg-yellow-500/10 text-yellow-500",
+    color: "bg-amber-100",
   },
   {
-    icon: CheckSquare,
+    emoji: "🤝",
     step: "03",
     title: "Choose Vendors",
     desc: "Select the services you need",
-    color: "bg-green-500/10 text-green-500",
+    color: "bg-green-100",
   },
   {
-    icon: Sparkles,
+    emoji: "🎉",
     step: "04",
     title: "Get Plans",
     desc: "Receive 3 tailored plans instantly",
-    color: "bg-purple-500/10 text-purple-400",
+    color: "bg-purple-100",
   },
 ];
 
@@ -703,7 +703,7 @@ export function HomePage() {
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}
                     >
-                      <card.icon size={18} />
+                      <span className="text-xl leading-none select-none">{card.emoji}</span>
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">

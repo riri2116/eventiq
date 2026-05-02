@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
+  "outputDirectory": "src/frontend/dist",
   "framework": null,
   "rewrites": [
     { "source": "/:path*", "destination": "/index.html" }

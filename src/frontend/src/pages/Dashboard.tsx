@@ -33,7 +33,6 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-/* ─── helpers ────────────────────────────────────────────────── */
 function formatToLakh(amount: number): string {
   if (amount >= 1_00_00_000) return `₹${(amount / 1_00_00_000).toFixed(1)} Cr`;
   if (amount >= 1_00_000) return `₹${(amount / 1_00_000).toFixed(1)} L`;
@@ -58,7 +57,6 @@ function getEventTypeStyle(type: string) {
   return { bg: "from-blue-500 to-blue-700", text: "text-white" };
 }
 
-/* ─── Plan Card ──────────────────────────────────────────────── */
 function PlanCard({
   planSet,
   onDelete,
@@ -82,11 +80,9 @@ function PlanCard({
   const eventStyle = getEventTypeStyle(planSet.eventType ?? "");
 
   function handleCardClick() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     navigate({ to: "/plan-details" as any, search: { id: planSet.id } as any });
   }
 
-  // Summary costs
   const premiumCost = apiPlan?.plans?.find(
     (p) => p.plan_type === "premium",
   )?.total_cost;
@@ -138,11 +134,9 @@ function PlanCard({
         data-plan-id={planSet.id}
         onClick={handleCardClick}
       >
-        {/* Colorful header stripe */}
         <div className={`h-1.5 w-full bg-gradient-to-r ${eventStyle.bg}`} />
 
         <div className="p-5">
-          {/* Top row: event type badge + date + actions */}
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex flex-col gap-1.5 min-w-0">
               <span
@@ -163,7 +157,6 @@ function PlanCard({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   navigate({
                     to: "/plan-details" as any,
                     search: { id: planSet.id } as any,
@@ -191,7 +184,6 @@ function PlanCard({
             </div>
           </div>
 
-          {/* Budget prominence */}
           <div className="mb-4">
             <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-0.5">
               Budget
@@ -201,7 +193,6 @@ function PlanCard({
             </p>
           </div>
 
-          {/* Meta row */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
             <span className="flex items-center gap-1.5">
               <Calendar size={12} className="shrink-0" />
@@ -230,7 +221,6 @@ function PlanCard({
             )}
           </div>
 
-          {/* Vendor name chips */}
           {vendorKeys.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               {vendorKeys.slice(0, 5).map((key) => (
@@ -267,7 +257,6 @@ function PlanCard({
             </div>
           )}
 
-          {/* Cost breakdown footer */}
           <div className="pt-3.5 border-t border-border/60 grid grid-cols-3 gap-1 text-center">
             {offlinePlan &&
               (["bestFit", "standard", "leastFit"] as const).map((k) => (
@@ -319,7 +308,6 @@ function PlanCard({
           </div>
         </div>
 
-        {/* Bottom CTA band */}
         <div className="px-5 pb-4">
           <button
             type="button"
@@ -335,7 +323,6 @@ function PlanCard({
   );
 }
 
-/* ─── Stats Bar ──────────────────────────────────────────────── */
 function StatsBar({ plans }: { plans: (SavedPlanSet | ApiSavedPlanSet)[] }) {
   const totalBudget = plans.reduce((s, p) => s + p.budget, 0);
   const lastActivity =
@@ -404,7 +391,6 @@ function StatsBar({ plans }: { plans: (SavedPlanSet | ApiSavedPlanSet)[] }) {
   );
 }
 
-/* ─── Profile Tab ─────────────────────────────────────────────── */
 function ProfileTab({
   email,
   name,
@@ -477,7 +463,6 @@ function ProfileTab({
   );
 }
 
-/* ─── Main Page ──────────────────────────────────────────────── */
 type Tab = "plans" | "profile";
 
 export function DashboardPage() {
@@ -551,8 +536,7 @@ export function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Page header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-1">
                 My Event Plans
@@ -574,10 +558,8 @@ export function DashboardPage() {
             </Button>
           </div>
 
-          {/* Stats bar */}
           <StatsBar plans={plans} />
 
-          {/* Tabs */}
           <div
             className="flex gap-1 bg-muted/50 p-1 rounded-xl w-fit mb-8 border border-border"
             data-ocid="dashboard.tabs"
@@ -605,7 +587,6 @@ export function DashboardPage() {
             ))}
           </div>
 
-          {/* Tab content */}
           {activeTab === "plans" ? (
             plans.length === 0 ? (
               <div

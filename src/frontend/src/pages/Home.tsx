@@ -24,8 +24,6 @@ import {
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* ─── Data ─────────────────────────────────────────────────── */
-
 const EVENT_TAGS = [
   {
     label: "Weddings 💍",
@@ -107,7 +105,6 @@ const HOW_IT_WORKS_CARDS = [
   },
 ];
 
-/* 8-slide carousel — diverse event images from Unsplash */
 const HERO_SLIDES = [
   {
     img: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&h=600&fit=crop&auto=format",
@@ -228,8 +225,6 @@ const CATEGORY_TAGS = [
   },
 ];
 
-/* ─── Curtain overlay ───────────────────────────────────────── */
-
 function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
   const [hiding, setHiding] = useState(false);
 
@@ -245,14 +240,11 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         transition: "opacity 0.7s ease",
         opacity: hiding ? 0 : 1,
         pointerEvents: hiding ? "none" : "auto",
-        /* warm cream → steel-blue gradient background */
         background:
           "radial-gradient(ellipse at 30% 60%, #e8d5b7 0%, #d4c5a0 30%, #b8cede 65%, #8faec5 100%)",
       }}
       data-ocid="curtain.overlay"
     >
-      {/* ── decorative floating spheres ── */}
-      {/* top-right large blue sphere */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -264,7 +256,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           filter: "blur(2px)",
         }}
       />
-      {/* bottom-left large cream sphere */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -276,7 +267,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           filter: "blur(3px)",
         }}
       />
-      {/* mid-left small blue sphere */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -288,7 +278,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           filter: "blur(1px)",
         }}
       />
-      {/* bottom-right small sand sphere */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -300,10 +289,8 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         }}
       />
 
-      {/* ── centred content ── */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
 
-        {/* logo badge */}
         <motion.div
           initial={{ opacity: 0, y: -18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -327,7 +314,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           </span>
         </motion.div>
 
-        {/* headline */}
         <motion.h1
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
@@ -340,7 +326,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           {" "}Celebrate.
         </motion.h1>
 
-        {/* subtitle */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -352,7 +337,6 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           and unforgettable experiences.
         </motion.p>
 
-        {/* CTA button */}
         <motion.button
           type="button"
           data-ocid="curtain.start_button"
@@ -379,13 +363,8 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
-/* ─── 3D Coverflow Carousel ─────────────────────────────────── */
-
-// Active slide occupies 74% of container width, centred.
-// Side slides use the same size but are shifted & 3-D rotated so they peek
-// in from the edges — translateX is % of the slide's own width.
-const CF_W = 80;   // active slide width as % of container
-const CF_L = (100 - CF_W) / 2; // left offset so it's centred = 13%
+const CF_W = 80;
+const CF_L = (100 - CF_W) / 2;
 
 function getCoverflowStyle(offset: number): React.CSSProperties {
   const t =
@@ -450,7 +429,6 @@ function HeroCarousel() {
 
   return (
     <div className="w-full select-none">
-      {/* Slide track */}
       <div
         className="relative w-full overflow-hidden"
         style={{ height: "290px" }}
@@ -493,7 +471,6 @@ function HeroCarousel() {
         );
       })}
 
-      {/* Arrows */}
       <button
         type="button"
         onClick={prev}
@@ -513,7 +490,6 @@ function HeroCarousel() {
         <ArrowRight size={16} />
       </button>
 
-      {/* Dots */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
         {HERO_SLIDES.map((slide, i) => (
           <button
@@ -526,9 +502,8 @@ function HeroCarousel() {
           />
         ))}
       </div>
-      </div>{/* end slide track */}
+      </div>
 
-      {/* Caption below the carousel */}
       <motion.div
         key={current}
         initial={{ opacity: 0, y: 6 }}
@@ -547,8 +522,6 @@ function HeroCarousel() {
     </div>
   );
 }
-
-/* ─── Plan Mini Card ────────────────────────────────────────── */
 
 function PlanMiniCard({
   icon: Icon,
@@ -577,8 +550,6 @@ function PlanMiniCard({
     </div>
   );
 }
-
-/* ─── Spotlight Card ────────────────────────────────────────── */
 
 function SpotlightCard({
   venue,
@@ -625,8 +596,6 @@ function SpotlightCard({
   );
 }
 
-/* ─── Main page ─────────────────────────────────────────────── */
-
 export function HomePage() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
@@ -644,7 +613,6 @@ export function HomePage() {
     try {
       sessionStorage.setItem("eventiq-curtain-seen", "true");
     } catch {
-      /* noop */
     }
   }
 
@@ -657,14 +625,12 @@ export function HomePage() {
       {curtainVisible && <CurtainOverlay onDismiss={dismissCurtain} />}
 
       <Layout>
-        {/* ── HERO ──────────────────────────────────────────── */}
         <section
           className="relative overflow-hidden bg-background pt-8 pb-16"
           data-ocid="hero.section"
         >
           <div className="container mx-auto px-6 lg:px-10 relative z-10">
             <div className="grid lg:grid-cols-5 gap-10 lg:gap-14 items-center">
-              {/* LEFT: Carousel + headline */}
               <div className="lg:col-span-3 flex flex-col gap-6">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -721,7 +687,6 @@ export function HomePage() {
                 </motion.div>
               </div>
 
-              {/* RIGHT: How It Works steps */}
               <motion.div
                 className="lg:col-span-2 flex flex-col gap-4"
                 initial={{ opacity: 0, x: 28 }}
@@ -768,7 +733,6 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── QUICK PLAN FORM SECTION ────────────────────────── */}
         <section
           className="bg-muted/30 py-16 border-y border-border"
           data-ocid="quick_plan.section"
@@ -797,7 +761,6 @@ export function HomePage() {
               transition={{ duration: 0.55, delay: 0.1 }}
               className="bg-card border border-border rounded-2xl p-6 shadow-elevated max-w-3xl mx-auto"
             >
-              {/* Quick info pills */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {[
                   {
@@ -834,7 +797,6 @@ export function HomePage() {
                 ))}
               </div>
 
-              {/* CTA */}
               <Link
                 to="/planning"
                 data-ocid="quick_plan.get_plans_button"
@@ -850,7 +812,6 @@ export function HomePage() {
                 </Button>
               </Link>
 
-              {/* Plan type preview cards */}
               <div className="flex gap-3 mt-5">
                 <PlanMiniCard
                   icon={Star}
@@ -875,7 +836,6 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── LOCAL SPOTLIGHT ───────────────────────────────── */}
         <section className="bg-background py-16" data-ocid="spotlight.section">
           <div className="container mx-auto px-6 lg:px-10">
             <motion.div
@@ -908,7 +868,6 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── OUR EDGE ──────────────────────────────────────── */}
         <section
           className="bg-muted/30 py-16 border-y border-border"
           data-ocid="our_edge.section"
@@ -970,7 +929,6 @@ export function HomePage() {
               ))}
             </div>
 
-            {/* Differentiators strip */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -991,7 +949,6 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── FIND BY CATEGORY ──────────────────────────────── */}
         <section className="bg-background py-16" data-ocid="categories.section">
           <div className="container mx-auto px-6 lg:px-10">
             <motion.div
@@ -1028,7 +985,6 @@ export function HomePage() {
               ))}
             </div>
 
-            {/* Marquee below tags */}
             <div className="mt-10 overflow-hidden relative" aria-hidden="true">
               <div
                 className="flex gap-2 w-max"
@@ -1047,7 +1003,6 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ─────────────────────────────────────── */}
         <section
           className="bg-muted/30 py-16 border-t border-border"
           data-ocid="cta.section"

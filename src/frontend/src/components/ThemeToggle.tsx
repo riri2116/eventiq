@@ -11,7 +11,6 @@ export function ThemeToggle({ variant = "icon", onToggle }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch — render only after client mount
   useEffect(() => {
     setMounted(true);
   }, []);

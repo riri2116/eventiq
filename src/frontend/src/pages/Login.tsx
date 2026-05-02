@@ -17,7 +17,6 @@ import { motion } from "motion/react";
 import { type FormEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* ── Validation helpers ─────────────────────────────────────── */
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -44,7 +43,6 @@ function FieldSuccess() {
   );
 }
 
-/* ── Left panel branding feature pills ─────────────────────── */
 const FEATURES = [
   { icon: <Calendar size={14} />, text: "Smart event planning" },
   { icon: <MapPin size={14} />, text: "Dehradun vendor network" },
@@ -59,7 +57,6 @@ export function LoginPage() {
   const [serverError, setServerError] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
 
-  /* Per-field touched + error state */
   const [emailVal, setEmailVal] = useState("");
   const [passwordVal, setPasswordVal] = useState("");
   const [touched, setTouched] = useState({ email: false, password: false });
@@ -132,7 +129,6 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel — gradient branding ───────────────────── */}
       <div
         className="hidden lg:flex lg:w-[42%] flex-col justify-between p-12 relative overflow-hidden"
         style={{
@@ -140,7 +136,6 @@ export function LoginPage() {
             "linear-gradient(145deg, oklch(0.45 0.22 261) 0%, oklch(0.35 0.2 275) 50%, oklch(0.28 0.18 280) 100%)",
         }}
       >
-        {/* Background decorative circles */}
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-10"
           style={{ background: "oklch(0.9 0.05 261)" }}
@@ -154,7 +149,6 @@ export function LoginPage() {
           style={{ background: "oklch(0.9 0.05 261)" }}
         />
 
-        {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -166,7 +160,6 @@ export function LoginPage() {
           </div>
         </div>
 
-        {/* Hero copy */}
         <div className="relative z-10 space-y-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -195,7 +188,6 @@ export function LoginPage() {
             experiences.
           </motion.p>
 
-          {/* Feature pills */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -216,7 +208,6 @@ export function LoginPage() {
           </motion.div>
         </div>
 
-        {/* Bottom quote */}
         <div className="relative z-10">
           <div className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-2xl p-4">
             <Sparkles size={16} className="text-white/70 shrink-0 mt-0.5" />
@@ -228,9 +219,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel — form ───────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-background">
-        {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-border">
           <Link
             to="/"
@@ -246,7 +235,6 @@ export function LoginPage() {
           </Link>
         </div>
 
-        {/* Desktop back link */}
         <div className="hidden lg:flex items-center justify-end px-10 py-6">
           <Link
             to="/"
@@ -257,7 +245,6 @@ export function LoginPage() {
           </Link>
         </div>
 
-        {/* Form container */}
         <div className="flex-1 flex items-center justify-center px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -265,7 +252,6 @@ export function LoginPage() {
             transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="w-full max-w-md"
           >
-            {/* Heading */}
             <div className="mb-8">
               <h2 className="font-display font-bold text-3xl text-foreground mb-2">
                 Sign In
@@ -282,7 +268,6 @@ export function LoginPage() {
               </p>
             </div>
 
-            {/* Card */}
             <div className="bg-card border border-border rounded-2xl shadow-elevated p-8">
               <form
                 onSubmit={handleSubmit}
@@ -290,7 +275,6 @@ export function LoginPage() {
                 noValidate
                 data-ocid="login.form"
               >
-                {/* Email */}
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-sm font-medium">
                     Email address
@@ -316,7 +300,6 @@ export function LoginPage() {
                   {emailError && <FieldError msg={emailError} />}
                 </div>
 
-                {/* Password */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="text-sm font-medium">
@@ -374,7 +357,6 @@ export function LoginPage() {
                   {passwordError && <FieldError msg={passwordError} />}
                 </div>
 
-                {/* Forgot password message */}
                 {forgotSent && (
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}
@@ -386,7 +368,6 @@ export function LoginPage() {
                   </motion.div>
                 )}
 
-                {/* Server error */}
                 {serverError && (
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}

@@ -18,7 +18,6 @@ export interface PlanFormData {
   selectedVendorKeys: VendorKey16[];
 }
 
-/** Pick a vendor from the 16-cat database at a given tier preference */
 function pickVendor16(
   key: VendorKey16,
   tier: "$" | "$$" | "$$$",

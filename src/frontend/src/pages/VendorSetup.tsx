@@ -19,7 +19,6 @@ import { motion } from "motion/react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 
-/* ─── Constants ───────────────────────────────────────────────── */
 const SERVICE_CATEGORIES = [
   "Venue",
   "Catering",
@@ -38,7 +37,6 @@ const PRICING_TIERS = [
 
 type PricingTier = "$" | "$$" | "$$$";
 
-/* ─── Validation helpers ──────────────────────────────────────── */
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -60,7 +58,6 @@ function FieldError({ msg }: { msg: string }) {
   );
 }
 
-/* ─── Stored profile interface ────────────────────────────────── */
 interface FullVendorProfile {
   ownerEmail: string;
   businessName: string;
@@ -87,7 +84,6 @@ function loadProfile(email: string): FullVendorProfile | null {
   }
 }
 
-/* ─── Section wrapper ─────────────────────────────────────────── */
 function Section({
   title,
   children,
@@ -105,7 +101,6 @@ function Section({
   );
 }
 
-/* ─── Field state types ───────────────────────────────────────── */
 interface VendorFields {
   businessName: string;
   serviceCategory: string;
@@ -119,7 +114,6 @@ interface VendorFields {
 
 type TouchedFields = Record<keyof VendorFields, boolean>;
 
-/* ─── Main Page ──────────────────────────────────────────────── */
 export function VendorSetupPage() {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -134,7 +128,6 @@ export function VendorSetupPage() {
   );
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Controlled field values
   const [fields, setFields] = useState<VendorFields>({
     businessName: p?.businessName ?? "",
     serviceCategory: p?.serviceCategory ?? "",
@@ -163,7 +156,6 @@ export function VendorSetupPage() {
   const set = (field: keyof VendorFields, value: string) =>
     setFields((f) => ({ ...f, [field]: value }));
 
-  // Derived errors
   const errors: Partial<
     VendorFields & { pricingTier: string; priceRange: string }
   > = {};
@@ -234,7 +226,6 @@ export function VendorSetupPage() {
     return true;
   }
 
-  /* ── Not logged in ── */
   if (!isLoggedIn) {
     return (
       <Layout>
@@ -326,7 +317,6 @@ export function VendorSetupPage() {
             transition={{ duration: 0.5 }}
             className="max-w-2xl mx-auto"
           >
-            {/* Page header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 mb-4">
                 <Store size={26} className="text-primary" />
@@ -340,7 +330,6 @@ export function VendorSetupPage() {
               </p>
             </div>
 
-            {/* Success banner */}
             {showSuccess && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
@@ -360,7 +349,6 @@ export function VendorSetupPage() {
               </motion.div>
             )}
 
-            {/* Active profile badge */}
             {savedProfile && !showSuccess && (
               <div className="flex items-center justify-center gap-2 mb-6">
                 <Badge
@@ -374,7 +362,6 @@ export function VendorSetupPage() {
               </div>
             )}
 
-            {/* Form card */}
             <div className="bg-card border border-border rounded-2xl shadow-soft">
               <form
                 onSubmit={handleSubmit}
@@ -382,7 +369,6 @@ export function VendorSetupPage() {
                 noValidate
                 data-ocid="vendor.form"
               >
-                {/* ── Business Info ── */}
                 <Section title="Business Information">
                   <div className="space-y-2">
                     <Label htmlFor="businessName">Business Name *</Label>
@@ -454,7 +440,6 @@ export function VendorSetupPage() {
                   </div>
                 </Section>
 
-                {/* ── Pricing ── */}
                 <Section title="Pricing">
                   <div className="space-y-2">
                     <Label>Pricing Tier *</Label>
@@ -518,7 +503,6 @@ export function VendorSetupPage() {
                   </div>
                 </Section>
 
-                {/* ── Location ── */}
                 <Section title="Location">
                   <div className="space-y-2">
                     <Label
@@ -551,7 +535,6 @@ export function VendorSetupPage() {
                   </div>
                 </Section>
 
-                {/* ── Contact ── */}
                 <Section title="Contact Details">
                   <div className="space-y-2">
                     <Label htmlFor="contactEmail">Contact Email *</Label>
@@ -597,7 +580,6 @@ export function VendorSetupPage() {
                   </div>
                 </Section>
 
-                {/* ── Submit ── */}
                 <div className="pt-2 flex flex-col sm:flex-row gap-3 border-t border-border">
                   <Button
                     type="submit"

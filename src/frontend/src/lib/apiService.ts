@@ -1,34 +1,16 @@
-/**
- * EventIQ API Service — Zero-transformation integration
- *
- * Backend endpoint: POST https://event-management-capstone-project.onrender.com/plan-event
- *
- * IMPORTANT: All field names exactly match the backend spec — do NOT rename or
- * transform any field between the frontend request and the backend response.
- * Zero-transformation policy enforced throughout this file.
- */
-
-// ── Endpoint constant — update only this line if the backend URL changes ──────
-// Zero-transformation: field names match backend exactly
 export const PLAN_EVENT_URL =
   "https://event-management-capstone-project.onrender.com/plan-event";
 
-// ── Request interface — exact backend field names ────────────────────────────
-// Zero-transformation: field names match backend exactly
-
 export interface EventPlanRequest {
   event_type: string;
-  event_date: string; // YYYY-MM-DD
+  event_date: string;
   locality: string;
   guest_count: number;
   min_budget: number;
   max_budget: number;
   services: string[];
-  month: number; // 1-12
+  month: number;
 }
-
-// ── Response interfaces — exact backend field names ──────────────────────────
-// Zero-transformation: field names match backend exactly
 
 export interface BackendVendor {
   vendor_id: string;
@@ -37,7 +19,7 @@ export interface BackendVendor {
   allocated_budget: number;
   score: number;
   address: string;
-  location: string; // URL string — render as clickable "View on Map" link
+  location: string;
   latitude: number;
   longitude: number;
   contact: string;
@@ -62,49 +44,31 @@ export interface BackendResponse {
   plans: BackendPlan[];
 }
 
-// ── API function ─────────────────────────────────────────────────────────────
-
-/**
- * Submit an event planning request to the backend API.
- *
- * Returns the parsed BackendResponse directly — no field transformation.
- *
- * Error cases:
- *   - 503 Service Unavailable → throws "Service temporarily unavailable"
- *   - Any other non-OK HTTP → throws with HTTP status message
- *   - response.status !== "success" → throws with the returned status string
- *   - Network failure → throws with a user-friendly message
- */
 export async function submitEventPlan(
   request: EventPlanRequest,
 ): Promise<BackendResponse> {
   let response: Response;
 
   try {
-    // Zero-transformation: request body field names match backend exactly
     response = await fetch(PLAN_EVENT_URL, {
       method: "POST",
       headers: {
-        // Content-Type must be application/json for the backend to parse the body
         "Content-Type": "application/json",
       },
       body: JSON.stringify(request),
     });
   } catch {
-    // Network-level failure (offline, DNS failure, CORS, timeout, etc.)
     throw new Error(
       "Could not reach the planning service. Please check your internet connection and try again.",
     );
   }
 
-  // Handle 503 Service Unavailable specifically
   if (response.status === 503) {
     throw new Error(
       "Service temporarily unavailable. The planning server is down or busy — falling back to offline plans.",
     );
   }
 
-  // Handle all other non-OK HTTP responses
   if (!response.ok) {
     let detail = "";
     try {
@@ -117,7 +81,6 @@ export async function submitEventPlan(
     );
   }
 
-  // Parse JSON — zero-transformation: no field renaming
   let data: BackendResponse;
   try {
     data = (await response.json()) as BackendResponse;
@@ -125,7 +88,6 @@ export async function submitEventPlan(
     throw new Error("Received an invalid response from the planning service.");
   }
 
-  // Accept both "success" and "adjusted_plan" as valid statuses
   const VALID_STATUSES = ["success", "adjusted_plan"];
   if (!VALID_STATUSES.includes(data.status)) {
     throw new Error(
@@ -133,6 +95,5 @@ export async function submitEventPlan(
     );
   }
 
-  // Return the response exactly as received — zero-transformation
   return data;
 }

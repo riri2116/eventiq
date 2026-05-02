@@ -79,8 +79,6 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-// ── Rich vendor types for the 16-category Dehradun dataset ──────────────────
-
 export interface RichVendorBase {
   id: string;
   name: string;
@@ -140,8 +138,6 @@ export interface VendorEntry16 {
 
 export type VendorDatabase16 = Record<VendorCategory16Key, VendorEntry16>;
 
-// ── VendorKey16: explicit union of all 16 category keys ─────────────────────
-
 export type VendorKey16 =
   | "banquetHall"
   | "caterer"
@@ -160,8 +156,6 @@ export type VendorKey16 =
   | "weddingPhotographer"
   | "weddingResort";
 
-// ── VendorItemFull: extends VendorItem with full detail properties ────────────
-
 export interface VendorItemFull extends VendorItem {
   id?: string;
   location?: string;
@@ -170,22 +164,16 @@ export interface VendorItemFull extends VendorItem {
   phone?: string;
   email?: string;
   amenities?: string[];
-  // venue-specific
   capacity?: number;
   parking?: boolean;
-  // caterer-specific
   specialty?: string;
   pricePerPlate?: number;
-  // photographer-specific
   style?: string;
   deliverables?: string[];
-  // for categorization / display
   categoryKey?: string;
   emoji?: string;
   category?: string;
 }
-
-// ── SelectedVendors16: supports all 16 vendor category slots ─────────────────
 
 export interface SelectedVendors16 {
   banquetHall?: VendorItemFull;
@@ -206,8 +194,6 @@ export interface SelectedVendors16 {
   weddingResort?: VendorItemFull;
 }
 
-// ── Extended EventPlan supporting 16 vendor keys ─────────────────────────────
-
 export interface EventPlan16
   extends Omit<EventPlan, "selectedVendorKeys" | "vendors"> {
   selectedVendorKeys: VendorKey16[];
@@ -215,18 +201,15 @@ export interface EventPlan16
   guestCount?: number;
 }
 
-// ── Backend API types — exact field names, zero transformation ───────────────
-// These interfaces mirror the backend API spec 1:1. Do NOT rename any field.
-
 export interface EventPlanRequest {
   event_type: string;
-  event_date: string; // YYYY-MM-DD
+  event_date: string;
   locality: string;
   guest_count: number;
   min_budget: number;
   max_budget: number;
   services: string[];
-  month: number; // 1–12
+  month: number;
 }
 
 export interface BackendVendor {
@@ -257,8 +240,6 @@ export interface BackendResponse {
   event_id: number;
   plans: BackendPlan[];
 }
-
-// ── Unified saved plan that can hold either offline or API plans ──────────────
 
 export interface ApiSavedPlanSet {
   id: string;

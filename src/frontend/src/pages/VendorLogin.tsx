@@ -109,7 +109,6 @@ export function VendorLoginPage() {
       return;
     }
 
-    // Confirm the freshly-logged-in user has a vendor account
     try {
       const raw = localStorage.getItem("eventiq_session");
       const user = raw ? JSON.parse(raw) : null;
@@ -121,7 +120,6 @@ export function VendorLoginPage() {
         return;
       }
     } catch {
-      // fall through to navigate
     }
 
     toast.success("Welcome back, vendor!");
@@ -145,7 +143,6 @@ export function VendorLoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel — vendor branding ─────────────────────── */}
       <div
         className="hidden lg:flex lg:w-[42%] flex-col justify-between p-12 relative overflow-hidden"
         style={{
@@ -239,7 +236,6 @@ export function VendorLoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel — form ───────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-background">
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-border">
           <Link

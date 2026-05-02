@@ -34,7 +34,6 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-/* ─── Helpers ────────────────────────────────────────────────────────────── */
 function formatToLakh(amount: number): string {
   if (amount >= 1_00_00_000)
     return `₹${(amount / 1_00_00_000).toFixed(2).replace(/\.?0+$/, "")} Cr`;
@@ -68,7 +67,6 @@ const CHART_COLORS = [
   "#7C3AED",
 ];
 
-/* ─── Types ───────────────────────────────────────────────────────────────── */
 interface VendorDetail {
   key: string;
   emoji: string;
@@ -78,7 +76,6 @@ interface VendorDetail {
   rich: RichVendor | null;
 }
 
-/* ─── CSS Conic-Gradient Pie Chart ────────────────────────────────────────── */
 function PieChart({ vendors }: { vendors: VendorDetail[] }) {
   const total = vendors.reduce((s, v) => s + v.cost, 0);
   if (vendors.length === 0 || total === 0) return null;
@@ -139,7 +136,6 @@ function PieChart({ vendors }: { vendors: VendorDetail[] }) {
   );
 }
 
-/* ─── Star Rating row ─────────────────────────────────────────────────────── */
 function StarRow({ rating }: { rating: number }) {
   const full = Math.floor(rating);
   const hasHalf = rating - full >= 0.5;
@@ -165,7 +161,6 @@ function StarRow({ rating }: { rating: number }) {
   );
 }
 
-/* ─── Vendor Detail Card (offline) ────────────────────────────────────────── */
 function VendorCard({ vd, color }: { vd: VendorDetail; color: string }) {
   const r = vd.rich;
 
@@ -190,12 +185,10 @@ function VendorCard({ vd, color }: { vd: VendorDetail; color: string }) {
       className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-smooth"
       data-ocid={`plan_details.vendor_card_${vd.key}`}
     >
-      {/* Top colored accent */}
       <div className="h-1 w-full" style={{ background: color }} />
 
       <div className="p-5">
         <div className="flex items-start gap-4 mb-3">
-          {/* Emoji badge */}
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-2xl"
             style={{
@@ -373,7 +366,6 @@ function VendorCard({ vd, color }: { vd: VendorDetail; color: string }) {
   );
 }
 
-/* ─── Smart Insights ─────────────────────────────────────────────────────── */
 function SmartInsights({
   vendors,
   planSet,
@@ -465,7 +457,6 @@ function SmartInsights({
       <ul className="space-y-3">
         {insights.slice(0, 5).map((insight, i) => (
           <li
-            // biome-ignore lint/suspicious/noArrayIndexKey: stable list
             key={i}
             className="flex gap-2.5 text-sm text-muted-foreground leading-relaxed"
           >
@@ -478,7 +469,6 @@ function SmartInsights({
   );
 }
 
-/* ─── API Vendor Card ─────────────────────────────────────────────────────── */
 function ApiVendorCard({
   vendor,
   color,
@@ -502,12 +492,10 @@ function ApiVendorCard({
       className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-smooth"
       data-ocid={`plan_details.api_vendor_card_${index}`}
     >
-      {/* Top color bar */}
       <div className="h-1 w-full" style={{ background: color }} />
 
       <div className="p-5">
         <div className="flex items-start gap-4 mb-3">
-          {/* Category initial badge */}
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-lg font-bold"
             style={{
@@ -550,7 +538,6 @@ function ApiVendorCard({
           </div>
         </div>
 
-        {/* Contact */}
         {vendor.contact && (
           <div className="flex flex-wrap gap-3 mb-3 p-3 rounded-xl bg-primary/5 border border-primary/15">
             {isPhoneContact ? (
@@ -580,7 +567,6 @@ function ApiVendorCard({
           </div>
         )}
 
-        {/* Website */}
         {vendor.website && vendor.website !== "http://example.com" && (
           <div className="mb-2">
             <a
@@ -597,7 +583,6 @@ function ApiVendorCard({
           </div>
         )}
 
-        {/* Map link */}
         {vendor.location && (
           <div className="mb-3">
             <a
@@ -648,7 +633,6 @@ function ApiVendorCard({
   );
 }
 
-/* ─── API Pie Chart ───────────────────────────────────────────────────────── */
 function ApiPieChart({ vendors }: { vendors: BackendVendor[] }) {
   const total = vendors.reduce((s, v) => s + v.allocated_budget, 0);
   if (vendors.length === 0 || total === 0) return null;
@@ -709,7 +693,6 @@ function ApiPieChart({ vendors }: { vendors: BackendVendor[] }) {
   );
 }
 
-/* ─── API Plan View ───────────────────────────────────────────────────────── */
 function ApiPlanView({ plan }: { plan: BackendPlan }) {
   const total = plan.total_cost;
 
@@ -742,7 +725,6 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
 
   return (
     <div className="space-y-6">
-      {/* Plan summary */}
       <div className="bg-card border border-border rounded-2xl p-5 shadow-soft">
         <h2
           className={`font-display font-bold text-lg mb-4 flex items-center gap-2 ${meta.color}`}
@@ -769,9 +751,7 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
         </div>
       </div>
 
-      {/* Two-column layout */}
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left: Vendor cards */}
         <div
           className="lg:w-[60%] space-y-4"
           data-ocid="plan_details.vendors_section"
@@ -801,11 +781,9 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
           )}
         </div>
 
-        {/* Right: Chart + summary */}
         <div className="lg:w-[40%] space-y-5">
           {plan.vendors.length > 0 && (
             <>
-              {/* Pie chart */}
               <div
                 className="bg-card border border-border rounded-2xl p-5 shadow-soft"
                 data-ocid="plan_details.budget_chart_card"
@@ -856,7 +834,6 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
                 </div>
               </div>
 
-              {/* Budget summary */}
               <div className="bg-card border border-border rounded-2xl p-5 shadow-soft">
                 <h2 className="font-display font-semibold text-sm text-foreground mb-4">
                   Budget Summary
@@ -892,7 +869,6 @@ function ApiPlanView({ plan }: { plan: BackendPlan }) {
   );
 }
 
-/* ─── Main Page ──────────────────────────────────────────────────────────── */
 export function PlanDetailsPage() {
   const search = useSearch({ strict: false });
   const planId = (search as { id?: string })?.id ?? undefined;
@@ -932,7 +908,6 @@ export function PlanDetailsPage() {
           break;
         }
       } catch {
-        /* ignore parse errors */
       }
     }
 
@@ -941,7 +916,6 @@ export function PlanDetailsPage() {
         const raw = sessionStorage.getItem(`plan_${planId}`);
         if (raw) foundOffline = JSON.parse(raw) as SavedPlanSet;
       } catch {
-        /* ignore */
       }
     }
 
@@ -1068,7 +1042,6 @@ export function PlanDetailsPage() {
         className="container mx-auto px-4 sm:px-8 py-8"
         data-ocid="plan_details.page"
       >
-        {/* Breadcrumb */}
         <div
           className="flex items-center justify-between mb-6 print-hide"
           data-ocid="plan_details.nav"
@@ -1086,12 +1059,10 @@ export function PlanDetailsPage() {
           </Link>
         </div>
 
-        {/* Event Header Card */}
         <div
           className="bg-card border border-border rounded-2xl overflow-hidden mb-8 shadow-soft"
           data-ocid="plan_details.event_header"
         >
-          {/* Gradient header band */}
           <div className="h-2 w-full bg-gradient-to-r from-primary via-primary/80 to-primary/60" />
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
@@ -1167,7 +1138,6 @@ export function PlanDetailsPage() {
           </div>
         </div>
 
-        {/* API plan: plan selector tabs + view */}
         {apiPlanSet && activePlan && (
           <>
             {apiPlanSet.plans.length > 1 && (
@@ -1205,10 +1175,8 @@ export function PlanDetailsPage() {
           </>
         )}
 
-        {/* Offline plan: two-column layout */}
         {planSet && (
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left: vendors (60%) */}
             <div
               className="lg:w-[60%] space-y-4"
               data-ocid="plan_details.vendors_section"
@@ -1237,9 +1205,7 @@ export function PlanDetailsPage() {
               )}
             </div>
 
-            {/* Right: charts & insights (40%) */}
             <div className="lg:w-[40%] space-y-5">
-              {/* Budget pie chart */}
               {vendors.length > 0 && (
                 <div
                   className="bg-card border border-border rounded-2xl p-5 shadow-soft"
@@ -1291,7 +1257,6 @@ export function PlanDetailsPage() {
                 </div>
               )}
 
-              {/* Cost breakdown */}
               {vendors.length > 0 && (
                 <div
                   className="bg-card border border-border rounded-2xl p-5 shadow-soft"
@@ -1341,7 +1306,6 @@ export function PlanDetailsPage() {
                 </div>
               )}
 
-              {/* Smart Insights */}
               <SmartInsights vendors={vendors} planSet={planSet} />
             </div>
           </div>

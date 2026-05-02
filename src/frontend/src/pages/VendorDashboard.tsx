@@ -23,7 +23,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* ─── Constants ───────────────────────────────────────────────── */
 const SERVICE_CATEGORIES = [
   "Venue",
   "Catering",
@@ -42,7 +41,6 @@ const PRICING_TIERS = [
 
 type PricingTier = "$" | "$$" | "$$$";
 
-/* ─── Profile type ────────────────────────────────────────────── */
 interface FullVendorProfile {
   ownerEmail: string;
   businessName: string;
@@ -81,7 +79,6 @@ const UNTOUCHED: TouchedFields = {
   maxPrice: false,
 };
 
-/* ─── Helpers ─────────────────────────────────────────────────── */
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -105,7 +102,6 @@ function saveProfile(profile: FullVendorProfile): void {
   );
 }
 
-/* ─── Info card for profile grid ─────────────────────────────── */
 function ProfileCard({
   icon,
   label,
@@ -136,7 +132,6 @@ function ProfileCard({
   );
 }
 
-/* ─── Field error ─────────────────────────────────────────────── */
 function FieldError({ msg }: { msg: string }) {
   return (
     <motion.p
@@ -151,7 +146,6 @@ function FieldError({ msg }: { msg: string }) {
   );
 }
 
-/* ─── Edit Modal ──────────────────────────────────────────────── */
 function EditModal({
   profile,
   onClose,
@@ -183,7 +177,6 @@ function EditModal({
   const set = (field: keyof VendorFields, value: string) =>
     setFields((f) => ({ ...f, [field]: value }));
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -192,7 +185,6 @@ function EditModal({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // Derived errors
   const errors: Partial<VendorFields & { priceRange: string }> = {};
   if (touched.businessName) {
     if (!fields.businessName.trim())
@@ -253,7 +245,6 @@ function EditModal({
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Touch all fields
     setTouched({
       businessName: true,
       serviceCategory: true,
@@ -295,7 +286,6 @@ function EditModal({
 
   return (
     <AnimatePresence>
-      {/* Backdrop */}
       <motion.div
         ref={backdropRef}
         initial={{ opacity: 0 }}
@@ -311,7 +301,6 @@ function EditModal({
         }}
         data-ocid="vendor_dashboard.dialog"
       >
-        {/* Modal panel */}
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -320,7 +309,6 @@ function EditModal({
           className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border rounded-2xl shadow-elevated"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Modal header */}
           <div className="sticky top-0 z-10 bg-card border-b border-border flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -341,14 +329,12 @@ function EditModal({
             </button>
           </div>
 
-          {/* Modal form */}
           <form
             onSubmit={handleSubmit}
             noValidate
             className="p-6 space-y-6"
             data-ocid="vendor_dashboard.edit_form"
           >
-            {/* Business Info */}
             <fieldset className="space-y-4">
               <legend className="font-display font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">
                 Business Information
@@ -418,7 +404,6 @@ function EditModal({
               </div>
             </fieldset>
 
-            {/* Pricing */}
             <fieldset className="space-y-4">
               <legend className="font-display font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">
                 Pricing
@@ -484,7 +469,6 @@ function EditModal({
               </div>
             </fieldset>
 
-            {/* Location */}
             <fieldset className="space-y-3">
               <legend className="font-display font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-2">
                 Location
@@ -518,7 +502,6 @@ function EditModal({
               </div>
             </fieldset>
 
-            {/* Contact */}
             <fieldset className="space-y-4">
               <legend className="font-display font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">
                 Contact Details
@@ -562,7 +545,6 @@ function EditModal({
               </div>
             </fieldset>
 
-            {/* Actions */}
             <div className="flex gap-3 pt-2 border-t border-border">
               <Button
                 type="button"
@@ -589,7 +571,6 @@ function EditModal({
   );
 }
 
-/* ─── Main Page ───────────────────────────────────────────────── */
 export function VendorDashboardPage() {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -598,14 +579,12 @@ export function VendorDashboardPage() {
   );
   const [editOpen, setEditOpen] = useState(false);
 
-  // Redirect non-vendors
   useEffect(() => {
     if (isLoggedIn && currentUser && !currentUser.isVendor) {
       void navigate({ to: "/dashboard" });
     }
   }, [isLoggedIn, currentUser, navigate]);
 
-  // Redirect unauthenticated
   if (!isLoggedIn || !currentUser) {
     return (
       <Layout>
@@ -648,7 +627,6 @@ export function VendorDashboardPage() {
     <Layout>
       <div className="bg-muted/30 min-h-screen">
         <div className="container mx-auto px-4 sm:px-8 py-10">
-          {/* Page header */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -678,7 +656,6 @@ export function VendorDashboardPage() {
             )}
           </motion.div>
 
-          {/* No profile — empty state */}
           {!profile ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.97 }}
@@ -714,7 +691,6 @@ export function VendorDashboardPage() {
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
-              {/* Status row */}
               <div
                 className="flex items-center gap-3"
                 data-ocid="vendor_dashboard.status_badge"
@@ -737,7 +713,6 @@ export function VendorDashboardPage() {
                 </span>
               </div>
 
-              {/* Business hero card */}
               <div className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden">
                 <div className="h-1.5 gradient-accent" />
                 <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -765,7 +740,6 @@ export function VendorDashboardPage() {
                 </div>
               </div>
 
-              {/* Profile 2-column grid */}
               <div
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4"
                 data-ocid="vendor_dashboard.profile_grid"
@@ -802,7 +776,6 @@ export function VendorDashboardPage() {
                 />
               </div>
 
-              {/* Description card (full width) */}
               <div className="bg-card border border-border rounded-xl p-6 shadow-card">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -820,7 +793,6 @@ export function VendorDashboardPage() {
                 </p>
               </div>
 
-              {/* Edit CTA at bottom */}
               <div className="flex justify-end pt-2">
                 <Button
                   variant="outline"
@@ -837,7 +809,6 @@ export function VendorDashboardPage() {
         </div>
       </div>
 
-      {/* Edit Modal */}
       {editOpen && profile && (
         <EditModal
           profile={profile}

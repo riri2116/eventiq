@@ -65,7 +65,6 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-// ─── Vendor key → service label mapping (for backend services[] array) ────────
 const VENDOR_KEY_TO_SERVICE: Record<string, string> = {
   banquetHall: "banquet hall",
   caterer: "caterer",
@@ -85,7 +84,6 @@ const VENDOR_KEY_TO_SERVICE: Record<string, string> = {
   weddingResort: "wedding resort",
 };
 
-// ─── Audience scale → guest count mapping ─────────────────────────────────────
 const AUDIENCE_SCALE_TO_GUEST_COUNT: Record<string, number> = {
   "Intimate (10-30)": 20,
   "Small (30-60)": 45,
@@ -94,7 +92,6 @@ const AUDIENCE_SCALE_TO_GUEST_COUNT: Record<string, number> = {
   "Grand (300+)": 400,
 };
 
-// ─── Month name → number mapping ──────────────────────────────────────────────
 const MONTH_NAME_TO_NUMBER: Record<string, number> = {
   January: 1,
   February: 2,
@@ -110,7 +107,6 @@ const MONTH_NAME_TO_NUMBER: Record<string, number> = {
   December: 12,
 };
 
-// ─── Budget formatting helpers ───────────────────────────────────────────────
 function formatBudget(value: number): string {
   if (value >= 10000000) {
     const cr = value / 10000000;
@@ -123,7 +119,6 @@ function formatBudget(value: number): string {
   return `₹${value.toLocaleString("en-IN")}`;
 }
 
-/** Format large rupee amounts into compact lakh/K notation for plan cards */
 function formatToLakh(amount: number): string {
   if (amount >= 100000) {
     return `₹${(amount / 100000).toFixed(1)} L`;
@@ -134,7 +129,6 @@ function formatToLakh(amount: number): string {
   return `₹${amount}`;
 }
 
-// ─── DualRangeSlider ─────────────────────────────────────────────────────────
 const SLIDER_MIN = 3000;
 const SLIDER_MAX = 500000000;
 
@@ -330,7 +324,6 @@ function DualRangeSlider({
   );
 }
 
-// ─── Inline field error ───────────────────────────────────────────────────────
 function FieldError({ msg, ocid }: { msg: string; ocid?: string }) {
   return (
     <motion.p
@@ -346,7 +339,6 @@ function FieldError({ msg, ocid }: { msg: string; ocid?: string }) {
   );
 }
 
-// ─── Styled Select ────────────────────────────────────────────────────────────
 function StyledSelect({
   id,
   name,
@@ -384,7 +376,6 @@ function StyledSelect({
   );
 }
 
-// ─── Save Login Dialog ────────────────────────────────────────────────────────
 function SaveLoginDialog({
   open,
   onOpenChange,
@@ -415,7 +406,6 @@ function SaveLoginDialog({
   );
 }
 
-// ─── Plan variant border/glow spec ───────────────────────────────────────────
 type PlanVariant = "best" | "recommended" | "budget";
 
 const PLAN_VARIANT_STYLE: Record<
@@ -431,11 +421,9 @@ const PLAN_VARIANT_STYLE: Record<
   budget: { border: "#3B82F6", glow: "rgba(59,130,246,0.5)", type: "Budget" },
 };
 
-// Vendor row: subtle glow on hover (dark glow in light mode, light glow in dark)
 const VENDOR_ROW_HOVER_CLASS =
   "rounded-md -mx-1 px-1 transition-shadow duration-150 ease-out hover:shadow-[0_0_8px_rgba(0,0,0,0.18)] dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.18)]";
 
-// ─── Offline Plan Card (existing offline-generated plans) ────────────────────
 function OfflinePlanCard({
   planSet,
   planKey,
@@ -501,10 +489,8 @@ function OfflinePlanCard({
       setLoginOpen(true);
       return;
     }
-    // Preserve existing dashboard storage so the Dashboard page keeps working
     savePlanToStorage(planSet, currentUser!.email);
 
-    // New "savedPlans" storage per spec
     const record: SavedPlanRecord = {
       id: `offline_${planSet.id}_${planKey}`,
       type: variant.type,
@@ -554,7 +540,6 @@ function OfflinePlanCard({
         }}
         data-ocid={`plan.${planKey}_card`}
       >
-        {/* Top accent bar for highlight card */}
         {config.accentBar && (
           <div
             className="absolute top-0 left-0 right-0 h-0.5"
@@ -563,7 +548,6 @@ function OfflinePlanCard({
         )}
 
         <div className="p-6 flex flex-col gap-5 flex-1">
-          {/* Badge row */}
           <div className="flex items-center justify-between gap-2">
             <span
               className="text-xs font-bold px-3 py-1.5 rounded-full border"
@@ -583,7 +567,6 @@ function OfflinePlanCard({
             )}
           </div>
 
-          {/* Cost hero */}
           <div>
             <p className="font-display font-bold text-4xl text-foreground tracking-tight leading-none">
               {formatToLakh(plan.totalCost)}
@@ -593,7 +576,6 @@ function OfflinePlanCard({
             </p>
           </div>
 
-          {/* Remaining budget box */}
           <div
             className="rounded-xl px-4 py-3 flex items-center justify-between"
             style={{
@@ -609,7 +591,6 @@ function OfflinePlanCard({
             </span>
           </div>
 
-          {/* Vendor rows */}
           <div className="flex-1 space-y-0 divide-y divide-border/40">
             {vendorEntries.map(([key, vendor]) => (
               <div
@@ -643,7 +624,6 @@ function OfflinePlanCard({
             ))}
           </div>
 
-          {/* Over budget warning */}
           {plan.totalCost > plan.budget && (
             <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 rounded-xl px-3 py-2">
               <AlertCircle size={13} />
@@ -654,7 +634,6 @@ function OfflinePlanCard({
           )}
         </div>
 
-        {/* Save button */}
         <div className="px-6 pb-6">
           <Button
             type="button"
@@ -673,7 +652,6 @@ function OfflinePlanCard({
   );
 }
 
-// ─── API Plan Card (plans from backend API) ───────────────────────────────────
 const API_TYPE_TO_VARIANT: Record<string, PlanVariant> = {
   premium: "best",
   balanced: "recommended",
@@ -739,7 +717,6 @@ function ApiPlanCard({
       setLoginOpen(true);
       return;
     }
-    // Preserve existing dashboard storage so the Dashboard page keeps working
     const apiPlanSet: ApiSavedPlanSet = {
       id: `api_${apiResponse.event_id}_${plan.plan_type}`,
       eventName,
@@ -759,7 +736,6 @@ function ApiPlanCard({
       localStorage.setItem(key, JSON.stringify(existing));
     }
 
-    // New "savedPlans" storage per spec
     const record: SavedPlanRecord = {
       id: `api_${apiResponse.event_id}_${plan.plan_type}`,
       type: variant.type,
@@ -809,7 +785,6 @@ function ApiPlanCard({
         }}
         data-ocid={`plan.${plan.plan_type}_card`}
       >
-        {/* Top accent bar for highlight card */}
         {config.accentBar && (
           <div
             className="absolute top-0 left-0 right-0 h-0.5"
@@ -818,7 +793,6 @@ function ApiPlanCard({
         )}
 
         <div className="p-6 flex flex-col gap-5 flex-1">
-          {/* Badge row */}
           <div className="flex items-center justify-between gap-2">
             <span
               className="text-xs font-bold px-3 py-1.5 rounded-full border"
@@ -838,7 +812,6 @@ function ApiPlanCard({
             )}
           </div>
 
-          {/* Cost hero */}
           <div>
             <p className="font-display font-bold text-4xl text-foreground tracking-tight leading-none">
               {formatToLakh(plan.total_cost)}
@@ -848,7 +821,6 @@ function ApiPlanCard({
             </p>
           </div>
 
-          {/* Remaining budget box — always shown, even when 0 */}
           <div
             className="rounded-xl px-4 py-3 flex items-center justify-between"
             style={{
@@ -864,7 +836,6 @@ function ApiPlanCard({
             </span>
           </div>
 
-          {/* Shortfall row — only when budget_gap > 0 */}
           {(plan.budget_gap ?? 0) > 0 && (
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-medium text-red-500/80">
@@ -876,7 +847,6 @@ function ApiPlanCard({
             </div>
           )}
 
-          {/* Subtle warning — shown when status is adjusted_plan or message exists */}
           {(plan.status === "adjusted_plan" || plan.message) && (
             <div
               className="rounded-lg px-3 py-2.5"
@@ -895,7 +865,6 @@ function ApiPlanCard({
             </div>
           )}
 
-          {/* Vendor rows */}
           <div className="flex-1 space-y-0 divide-y divide-border/40">
             {plan.vendors.map((vendor: BackendVendor) => (
               <div
@@ -925,7 +894,6 @@ function ApiPlanCard({
           </div>
         </div>
 
-        {/* Save button */}
         <div className="px-6 pb-6">
           <Button
             type="button"
@@ -944,7 +912,6 @@ function ApiPlanCard({
   );
 }
 
-// ─── ResultsSkeleton ─────────────────────────────────────────────────────────
 function ResultsSkeleton() {
   return (
     <div className="mt-16" data-ocid="planning.results_loading_state">
@@ -974,7 +941,6 @@ function ResultsSkeleton() {
   );
 }
 
-// ─── Validation types ─────────────────────────────────────────────────────────
 interface FormErrors {
   eventName?: string;
   eventType?: string;
@@ -997,11 +963,8 @@ interface FormTouched {
   vendors: boolean;
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export function PlanningPage() {
-  // Offline plan result
   const [planSet, setPlanSet] = useState<SavedPlanSet | null>(null);
-  // API plan result
   const [apiResult, setApiResult] = useState<{
     response: BackendResponse;
     eventName: string;
@@ -1016,10 +979,9 @@ export function PlanningPage() {
     new Set(["banquetHall", "caterer"]),
   );
 
-  // Controlled field values
   const [eventNameVal, setEventNameVal] = useState("");
   const [eventTypeVal, setEventTypeVal] = useState("");
-  const [eventDateVal, setEventDateVal] = useState(""); // YYYY-MM-DD
+  const [eventDateVal, setEventDateVal] = useState("");
   const [localityVal, setLocalityVal] = useState("");
   const [eventMonthVal, setEventMonthVal] = useState("");
   const [audienceScaleVal, setAudienceScaleVal] = useState("");
@@ -1039,12 +1001,11 @@ export function PlanningPage() {
   const touch = (field: keyof FormTouched) =>
     setTouched((t) => ({ ...t, [field]: true }));
 
-  // Auto-derive month from event_date when it changes
   function handleDateChange(val: string) {
     setEventDateVal(val);
     touch("eventDate");
     if (val) {
-      const monthNum = new Date(val).getMonth() + 1; // 1-12
+      const monthNum = new Date(val).getMonth() + 1;
       const monthName = Object.entries(MONTH_NAME_TO_NUMBER).find(
         ([, num]) => num === monthNum,
       )?.[0];
@@ -1055,7 +1016,6 @@ export function PlanningPage() {
     }
   }
 
-  // Derived errors
   const errors: FormErrors = {};
   if (touched.eventName) {
     if (!eventNameVal.trim()) errors.eventName = "Event name is required";
@@ -1131,7 +1091,6 @@ export function PlanningPage() {
     setIsOfflineMode(false);
     setApiError(null);
 
-    // Derive month number — prefer from date picker, fall back to dropdown
     let month: number;
     if (eventDateVal) {
       month = new Date(eventDateVal).getMonth() + 1;
@@ -1139,17 +1098,14 @@ export function PlanningPage() {
       month = MONTH_NAME_TO_NUMBER[eventMonthVal] ?? 1;
     }
 
-    // Build guest_count from audience scale
     const guest_count =
       AUDIENCE_SCALE_TO_GUEST_COUNT[audienceScaleVal] ??
       Number.parseInt(audienceScaleVal.match(/\d+/)?.[0] ?? "100", 10);
 
-    // Build services array from selected vendor keys
     const services = Array.from(selectedVendors)
       .map((key) => VENDOR_KEY_TO_SERVICE[key])
       .filter(Boolean);
 
-    // Build the exact request payload — field names match backend spec exactly
     const request: EventPlanRequest = {
       event_type: eventTypeVal,
       event_date:
@@ -1163,11 +1119,9 @@ export function PlanningPage() {
       month,
     };
 
-    // Try API first
     try {
       const response: BackendResponse = await submitEventPlan(request);
 
-      // Both "success" and "adjusted_plan" are valid — display the API result
       setApiResult({ response, eventName: eventNameVal.trim() });
       setIsGenerating(false);
       setTimeout(() => {
@@ -1176,7 +1130,6 @@ export function PlanningPage() {
           ?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     } catch (err) {
-      // API failed — fall back to offline generation
       const errorMsg = err instanceof Error ? err.message : "API unavailable";
       setApiError(errorMsg);
       setIsOfflineMode(true);
@@ -1208,7 +1161,6 @@ export function PlanningPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-background">
-        {/* Page header banner */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1225,7 +1177,6 @@ export function PlanningPage() {
 
         <div className="container mx-auto px-4 sm:px-8 py-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            {/* Form card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1239,7 +1190,6 @@ export function PlanningPage() {
                   boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
                 }}
               >
-                {/* Card header */}
                 <div
                   className="px-8 py-5 border-b border-border rounded-t-2xl"
                   style={{ background: "rgba(59,130,246,0.04)" }}
@@ -1258,7 +1208,6 @@ export function PlanningPage() {
                   noValidate
                   data-ocid="planning.form"
                 >
-                  {/* Row 1: Event Name + Type */}
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label
@@ -1321,7 +1270,6 @@ export function PlanningPage() {
                     </div>
                   </div>
 
-                  {/* Row 2: Date + Locality */}
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label
@@ -1390,7 +1338,6 @@ export function PlanningPage() {
                     </div>
                   </div>
 
-                  {/* Row 3: Month + Audience Scale + Target Audience */}
                   <div className="grid sm:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label
@@ -1501,7 +1448,6 @@ export function PlanningPage() {
                     </div>
                   </div>
 
-                  {/* Budget Range */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="font-semibold text-sm">
@@ -1529,7 +1475,6 @@ export function PlanningPage() {
                     />
                   </div>
 
-                  {/* Vendor Selection */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -1597,7 +1542,6 @@ export function PlanningPage() {
                               onChange={() => toggleVendor(key)}
                             />
 
-                            {/* Checkmark badge — top-right */}
                             <span className="vendor-badge" aria-hidden="true">
                               <svg
                                 viewBox="0 0 16 16"
@@ -1618,12 +1562,10 @@ export function PlanningPage() {
                               </svg>
                             </span>
 
-                            {/* Pale circular icon area */}
                             <span className="vendor-icon-circle">
                               {VENDOR_EMOJI_16[key]}
                             </span>
 
-                            {/* Service label */}
                             <span className="vendor-label">
                               {VENDOR_LABELS_16[key]
                                 .replace(/^[^\w]+/, "")
@@ -1642,7 +1584,6 @@ export function PlanningPage() {
                     )}
                   </div>
 
-                  {/* Submit */}
                   <Button
                     type="submit"
                     size="lg"
@@ -1672,7 +1613,6 @@ export function PlanningPage() {
               </div>
             </motion.div>
 
-            {/* Side panel — plan summary */}
             <motion.aside
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1746,10 +1686,8 @@ export function PlanningPage() {
             </motion.aside>
           </div>
 
-          {/* Loading skeleton */}
           {isGenerating && <ResultsSkeleton />}
 
-          {/* Offline mode indicator — amber banner */}
           {isOfflineMode && apiResult === null && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
@@ -1786,7 +1724,6 @@ export function PlanningPage() {
             </motion.div>
           )}
 
-          {/* API success indicator */}
           {apiResult && !isOfflineMode && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
@@ -1809,7 +1746,6 @@ export function PlanningPage() {
             </motion.div>
           )}
 
-          {/* API Results */}
           {apiResult && !isGenerating && (
             <motion.div
               id="plan-results"
@@ -1857,7 +1793,6 @@ export function PlanningPage() {
             </motion.div>
           )}
 
-          {/* Offline Results (fallback) */}
           {planSet && !isGenerating && !apiResult && (
             <motion.div
               id="plan-results"

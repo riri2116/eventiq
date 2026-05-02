@@ -109,7 +109,6 @@ export function ChatAssistant() {
           style={{ height: "420px" }}
           data-ocid="chat.dialog"
         >
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-primary/10 border-b border-border">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -128,7 +127,6 @@ export function ChatAssistant() {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((msg) => (
               <div
@@ -149,7 +147,6 @@ export function ChatAssistant() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
           <div className="px-3 py-3 border-t border-border flex gap-2">
             <input
               type="text"

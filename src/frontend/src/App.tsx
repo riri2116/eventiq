@@ -11,7 +11,6 @@ import {
 import { ThemeProvider } from "next-themes";
 
 import { Skeleton } from "@/components/ui/skeleton";
-// Lazy page imports
 import { Suspense, lazy } from "react";
 
 const HomePage = lazy(() =>
@@ -53,7 +52,6 @@ function PageLoader() {
   );
 }
 
-// Root route
 const rootRoute = createRootRoute({
   component: () => (
     <Suspense fallback={<PageLoader />}>

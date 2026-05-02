@@ -1,7 +1,5 @@
 import type { VendorCategory, VendorDatabase16 } from "@/types";
 
-// ── Legacy 6-category database (preserved) ──────────────────────────────────
-
 export const vendorDatabase: VendorCategory = {
   venues: [
     {
@@ -195,8 +193,6 @@ export const EVENT_MONTHS = [
   "December",
 ];
 
-// ── 16-category constants ────────────────────────────────────────────────────
-
 export const VENDOR_CATEGORIES_16 = [
   "banquetHall",
   "caterer",
@@ -253,8 +249,6 @@ export const VENDOR_EMOJI_16: Record<string, string> = {
   weddingPhotographer: "📸",
   weddingResort: "🏰",
 };
-
-// ── 16-category Dehradun vendor database ────────────────────────────────────
 
 export const vendorDatabase16: VendorDatabase16 = {
   banquetHall: {

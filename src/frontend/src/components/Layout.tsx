@@ -32,10 +32,8 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-card border-b border-border shadow-soft">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-          {/* Logo */}
           <Link
             to="/"
             className="flex items-center gap-2 shrink-0 group"
@@ -49,7 +47,6 @@ export function Layout({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <nav
             className="hidden md:flex items-center gap-1 flex-1 justify-center"
             aria-label="Main navigation"
@@ -77,7 +74,6 @@ export function Layout({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="flex items-center gap-3">
             <div className="hidden md:block">
               <ThemeToggle />
@@ -124,7 +120,6 @@ export function Layout({ children }: { children: ReactNode }) {
               </div>
             )}
 
-            {/* Mobile Menu Toggle */}
             <button
               type="button"
               className="md:hidden p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-smooth"
@@ -137,7 +132,6 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {mobileOpen && (
           <div className="md:hidden border-t border-border bg-card px-5 py-4 flex flex-col gap-1.5">
             {NAV_LINKS.map((link) => (
@@ -200,10 +194,8 @@ export function Layout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      {/* Main content */}
       <main className="flex-1">{children}</main>
 
-      {/* Footer */}
       <footer className="bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-6 py-5">
           <p className="text-center text-sm text-muted-foreground">

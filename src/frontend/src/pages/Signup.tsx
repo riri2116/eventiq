@@ -17,7 +17,6 @@ import { motion } from "motion/react";
 import { type FormEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* ── Validation helpers ─────────────────────────────────────── */
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -72,7 +71,6 @@ function inputCls(hasError: boolean, isOk: boolean, extraRight = false) {
   }`;
 }
 
-/* ── Left panel perks ──────────────────────────────────────── */
 const PERKS = [
   { icon: <PartyPopper size={14} />, text: "Plan any event type" },
   { icon: <Shield size={14} />, text: "Verified vendors only" },
@@ -88,13 +86,11 @@ export function SignupPage() {
   const [serverError, setServerError] = useState("");
   const [isVendor, setIsVendor] = useState(false);
 
-  /* Field values */
   const [nameVal, setNameVal] = useState("");
   const [emailVal, setEmailVal] = useState("");
   const [passwordVal, setPasswordVal] = useState("");
   const [confirmVal, setConfirmVal] = useState("");
 
-  /* Touched map */
   const [touched, setTouched] = useState({
     name: false,
     email: false,
@@ -102,7 +98,6 @@ export function SignupPage() {
     confirm: false,
   });
 
-  /* Refs for focus-on-error */
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -111,7 +106,6 @@ export function SignupPage() {
   const touch = (field: keyof typeof touched) =>
     setTouched((t) => ({ ...t, [field]: true }));
 
-  /* Derived errors */
   const nameError = touched.name
     ? nameVal.trim().length === 0
       ? "Name is required"
@@ -201,7 +195,6 @@ export function SignupPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel — gradient branding ───────────────────── */}
       <div
         className="hidden lg:flex lg:w-[42%] flex-col justify-between p-12 relative overflow-hidden"
         style={{
@@ -209,7 +202,6 @@ export function SignupPage() {
             "linear-gradient(145deg, oklch(0.42 0.20 155) 0%, oklch(0.35 0.18 261) 50%, oklch(0.28 0.18 280) 100%)",
         }}
       >
-        {/* Background decorative circles */}
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-10"
           style={{ background: "oklch(0.9 0.05 155)" }}
@@ -219,7 +211,6 @@ export function SignupPage() {
           style={{ background: "oklch(0.9 0.05 155)" }}
         />
 
-        {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -231,7 +222,6 @@ export function SignupPage() {
           </div>
         </div>
 
-        {/* Hero copy */}
         <div className="relative z-10 space-y-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -259,7 +249,6 @@ export function SignupPage() {
             Free to start. Access our curated Dehradun vendor network instantly.
           </motion.p>
 
-          {/* Perks */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -280,7 +269,6 @@ export function SignupPage() {
           </motion.div>
         </div>
 
-        {/* Bottom badge */}
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -291,9 +279,7 @@ export function SignupPage() {
         </div>
       </div>
 
-      {/* ── Right panel — form ───────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-background">
-        {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-border">
           <Link
             to="/"
@@ -309,7 +295,6 @@ export function SignupPage() {
           </Link>
         </div>
 
-        {/* Desktop back link */}
         <div className="hidden lg:flex items-center justify-end px-10 py-6">
           <Link
             to="/"
@@ -320,7 +305,6 @@ export function SignupPage() {
           </Link>
         </div>
 
-        {/* Form container */}
         <div className="flex-1 flex items-center justify-center px-6 py-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -328,7 +312,6 @@ export function SignupPage() {
             transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="w-full max-w-md"
           >
-            {/* Heading */}
             <div className="mb-7">
               <h2 className="font-display font-bold text-3xl text-foreground mb-2">
                 Create Account
@@ -345,7 +328,6 @@ export function SignupPage() {
               </p>
             </div>
 
-            {/* Card */}
             <div className="bg-card border border-border rounded-2xl shadow-elevated p-7">
               <form
                 onSubmit={handleSubmit}
@@ -353,7 +335,6 @@ export function SignupPage() {
                 noValidate
                 data-ocid="signup.form"
               >
-                {/* Full Name */}
                 <div className="space-y-1.5">
                   <Label htmlFor="name" className="text-sm font-medium">
                     Full Name
@@ -377,7 +358,6 @@ export function SignupPage() {
                   {nameError && <FieldError msg={nameError} />}
                 </div>
 
-                {/* Email */}
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-sm font-medium">
                     Email address
@@ -402,7 +382,6 @@ export function SignupPage() {
                   {emailError && <FieldError msg={emailError} />}
                 </div>
 
-                {/* Password */}
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-sm font-medium">
                     Password
@@ -439,7 +418,6 @@ export function SignupPage() {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  {/* Strength meter */}
                   {passwordVal.length > 0 && (
                     <div className="mt-2 space-y-1">
                       <div className="flex gap-1">
@@ -472,7 +450,6 @@ export function SignupPage() {
                   {passwordError && <FieldError msg={passwordError} />}
                 </div>
 
-                {/* Confirm Password */}
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="confirmPassword"
@@ -517,7 +494,6 @@ export function SignupPage() {
                   {confirmError && <FieldError msg={confirmError} />}
                 </div>
 
-                {/* Vendor toggle */}
                 <label
                   className={`flex items-start gap-3 cursor-pointer p-4 rounded-xl border transition-smooth ${
                     isVendor
@@ -546,7 +522,6 @@ export function SignupPage() {
                   </div>
                 </label>
 
-                {/* Server error */}
                 {serverError && (
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}

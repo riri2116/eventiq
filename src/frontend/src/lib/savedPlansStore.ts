@@ -35,7 +35,6 @@ function writeAll(plans: SavedPlanRecord[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
   } catch {
-    // ignore quota / serialization errors silently — storage is best-effort
   }
 }
 
@@ -51,7 +50,6 @@ export function savePlan(record: SavedPlanRecord): SavePlanResult {
   return "saved";
 }
 
-// ── Tiny pub/sub for toast notifications ────────────────────────────────────
 type ToastListener = (message: string) => void;
 const listeners = new Set<ToastListener>();
 

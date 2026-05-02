@@ -9,15 +9,13 @@
     --font-mono: "JetBrains Mono";
     --radius: 0.75rem;
 
-    /* Light mode — steel blue + cream */
-    --background: 0.975 0.012 85; /* light cream */
+    --background: 0.975 0.012 85;
     --foreground: 0.18 0.02 240;
     --card: 0.982 0.008 85;
     --card-foreground: 0.18 0.02 240;
     --popover: 0.982 0.008 85;
     --popover-foreground: 0.18 0.02 240;
 
-    /* Steel blue primary — #4F6D8A */
     --primary: 0.50 0.085 234;
     --primary-foreground: 1 0 0;
 
@@ -37,11 +35,11 @@
     --input: 0.9 0.01 234;
     --ring: 0.50 0.085 234;
 
-    --chart-1: 0.50 0.085 234; /* steel blue */
-    --chart-2: 0.62 0.18 142; /* green */
-    --chart-3: 0.72 0.18 80; /* amber */
-    --chart-4: 0.65 0.2 290; /* purple */
-    --chart-5: 0.55 0.22 25; /* red */
+    --chart-1: 0.50 0.085 234;
+    --chart-2: 0.62 0.18 142;
+    --chart-3: 0.72 0.18 80;
+    --chart-4: 0.65 0.2 290;
+    --chart-5: 0.55 0.22 25;
 
     --sidebar: 0.97 0.012 85;
     --sidebar-foreground: 0.18 0.02 240;
@@ -54,7 +52,6 @@
   }
 
   .dark {
-    /* Dark mode — comfortable grey #23272F */
     --background: 0.18 0.01 240;
     --foreground: 0.97 0.01 240;
     --card: 0.22 0.02 240;
@@ -62,7 +59,6 @@
     --popover: 0.22 0.02 240;
     --popover-foreground: 0.97 0.01 240;
 
-    /* Steel blue primary in dark mode */
     --primary: 0.50 0.085 234;
     --primary-foreground: 1 0 0;
 
@@ -128,12 +124,10 @@
 }
 
 @layer utilities {
-  /* Smooth universal transition */
   .transition-smooth {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Gradient accent utility — steel blue */
   .gradient-accent {
     background: linear-gradient(
       135deg,
@@ -142,7 +136,6 @@
     );
   }
 
-  /* Subtle shadows */
   .shadow-soft {
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.05);
   }
@@ -156,17 +149,14 @@
     box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.06), 0 0 0 1px rgb(0 0 0 / 0.03);
   }
 
-  /* Modern card: cream bg, rounded-xl, soft border + shadow */
   .card-modern {
     @apply bg-card rounded-xl border border-border shadow-card;
   }
 
-  /* Pill badge */
   .badge-pill {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
-  /* Primary button */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
            bg-primary text-primary-foreground font-semibold
@@ -174,7 +164,6 @@
            shadow-soft transition-smooth cursor-pointer;
   }
 
-  /* Secondary/outline button */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
            bg-card text-foreground font-medium border border-border
@@ -182,7 +171,6 @@
            shadow-soft transition-smooth cursor-pointer;
   }
 
-  /* Success green accent */
   .text-success {
     color: oklch(0.6 0.2 150);
   }

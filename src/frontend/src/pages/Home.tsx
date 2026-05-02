@@ -367,10 +367,12 @@ function HeroCarousel() {
   const goTo = (i: number) => { setCurrent(i); resetTimer(); };
 
   return (
-    <div
-      className="relative w-full select-none overflow-hidden rounded-2xl"
-      style={{ aspectRatio: "16/10" }}
-    >
+    <div className="w-full select-none">
+      {/* Slide track */}
+      <div
+        className="relative w-full overflow-hidden rounded-2xl"
+        style={{ aspectRatio: "16/10" }}
+      >
       {HERO_SLIDES.map((slide, i) => {
         let offset = i - current;
         if (offset > n / 2) offset -= n;
@@ -404,23 +406,6 @@ function HeroCarousel() {
                 className="w-full h-full object-cover"
                 draggable={false}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              {isActive && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.25 }}
-                  className="absolute bottom-4 left-4 right-4"
-                >
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm">
-                    <Tag size={10} className="shrink-0" />
-                    <span className="truncate">{slide.tag}</span>
-                  </span>
-                  <p className="text-white font-display font-semibold text-lg mt-1.5 drop-shadow-lg truncate">
-                    {slide.label}
-                  </p>
-                </motion.div>
-              )}
             </div>
           </div>
         );
@@ -459,6 +444,24 @@ function HeroCarousel() {
           />
         ))}
       </div>
+      </div>{/* end slide track */}
+
+      {/* Caption below the carousel */}
+      <motion.div
+        key={current}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="mt-3 flex items-center gap-2.5"
+      >
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/25 shrink-0">
+          <Tag size={10} className="shrink-0" />
+          {HERO_SLIDES[current].tag}
+        </span>
+        <p className="text-foreground font-display font-semibold text-base truncate">
+          {HERO_SLIDES[current].label}
+        </p>
+      </motion.div>
     </div>
   );
 }

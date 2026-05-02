@@ -308,9 +308,9 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 /* ─── 3D Coverflow Carousel ─────────────────────────────────── */
 
-const CYLINDER_RADIUS = 240;
-const SLIDE_W = 265;
-const SLIDE_H = 185;
+const CYLINDER_RADIUS = 300;
+const SLIDE_W = 320;
+const SLIDE_H = 220;
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
@@ -417,13 +417,13 @@ function HeroCarousel() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="absolute bottom-4 left-4"
+                    className="absolute bottom-3 left-0 right-0 px-4"
                   >
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm">
-                      <Tag size={10} />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/85 text-white backdrop-blur-sm max-w-full truncate">
+                      <Tag size={10} className="shrink-0" />
                       {slide.tag}
                     </span>
-                    <p className="text-white font-display font-semibold text-lg mt-1 drop-shadow-lg">
+                    <p className="text-white font-display font-semibold text-base mt-1 drop-shadow-lg truncate">
                       {slide.label}
                     </p>
                   </motion.div>

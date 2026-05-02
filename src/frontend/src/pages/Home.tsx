@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
+  CalendarDays,
   CheckSquare,
   Coins,
   FileText,
@@ -234,73 +235,145 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   function handleStart() {
     setHiding(true);
-    setTimeout(onDismiss, 600);
+    setTimeout(onDismiss, 700);
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 overflow-hidden"
       style={{
-        background: "rgba(4, 4, 4, 0.95)",
-        backdropFilter: "blur(8px)",
-        transition: "opacity 0.6s ease, transform 0.6s ease",
+        transition: "opacity 0.7s ease",
         opacity: hiding ? 0 : 1,
-        transform: hiding ? "scale(0.97)" : "scale(1)",
         pointerEvents: hiding ? "none" : "auto",
+        /* warm cream → steel-blue gradient background */
+        background:
+          "radial-gradient(ellipse at 30% 60%, #e8d5b7 0%, #d4c5a0 30%, #b8cede 65%, #8faec5 100%)",
       }}
       data-ocid="curtain.overlay"
     >
+      {/* ── decorative floating spheres ── */}
+      {/* top-right large blue sphere */}
       <div
-        className="relative flex flex-col items-center text-center px-12 py-12 rounded-3xl max-w-md mx-4"
+        className="absolute pointer-events-none"
         style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          backdropFilter: "blur(20px)",
-          boxShadow:
-            "0 32px 64px -12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.07)",
+          width: 340, height: 340,
+          top: -80, right: -80,
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 35% 35%, #a8c8e0, #6a9bbf 55%, #4a7fa8)",
+          opacity: 0.82,
+          filter: "blur(2px)",
         }}
-      >
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-          style={{
-            background: "rgba(59,130,246,0.15)",
-            border: "1px solid rgba(59,130,246,0.35)",
-          }}
+      />
+      {/* bottom-left large cream sphere */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 380, height: 380,
+          bottom: -120, left: -100,
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 40% 30%, #f5e8d0, #e0cba8 55%, #c9b48a)",
+          opacity: 0.9,
+          filter: "blur(3px)",
+        }}
+      />
+      {/* mid-left small blue sphere */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 110, height: 110,
+          top: "38%", left: "8%",
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 35% 30%, #c4daea, #7aaac8)",
+          opacity: 0.7,
+          filter: "blur(1px)",
+        }}
+      />
+      {/* bottom-right small sand sphere */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 70, height: 70,
+          bottom: "18%", right: "14%",
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 35% 30%, #f0ddb8, #d4b882)",
+          opacity: 0.75,
+        }}
+      />
+
+      {/* ── centred content ── */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+
+        {/* logo badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+          className="flex items-center gap-2.5 mb-8"
         >
-          <Zap size={26} style={{ color: "#3B82F6" }} />
-        </div>
-        <h1
-          className="font-display font-bold text-3xl mb-2"
-          style={{ color: "#F9F9F9" }}
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{
+              background: "linear-gradient(145deg, #5b8db8, #3d6e96)",
+              boxShadow: "0 4px 14px rgba(61,110,150,0.4)",
+            }}
+          >
+            <CalendarDays size={20} color="#fff" />
+          </div>
+          <span
+            className="font-display font-bold text-xl"
+            style={{ color: "#2c4a62" }}
+          >
+            EventIQ
+          </span>
+        </motion.div>
+
+        {/* headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="font-display font-black leading-tight mb-5"
+          style={{ fontSize: "clamp(2.4rem, 6vw, 4rem)", color: "#1e3448" }}
         >
-          EventIQ
-        </h1>
-        <p className="text-sm mb-1" style={{ color: "rgba(249,249,249,0.6)" }}>
-          Plan Smart. Execute Perfect.
-        </p>
-        <p
-          className="text-xs mb-8 leading-relaxed"
-          style={{ color: "rgba(249,249,249,0.38)" }}
+          Plan.{" "}
+          <span style={{ color: "#4a7fa8" }}>Perfect.</span>
+          {" "}Celebrate.
+        </motion.h1>
+
+        {/* subtitle */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.22 }}
+          className="text-base leading-relaxed max-w-xs mb-10"
+          style={{ color: "#4a6070" }}
         >
-          Dehradun's intelligent event planning companion
-        </p>
-        <button
+          Your all-in-one platform for smart event planning
+          and unforgettable experiences.
+        </motion.p>
+
+        {/* CTA button */}
+        <motion.button
           type="button"
           data-ocid="curtain.start_button"
           onClick={handleStart}
-          className="flex items-center gap-2.5 px-8 py-3.5 rounded-2xl font-display font-semibold text-base transition-all duration-300 hover:scale-105 active:scale-95"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.32 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center gap-3 px-9 py-3.5 rounded-full font-semibold text-base"
           style={{
-            background: "linear-gradient(135deg, #2563EB, #3B82F6)",
-            color: "#fff",
-            boxShadow: "0 8px 24px -4px rgba(59,130,246,0.5)",
-            border: "none",
+            background: "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.75)",
+            color: "#1e3448",
+            boxShadow: "0 6px 24px rgba(90,140,180,0.18)",
+            cursor: "pointer",
           }}
         >
-          Start Planning <ArrowRight size={18} />
-        </button>
-        <p className="text-xs mt-5" style={{ color: "rgba(249,249,249,0.28)" }}>
-          We Welcome You
-        </p>
+          Get Started <ArrowRight size={18} />
+        </motion.button>
       </div>
     </div>
   );

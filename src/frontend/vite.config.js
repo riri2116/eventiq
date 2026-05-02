@@ -16,6 +16,7 @@ export default defineConfig({
   logLevel: "error",
   build: {
     emptyOutDir: true,
+    outDir: "../../dist",
     sourcemap: false,
     minify: false,
   },

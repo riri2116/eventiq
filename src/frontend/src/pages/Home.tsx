@@ -626,9 +626,14 @@ export function HomePage() {
 
       <Layout>
         <section
-          className="relative overflow-hidden bg-background pt-8 pb-16"
+          className="relative overflow-hidden pt-8 pb-20 section-hero-bg"
           data-ocid="hero.section"
         >
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.72 0.09 234), transparent 70%)" }} />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.65 0.12 260), transparent 70%)" }} />
+            <div className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full opacity-15 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.68 0.1 200), transparent 70%)" }} />
+          </div>
           <div className="container mx-auto px-6 lg:px-10 relative z-10">
             <div className="grid lg:grid-cols-5 gap-10 lg:gap-14 items-center">
               <div className="lg:col-span-3 flex flex-col gap-6">
@@ -705,7 +710,8 @@ export function HomePage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.45, delay: 0.3 + i * 0.1 }}
-                    className="flex items-start gap-4 bg-card border border-border rounded-xl p-4 shadow-soft hover:shadow-elevated hover:border-primary/20 transition-smooth"
+                    className="flex items-start gap-4 bg-card/90 backdrop-blur-sm border border-border/60 rounded-xl p-4 hover:border-primary/30 transition-smooth"
+                    style={{ boxShadow: "0 4px 20px -4px rgba(79,109,138,0.15), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)" }}
                     data-ocid={`how_it_works.card.${i + 1}`}
                   >
                     <div
@@ -734,7 +740,7 @@ export function HomePage() {
         </section>
 
         <section
-          className="bg-muted/30 py-16 border-y border-border"
+          className="py-16 section-alt-bg"
           data-ocid="quick_plan.section"
         >
           <div className="container mx-auto px-6 lg:px-10">
@@ -759,7 +765,8 @@ export function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.55, delay: 0.1 }}
-              className="bg-card border border-border rounded-2xl p-6 shadow-elevated max-w-3xl mx-auto"
+              className="bg-card/90 backdrop-blur-sm border border-border/60 rounded-2xl p-6 max-w-3xl mx-auto"
+              style={{ boxShadow: "0 12px 40px -8px rgba(79,109,138,0.22), 0 4px 12px -4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)" }}
             >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {[
@@ -836,7 +843,10 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="bg-background py-16" data-ocid="spotlight.section">
+        <section
+          className="py-16 section-base-bg"
+          data-ocid="spotlight.section"
+        >
           <div className="container mx-auto px-6 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -869,9 +879,12 @@ export function HomePage() {
         </section>
 
         <section
-          className="bg-muted/30 py-16 border-y border-border"
+          className="py-16 relative overflow-hidden section-edge-bg"
           data-ocid="our_edge.section"
         >
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-0 right-0 w-72 h-72 rounded-full opacity-15 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.60 0.10 234), transparent 70%)" }} />
+          </div>
           <div className="container mx-auto px-6 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -911,7 +924,8 @@ export function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.12 }}
-                  className="bg-card border border-border rounded-2xl p-7 shadow-soft hover:shadow-elevated hover:border-primary/20 transition-smooth"
+                  className="bg-card/90 backdrop-blur-sm border border-border/60 rounded-2xl p-7 hover:border-primary/30 transition-smooth"
+                  style={{ boxShadow: "0 8px 32px -6px rgba(79,109,138,0.18), 0 2px 8px -2px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.65)" }}
                   data-ocid={card.ocid}
                 >
                   <div
@@ -949,7 +963,10 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="bg-background py-16" data-ocid="categories.section">
+        <section
+          className="py-16 relative overflow-hidden section-cat-bg"
+          data-ocid="categories.section"
+        >
           <div className="container mx-auto px-6 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -1004,9 +1021,13 @@ export function HomePage() {
         </section>
 
         <section
-          className="bg-muted/30 py-16 border-t border-border"
+          className="py-20 relative overflow-hidden section-cta-bg"
           data-ocid="cta.section"
         >
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.58 0.12 234), transparent 70%)" }} />
+            <div className="absolute top-0 right-1/4 w-64 h-64 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, oklch(0.65 0.10 260), transparent 70%)" }} />
+          </div>
           <div className="container mx-auto px-6 lg:px-10 text-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}

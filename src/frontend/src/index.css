@@ -192,6 +192,48 @@
   }
 }
 
+.section-hero-bg {
+  background: linear-gradient(160deg, oklch(0.99 0.008 240) 0%, oklch(0.97 0.012 230) 40%, oklch(0.95 0.018 234) 100%);
+}
+.dark .section-hero-bg {
+  background: linear-gradient(160deg, oklch(0.20 0.015 240) 0%, oklch(0.19 0.018 234) 40%, oklch(0.18 0.022 230) 100%);
+}
+
+.section-alt-bg {
+  background: linear-gradient(180deg, oklch(0.95 0.018 234) 0%, oklch(0.96 0.014 240) 40%, oklch(0.97 0.01 234) 100%);
+}
+.dark .section-alt-bg {
+  background: linear-gradient(180deg, oklch(0.19 0.022 234) 0%, oklch(0.20 0.018 240) 40%, oklch(0.21 0.015 234) 100%);
+}
+
+.section-base-bg {
+  background: linear-gradient(180deg, oklch(0.97 0.01 234) 0%, oklch(0.985 0.006 240) 60%, oklch(0.99 0.004 234) 100%);
+}
+.dark .section-base-bg {
+  background: linear-gradient(180deg, oklch(0.21 0.015 234) 0%, oklch(0.20 0.012 240) 60%, oklch(0.19 0.01 234) 100%);
+}
+
+.section-edge-bg {
+  background: linear-gradient(160deg, oklch(0.97 0.014 240) 0%, oklch(0.95 0.02 234) 50%, oklch(0.96 0.016 220) 100%);
+}
+.dark .section-edge-bg {
+  background: linear-gradient(160deg, oklch(0.20 0.018 240) 0%, oklch(0.19 0.024 234) 50%, oklch(0.20 0.020 220) 100%);
+}
+
+.section-cat-bg {
+  background: linear-gradient(180deg, oklch(0.96 0.016 220) 0%, oklch(0.975 0.01 234) 50%, oklch(0.985 0.006 240) 100%);
+}
+.dark .section-cat-bg {
+  background: linear-gradient(180deg, oklch(0.20 0.020 220) 0%, oklch(0.19 0.015 234) 50%, oklch(0.18 0.012 240) 100%);
+}
+
+.section-cta-bg {
+  background: linear-gradient(160deg, oklch(0.985 0.006 240) 0%, oklch(0.96 0.022 234) 50%, oklch(0.92 0.035 234) 100%);
+}
+.dark .section-cta-bg {
+  background: linear-gradient(160deg, oklch(0.18 0.012 240) 0%, oklch(0.20 0.028 234) 50%, oklch(0.22 0.04 234) 100%);
+}
+
 @keyframes marquee-scroll {
   0% {
     transform: translateX(0);

@@ -1171,7 +1171,7 @@ export function PlanningPage() {
           <img
             src={planningBannerImg}
             alt="Plan Your Event — Dream it. Plan it. Make it unforgettable."
-            className="w-[97%] mx-auto h-auto block"
+            className="w-full block object-cover object-center max-h-[360px]"
           />
         </motion.div>
 

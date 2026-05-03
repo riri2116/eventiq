@@ -31,7 +31,7 @@ const EVENT_TAGS = [
   },
   {
     label: "Conferences 🎤",
-    color: "bg-primary/20 text-primary border-primary/40",
+    color: "bg-slate-200 text-slate-800 border-slate-400",
   },
   {
     label: "Birthday Parties 🎂",
@@ -39,7 +39,7 @@ const EVENT_TAGS = [
   },
   {
     label: "Corporate Events 🏢",
-    color: "bg-primary/20 text-primary border-primary/40",
+    color: "bg-slate-200 text-slate-800 border-slate-400",
   },
   {
     label: "Cultural Programs 🎭",

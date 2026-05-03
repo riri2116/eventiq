@@ -634,20 +634,10 @@ export function HomePage() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
 
-  const [curtainVisible, setCurtainVisible] = useState(() => {
-    try {
-      return sessionStorage.getItem("eventiq-curtain-seen") !== "true";
-    } catch {
-      return true;
-    }
-  });
+  const [curtainVisible, setCurtainVisible] = useState(true);
 
   function dismissCurtain() {
     setCurtainVisible(false);
-    try {
-      sessionStorage.setItem("eventiq-curtain-seen", "true");
-    } catch {
-    }
   }
 
   function handleTagClick() {

@@ -241,51 +241,85 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         opacity: hiding ? 0 : 1,
         pointerEvents: hiding ? "none" : "auto",
         background:
-          "radial-gradient(ellipse at 30% 60%, #e8d5b7 0%, #d4c5a0 30%, #b8cede 65%, #8faec5 100%)",
+          "radial-gradient(ellipse at 20% 55%, #ead9be 0%, #d8c8a4 20%, #c5d8e8 55%, #90b8d0 80%, #7aaac4 100%)",
       }}
       data-ocid="curtain.overlay"
     >
       <div
         className="absolute pointer-events-none"
         style={{
-          width: 340, height: 340,
-          top: -80, right: -80,
+          width: 360, height: 360,
+          top: -90, right: -90,
           borderRadius: "50%",
-          background: "radial-gradient(circle at 35% 35%, #a8c8e0, #6a9bbf 55%, #4a7fa8)",
+          background: "radial-gradient(circle at 32% 28%, #d8edf8 0%, #9dc4de 38%, #5a90b8 68%, #2e6690 100%)",
+          boxShadow: "inset -14px -14px 28px rgba(0,0,0,0.22), inset 6px 6px 16px rgba(255,255,255,0.55), 0 24px 48px rgba(42,90,130,0.3)",
+          opacity: 0.92,
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 400, height: 400,
+          bottom: -130, left: -110,
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 36% 28%, #fdf0d8 0%, #e8d0a0 40%, #ccb070 72%, #b89050 100%)",
+          boxShadow: "inset -16px -16px 32px rgba(0,0,0,0.18), inset 8px 8px 18px rgba(255,255,255,0.6), 0 28px 52px rgba(160,120,60,0.28)",
+          opacity: 0.88,
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 120, height: 120,
+          top: "36%", left: "7%",
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 33% 28%, #d6eaf7 0%, #88bcd8 45%, #4a88b4 80%, #2a6090 100%)",
+          boxShadow: "inset -6px -6px 14px rgba(0,0,0,0.2), inset 3px 3px 8px rgba(255,255,255,0.55), 0 10px 24px rgba(42,80,130,0.25)",
           opacity: 0.82,
-          filter: "blur(2px)",
         }}
       />
       <div
         className="absolute pointer-events-none"
         style={{
-          width: 380, height: 380,
-          bottom: -120, left: -100,
+          width: 80, height: 80,
+          bottom: "16%", right: "13%",
           borderRadius: "50%",
-          background: "radial-gradient(circle at 40% 30%, #f5e8d0, #e0cba8 55%, #c9b48a)",
-          opacity: 0.9,
-          filter: "blur(3px)",
+          background: "radial-gradient(circle at 33% 28%, #faecd6 0%, #e8cc90 45%, #ccaa58 80%, #b08838 100%)",
+          boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.18), inset 2px 2px 6px rgba(255,255,255,0.55), 0 8px 18px rgba(160,120,40,0.24)",
+          opacity: 0.82,
         }}
       />
       <div
         className="absolute pointer-events-none"
         style={{
-          width: 110, height: 110,
-          top: "38%", left: "8%",
+          width: 52, height: 52,
+          top: "20%", right: "22%",
           borderRadius: "50%",
-          background: "radial-gradient(circle at 35% 30%, #c4daea, #7aaac8)",
+          background: "radial-gradient(circle at 33% 28%, #d0e8f8 0%, #78b0d0 50%, #3878a8 100%)",
+          boxShadow: "inset -3px -3px 8px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.5), 0 6px 14px rgba(40,80,130,0.22)",
           opacity: 0.7,
-          filter: "blur(1px)",
         }}
       />
       <div
         className="absolute pointer-events-none"
         style={{
-          width: 70, height: 70,
-          bottom: "18%", right: "14%",
+          width: 38, height: 38,
+          top: "62%", right: "34%",
           borderRadius: "50%",
-          background: "radial-gradient(circle at 35% 30%, #f0ddb8, #d4b882)",
-          opacity: 0.75,
+          background: "radial-gradient(circle at 33% 28%, #fce8c8 0%, #e0c080 50%, #c8a040 100%)",
+          boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.16), inset 1px 1px 4px rgba(255,255,255,0.5), 0 5px 12px rgba(160,120,40,0.2)",
+          opacity: 0.65,
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 180, height: 180,
+          top: "50%", right: "8%",
+          borderRadius: "50%",
+          background: "radial-gradient(circle at 34% 28%, #e8f4fc 0%, #a8cce4 40%, #68a0c4 70%, #3878a0 100%)",
+          boxShadow: "inset -8px -8px 18px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(255,255,255,0.52), 0 16px 36px rgba(40,80,130,0.25)",
+          opacity: 0.72,
         }}
       />
 

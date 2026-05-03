@@ -201,7 +201,7 @@ const CATEGORY_TAGS = [
   {
     label: "Corporate Events",
     emoji: "💼",
-    color: "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30",
+    color: "bg-slate-200 text-slate-800 border-slate-400 hover:bg-slate-300",
   },
   {
     label: "Music Concerts",

@@ -45,7 +45,7 @@ import type {
   SelectedVendors16,
   VendorItemFull,
 } from "@/types";
-import planningBannerImg from "@assets/ChatGPT_Image_Apr_30,_2026,_01_13_57_PM_1777535130367.png";
+import planningBannerImg from "@assets/WhatsApp_Image_2026-05-03_at_11.37.43_PM_1777832439599.jpeg";
 import {
   AlertCircle,
   Loader2,
@@ -1171,7 +1171,7 @@ export function PlanningPage() {
           <img
             src={planningBannerImg}
             alt="Plan Your Event — Dream it. Plan it. Make it unforgettable."
-            className="w-full h-auto block object-cover max-h-[260px] md:max-h-[300px]"
+            className="w-full h-auto block"
           />
         </motion.div>
 

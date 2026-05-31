@@ -15,7 +15,6 @@ import {
   Handshake,
   MapPin,
   Scale,
-  Sparkles,
   Star,
   Tag,
   Users,
@@ -635,13 +634,13 @@ export function HomePage() {
                     className="mb-3 px-3 py-1 text-xs font-medium border-primary/30 text-primary bg-primary/5"
                   >
                     <Zap size={10} className="mr-1.5" />
-                    Dehradun's Smart Event Planner
+                    Event Planning · Dehradun
                   </Badge>
 
                   <h1 className="font-display font-bold text-4xl lg:text-5xl xl:text-6xl text-foreground leading-[1.08] tracking-tight mb-3">
-                    Plan Smart.
+                    Plan with
                     <br />
-                    <span className="text-primary">Execute Perfect.</span>
+                    <span className="text-primary">Confidence.</span>
                   </h1>
                   <p className="text-base text-muted-foreground leading-relaxed max-w-lg mb-5">
                     Your dream event, perfectly planned with local Dehradun
@@ -799,8 +798,7 @@ export function HomePage() {
                   size="lg"
                   className="w-full gap-2 shadow-elevated font-semibold text-base py-6"
                 >
-                  <Sparkles size={18} />
-                  Get 3 Tailored Plans Instantly
+                  Get 3 Tailored Plans
                   <ArrowRight size={18} />
                 </Button>
               </Link>

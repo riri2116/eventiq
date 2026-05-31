@@ -49,7 +49,6 @@ import planningBannerImg from "@assets/WhatsApp_Image_2026-05-03_at_11.37.43_PM_
 import {
   AlertCircle,
   Loader2,
-  Sparkles,
   Star,
   Wifi,
   WifiOff,
@@ -1604,7 +1603,6 @@ export function PlanningPage() {
                       </>
                     ) : (
                       <>
-                        <Sparkles size={18} />
                         Generate My Plans
                       </>
                     )}
@@ -1635,12 +1633,10 @@ export function PlanningPage() {
                     borderColor: "rgba(59,130,246,0.2)",
                   }}
                 >
-                  <Sparkles size={12} />
                   What you'll get
                 </div>
                 <p className="text-foreground text-base leading-relaxed mb-5">
-                  Tell us about your event and we'll generate three intelligent
-                  plans —{" "}
+                  Tell us about your event and we'll generate three plans —{" "}
                   <span className="font-semibold text-[#3B82F6]">Budget</span>,{" "}
                   <span className="font-semibold text-[#10B981]">Balanced</span>
                   , and{" "}

@@ -1,5 +1,5 @@
 import type { ChatMessage } from "@/types";
-import { MessageCircle, Send, X, Sparkles } from "lucide-react";
+import { MessageCircle, Send, X, HelpCircle } from "lucide-react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -12,22 +12,22 @@ interface BotEntry {
 const KB: BotEntry[] = [
   {
     patterns: ["hello", "hi", "hey", "hlo", "hii", "good morning", "good evening", "namaste", "start"],
-    reply: "Hi there! 👋 Welcome to EventIQ — Dehradun's smart event planning platform. I can help you plan events, find vendors, understand pricing, or navigate the app. What would you like to know?",
+    reply: "Hello! Welcome to EventIQ — Dehradun's event planning platform. I can help you plan events, find vendors, understand pricing, or navigate the app. What would you like to know?",
     suggestions: ["How do I plan an event?", "What vendors are available?", "How does pricing work?"],
   },
   {
     patterns: ["what is eventiq", "about eventiq", "tell me about", "what do you do", "what is this"],
-    reply: "EventIQ is Dehradun's all-in-one event planning platform 🎉. You fill in your event details, we match you with verified local vendors across 16 service categories, and instantly generate 3 budget-fit plans — Best Fit, Recommended, and Budget. Everything from weddings to corporate conferences!",
+    reply: "EventIQ is Dehradun's event planning platform. You fill in your event details, we match you with verified local vendors across 16 service categories, and generate 3 budget-fit plans — Best Fit, Recommended, and Budget. Everything from weddings to corporate conferences.",
     suggestions: ["What categories do you cover?", "How do I get started?", "Is it free?"],
   },
   {
     patterns: ["how", "plan", "generate", "work", "use", "get started", "start planning"],
-    reply: "Here's how it works in 3 steps:\n1️⃣ Go to the **Planning** page and fill in event name, type, date, locality, and guest count.\n2️⃣ Hit **Generate Plan** — we instantly create 3 options.\n3️⃣ Save the plan you like to your Dashboard!",
+    reply: "Here's how it works in 3 steps:\n1. Go to the Planning page and fill in event name, type, date, locality, and guest count.\n2. Hit Generate Plan — we create 3 options tailored to your budget.\n3. Save the plan you like to your Dashboard.",
     suggestions: ["How do I save a plan?", "What event types are supported?", "Can I edit a plan?"],
   },
   {
     patterns: ["category", "categories", "service", "services", "types of service", "what services"],
-    reply: "We cover **16 service categories** across Dehradun:\n🎪 Venue · 🍽️ Catering · 📸 Photography · 🎵 Music & DJ · 💐 Decoration · 🎂 Cake · 💄 Makeup · 🚗 Transportation · 🎈 Entertainment · 🖨️ Printing · 🔊 AV & Lighting · 👔 Coordination · 🧹 Cleaning · 🌿 Floral · 🎤 Anchoring · 🎁 Gifting",
+    reply: "We cover 16 service categories across Dehradun:\nVenue, Catering, Photography, Music & DJ, Decoration, Cake, Makeup, Transportation, Entertainment, Printing, AV & Lighting, Coordination, Cleaning, Floral, Anchoring, and Gifting.",
     suggestions: ["How are vendors selected?", "Can I choose specific vendors?", "What's the cheapest venue?"],
   },
   {
@@ -37,7 +37,7 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["register", "sign up", "signup", "create account", "join", "become vendor", "list business", "vendor registration"],
-    reply: "To register:\n👤 **As a user:** Click **Sign Up** in the top menu and fill in your details.\n🏪 **As a vendor:** During signup, check the **'Register as Vendor'** option — you'll get access to a Vendor Setup page to list your services, prices, and availability.",
+    reply: "To register:\n- As a user: Click Sign Up in the top menu and fill in your details.\n- As a vendor: During signup, check the 'Register as Vendor' option — you'll get access to a Vendor Setup page to list your services, prices, and availability.",
     suggestions: ["What info do vendors need to provide?", "Is registration free?", "How do I log in?"],
   },
   {
@@ -57,12 +57,12 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["budget", "cost", "price", "pricing", "how much", "expensive", "cheap", "affordable", "rate", "charges", "fee"],
-    reply: "EventIQ generates 3 plans for every event:\n💎 **Best Fit** — optimized quality + value within your budget\n✅ **Recommended** — balanced mid-range option\n💰 **Budget** — most affordable vendors\n\nYou set your budget during planning and we fit vendors within it!",
+    reply: "EventIQ generates 3 plans for every event:\n- Best Fit — optimized quality and value within your budget\n- Recommended — balanced mid-range option\n- Budget — most affordable vendors\n\nYou set your budget during planning and we fit vendors within it.",
     suggestions: ["What's the cheapest venue?", "What's the cheapest catering?", "Is EventIQ free to use?"],
   },
   {
     patterns: ["free", "charge", "subscription", "pay", "payment", "cost of eventiq", "platform fee"],
-    reply: "EventIQ is completely **free to use** for event planners! 🎉 You can browse vendors, generate unlimited plans, and save them — all at no cost. Vendors pay a small listing fee to appear on the platform.",
+    reply: "EventIQ is completely free to use for event planners. You can browse vendors, generate unlimited plans, and save them — all at no cost. Vendors pay a small listing fee to appear on the platform.",
     suggestions: ["How do I get started?", "How do I register as a vendor?", "What vendors are available?"],
   },
   {
@@ -92,12 +92,12 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["wedding", "shaadi", "marriage", "bride", "groom", "baraat"],
-    reply: "EventIQ is great for weddings! 💍 We cover all wedding needs — venue, catering, decoration, photography, makeup, mehendi, baraat, and more. Our wedding plans include full vendor matching across all categories you need.",
+    reply: "EventIQ covers all wedding needs — venue, catering, decoration, photography, makeup, mehendi, baraat, and more. Our wedding plans include full vendor matching across all the categories you need.",
     suggestions: ["What vendors do I need for a wedding?", "How much does a wedding cost?", "How do I plan my wedding?"],
   },
   {
     patterns: ["birthday", "bday", "party", "celebration", "anniversary"],
-    reply: "Planning a birthday or anniversary? 🎂 EventIQ matches you with cake vendors, decoration teams, caterers, photographers, and entertainers — all within your budget. You can plan for intimate gatherings of 20 or large parties of 500+!",
+    reply: "Planning a birthday or anniversary? EventIQ matches you with cake vendors, decoration teams, caterers, photographers, and entertainers — all within your budget. You can plan for intimate gatherings of 20 or large parties of 500+.",
     suggestions: ["What's the budget for a birthday party?", "What vendors do I need for a party?"],
   },
   {
@@ -107,7 +107,7 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["locality", "area", "location", "place in dehradun", "where", "rajpur", "gms", "sahastradhara", "clement", "dalanwala"],
-    reply: "We cover **20+ localities** in Dehradun including:\n📍 Rajpur Road · GMS Road · Sahastradhara · Clement Town · Dalanwala · Patel Nagar · Race Course · Ballupur · Jakhan · Raipur · and more!\n\nSelect your preferred area when generating a plan.",
+    reply: "We cover 20+ localities in Dehradun including Rajpur Road, GMS Road, Sahastradhara, Clement Town, Dalanwala, Patel Nagar, Race Course, Ballupur, Jakhan, Raipur, and more. Select your preferred area when generating a plan.",
     suggestions: ["What venues are near Rajpur Road?", "How do I filter by locality?"],
   },
   {
@@ -142,12 +142,12 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["dark mode", "light mode", "theme", "night mode", "appearance"],
-    reply: "EventIQ supports both **light and dark mode**! 🌙☀️ Click the theme toggle button in the top navigation bar to switch between them. Your preference is remembered for future visits.",
+    reply: "EventIQ supports both light and dark mode. Click the theme toggle button in the top navigation bar to switch between them. Your preference is remembered for future visits.",
     suggestions: ["How do I navigate the app?", "What other features are there?"],
   },
   {
     patterns: ["navigate", "menu", "pages", "sections", "where to find", "navigation"],
-    reply: "The main navigation has:\n🏠 **Home** — explore features\n📋 **Planning** — generate event plans\n🏪 **Vendors** — browse all vendors\n📊 **Dashboard** — your saved plans\n👤 **Profile** — account settings\n\nAll accessible from the top menu bar!",
+    reply: "The main navigation has:\n- Home — explore features\n- Planning — generate event plans\n- Vendors — browse all vendors\n- Dashboard — your saved plans\n- Profile — account settings\n\nAll accessible from the top menu bar.",
     suggestions: ["How do I plan an event?", "How do I see vendors?"],
   },
   {
@@ -157,12 +157,12 @@ const KB: BotEntry[] = [
   },
   {
     patterns: ["thank", "thanks", "great", "good", "awesome", "helpful", "nice", "perfect", "wonderful"],
-    reply: "You're welcome! 😊 Happy to help make your event planning smooth. Is there anything else I can assist you with?",
+    reply: "Happy to help! Is there anything else you'd like to know about planning your event?",
     suggestions: ["How do I plan an event?", "What vendors are available?", "Is EventIQ free?"],
   },
   {
     patterns: ["bye", "goodbye", "ok", "okay", "done", "that's all", "thats all"],
-    reply: "Great chatting with you! 🎉 Best of luck with your event planning. Feel free to ask anything anytime — I'm always here!",
+    reply: "Best of luck with your event planning. Feel free to ask anything anytime — I'm always here.",
     suggestions: ["Plan a new event", "Browse vendors"],
   },
 ];
@@ -256,13 +256,13 @@ export function ChatAssistant() {
             <div className="flex items-center justify-between px-4 py-3 border-b border-border" style={{ background: "var(--primary)" }}>
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white/20">
-                  <Sparkles size={14} color="#fff" />
+                  <HelpCircle size={14} color="#fff" />
                 </div>
                 <div>
                   <div className="font-semibold text-sm text-white leading-none">EventIQ Assistant</div>
                   <div className="text-xs text-white/70 mt-0.5 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                    Online · Always available
+                    Online
                   </div>
                 </div>
               </div>
@@ -282,7 +282,7 @@ export function ChatAssistant() {
                 <div key={msg.id} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.role === "assistant" && (
                     <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center shrink-0 mt-1">
-                      <Sparkles size={11} className="text-primary" />
+                      <HelpCircle size={11} className="text-primary" />
                     </div>
                   )}
                   <div
@@ -300,7 +300,7 @@ export function ChatAssistant() {
               {isTyping && (
                 <div className="flex gap-2 items-center">
                   <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                    <Sparkles size={11} className="text-primary" />
+                    <HelpCircle size={11} className="text-primary" />
                   </div>
                   <div className="bg-muted px-3 py-2.5 rounded-2xl rounded-tl-sm flex gap-1 items-center">
                     {[0, 1, 2].map((i) => (

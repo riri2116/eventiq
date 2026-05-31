@@ -452,7 +452,7 @@ function SmartInsights({
         <span className="w-6 h-6 rounded-lg bg-amber-400/15 flex items-center justify-center text-sm">
           💡
         </span>
-        Smart Insights
+        Plan Insights
       </h2>
       <ul className="space-y-3">
         {insights.slice(0, 5).map((insight, i) => (
@@ -1091,7 +1091,7 @@ export function PlanDetailsPage() {
                   )}
                   {displayEventType && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold border border-primary/20">
-                      🎉 {displayEventType}
+                      {displayEventType}
                     </span>
                   )}
                 </div>

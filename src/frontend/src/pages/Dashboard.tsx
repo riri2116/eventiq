@@ -142,7 +142,7 @@ function PlanCard({
               <span
                 className={`inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${eventStyle.bg} ${eventStyle.text} capitalize shadow-sm`}
               >
-                🎉 {planSet.eventType || "Event"}
+                {planSet.eventType || "Event"}
               </span>
               <h3
                 className="font-display font-bold text-base text-foreground truncate"

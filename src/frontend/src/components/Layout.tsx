@@ -199,7 +199,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <footer className="bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-6 py-5">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} EventIQ. Plan Smart.
+            © {new Date().getFullYear()} EventIQ. Dehradun's Event Planning Platform.
           </p>
         </div>
       </footer>

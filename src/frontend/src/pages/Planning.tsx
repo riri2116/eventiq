@@ -18,7 +18,6 @@ import {
   EVENT_TYPES,
   TARGET_AUDIENCES,
   VENDOR_CATEGORIES_16,
-  VENDOR_EMOJI_16,
   VENDOR_LABELS_16,
 } from "@/data/vendorDatabase";
 import {
@@ -48,11 +47,27 @@ import type {
 import planningBannerImg from "@assets/WhatsApp_Image_2026-05-03_at_11.37.43_PM_1777832439599.jpeg";
 import {
   AlertCircle,
+  Building,
+  Building2,
+  Camera,
+  ClipboardList,
+  Gift,
+  Home,
+  Leaf,
+  Lightbulb,
   Loader2,
+  MapPin,
+  Music,
+  Music2,
+  Palette,
   Star,
+  Trees,
+  UtensilsCrossed,
+  Wand2,
   Wifi,
   WifiOff,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import {
   type FormEvent,
@@ -63,6 +78,25 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+
+const VENDOR_CARD_META: Record<string, { Icon: LucideIcon; bg: string; color: string }> = {
+  banquetHall:          { Icon: Building2,        bg: "#EDF7F3", color: "#1a5c4a" },
+  caterer:              { Icon: UtensilsCrossed,   bg: "#FFF8EC", color: "#B45309" },
+  djService:            { Icon: Music2,            bg: "#F3F0FF", color: "#6D28D9" },
+  eventDecorator:       { Icon: Palette,           bg: "#FFF0F5", color: "#BE185D" },
+  eventPlanner:         { Icon: ClipboardList,     bg: "#EFF6FF", color: "#1D4ED8" },
+  florist:              { Icon: Leaf,              bg: "#F0FDF4", color: "#15803D" },
+  hotelBanquetHall:     { Icon: Building,          bg: "#EDF7F3", color: "#0D9488" },
+  lightingService:      { Icon: Lightbulb,         bg: "#FFFBEB", color: "#B45309" },
+  makeupArtist:         { Icon: Wand2,             bg: "#FFF0F5", color: "#DB2777" },
+  mehendiArtist:        { Icon: Leaf,              bg: "#F0FDF4", color: "#166534" },
+  partyHall:            { Icon: Gift,              bg: "#FFF7ED", color: "#C2410C" },
+  tentHouse:            { Icon: Home,              bg: "#FAF7F0", color: "#92400E" },
+  weddingBand:          { Icon: Music,             bg: "#F3F0FF", color: "#7C3AED" },
+  weddingLawn:          { Icon: Trees,             bg: "#F0FDF4", color: "#166534" },
+  weddingPhotographer:  { Icon: Camera,            bg: "#EFF6FF", color: "#1D4ED8" },
+  weddingResort:        { Icon: MapPin,            bg: "#EDF7F3", color: "#1a5c4a" },
+};
 
 const VENDOR_KEY_TO_SERVICE: Record<string, string> = {
   banquetHall: "banquet hall",
@@ -1506,23 +1540,21 @@ export function PlanningPage() {
                       @media (min-width: 480px) { .vendor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
                       @media (min-width: 768px) { .vendor-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
                       @media (min-width: 1024px) { .vendor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-                      .vendor-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 16px 16px; background: #fff; border: 1.5px solid #E8EDF4; border-radius: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06); }
-                      .vendor-card:hover { border-color: #93C5FD; box-shadow: 0 4px 14px rgba(59,130,246,0.10); transform: translateY(-2px); }
-                      .vendor-card.selected { border-color: #3B82F6; border-width: 2px; background: rgba(59,130,246,0.04); box-shadow: 0 4px 16px rgba(59,130,246,0.12); }
-                      .vendor-icon-circle { width: 50px; height: 50px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; flex-shrink: 0; transition: background 0.2s ease; }
-                      .vendor-card.selected .vendor-icon-circle { background: rgba(59,130,246,0.12); }
-                      .vendor-badge { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: #3B82F6; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.6); transition: all 0.2s ease; }
+                      .vendor-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px; background: #fff; border: 1.5px solid #E4EBE8; border-radius: 14px; cursor: pointer; transition: all 0.18s ease; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); }
+                      .vendor-card:hover { border-color: #8BBFB0; box-shadow: 0 6px 18px rgba(26,92,74,0.10); transform: translateY(-2px); }
+                      .vendor-card.selected { border-color: #1a5c4a; border-width: 2px; background: rgba(26,92,74,0.04); box-shadow: 0 4px 16px rgba(26,92,74,0.12); }
+                      .vendor-icon-wrap { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.18s ease; }
+                      .vendor-card:hover .vendor-icon-wrap { transform: scale(1.07); }
+                      .vendor-badge { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: #1a5c4a; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); transition: all 0.18s cubic-bezier(.34,1.56,.64,1); }
                       .vendor-card.selected .vendor-badge { opacity: 1; transform: scale(1); }
                       .vendor-label { font-size: 12.5px; font-weight: 600; color: #1E293B; line-height: 1.35; word-break: break-word; }
-                      .vendor-card.selected .vendor-label { color: #3B82F6; }
+                      .vendor-card.selected .vendor-label { color: #1a5c4a; }
 
-                      .dark .vendor-card { background: oklch(0.22 0.02 240); border-color: oklch(0.32 0.02 240); box-shadow: 0 1px 4px 0 rgba(0,0,0,0.4); }
-                      .dark .vendor-card:hover { border-color: #3B82F6; box-shadow: 0 4px 14px rgba(59,130,246,0.25); }
-                      .dark .vendor-card.selected { border-color: #3B82F6; background: rgba(59,130,246,0.12); box-shadow: 0 4px 16px rgba(59,130,246,0.30); }
-                      .dark .vendor-icon-circle { background: oklch(0.28 0.03 240); }
-                      .dark .vendor-card.selected .vendor-icon-circle { background: rgba(59,130,246,0.22); }
+                      .dark .vendor-card { background: oklch(0.22 0.02 160); border-color: oklch(0.30 0.02 160); box-shadow: 0 1px 4px 0 rgba(0,0,0,0.4); }
+                      .dark .vendor-card:hover { border-color: oklch(0.52 0.08 160); box-shadow: 0 6px 18px rgba(26,92,74,0.30); }
+                      .dark .vendor-card.selected { border-color: oklch(0.55 0.1 160); background: rgba(26,92,74,0.18); box-shadow: 0 4px 16px rgba(26,92,74,0.35); }
                       .dark .vendor-label { color: oklch(0.95 0.01 240); }
-                      .dark .vendor-card.selected .vendor-label { color: #93C5FD; }
+                      .dark .vendor-card.selected .vendor-label { color: oklch(0.78 0.1 160); }
                     `}</style>
 
                       {VENDOR_CATEGORIES_16.map((key) => {
@@ -1561,9 +1593,17 @@ export function PlanningPage() {
                               </svg>
                             </span>
 
-                            <span className="vendor-icon-circle">
-                              {VENDOR_EMOJI_16[key]}
-                            </span>
+                            {(() => {
+                              const meta = VENDOR_CARD_META[key];
+                              return meta ? (
+                                <span
+                                  className="vendor-icon-wrap"
+                                  style={{ background: meta.bg }}
+                                >
+                                  <meta.Icon size={20} color={meta.color} strokeWidth={1.8} />
+                                </span>
+                              ) : null;
+                            })()}
 
                             <span className="vendor-label">
                               {VENDOR_LABELS_16[key]

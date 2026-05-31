@@ -259,8 +259,8 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
       <div
         className="relative z-10 flex flex-col items-center text-center w-full rounded-2xl"
         style={{
-          maxWidth: 560,
-          padding: "36px 40px 32px",
+          maxWidth: 540,
+          padding: "24px 36px 22px",
           background: "rgba(255,252,247,0.72)",
           backdropFilter: "blur(8px)",
           boxShadow: "0 2px 1px rgba(255,255,255,0.9) inset, 0 20px 60px rgba(100,80,40,0.10), 0 4px 16px rgba(100,80,40,0.07)",
@@ -272,7 +272,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-2.5 mb-6 w-full"
+          className="flex items-center justify-center gap-2.5 mb-4 w-full"
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#1a5c4a" }}>
             <CalendarDays size={17} color="#fff" />
@@ -286,7 +286,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.55, delay: 0.1 }}
-          className="flex items-center justify-center gap-3 mb-6 w-full"
+          className="flex items-center justify-center gap-3 mb-4 w-full"
         >
           <div style={{ width: 56, height: 1, background: "#c8b89a", flexShrink: 0 }} />
           <span className="text-xs font-medium tracking-[0.18em] uppercase whitespace-nowrap" style={{ color: "#8a7860" }}>
@@ -299,7 +299,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.16 }}
-          className="font-display font-bold leading-tight mb-4 w-full"
+          className="font-display font-bold leading-tight mb-3 w-full"
           style={{ fontSize: "clamp(1.75rem, 4vw, 2.9rem)", color: "#1c1208", letterSpacing: "-0.01em", textShadow: "0 2px 8px rgba(100,80,40,0.1)" }}
         >
           Your Event,{" "}
@@ -310,7 +310,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.26 }}
-          className="text-sm leading-relaxed mb-6 w-full"
+          className="text-sm leading-relaxed mb-4 w-full"
           style={{ color: "#6b5c48" }}
         >
           Connect with trusted local vendors, compare packages, and plan every detail — all in one place.
@@ -320,7 +320,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45, delay: 0.34 }}
-          className="flex flex-nowrap gap-1.5 justify-center mb-7 w-full"
+          className="flex flex-nowrap gap-1.5 justify-center mb-5 w-full"
         >
           {eventChips.map((chip) => (
             <span
@@ -342,7 +342,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           transition={{ duration: 0.45, delay: 0.42 }}
           whileHover={{ scale: 1.03, backgroundColor: "#155248" }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2.5 px-9 py-3 rounded-full font-semibold text-sm mb-6"
+          className="flex items-center justify-center gap-2.5 px-9 py-3 rounded-full font-semibold text-sm mb-4"
           style={{ background: "#1a5c4a", color: "#fff", cursor: "pointer", letterSpacing: "0.02em" }}
         >
           Start Planning <ArrowRight size={16} />

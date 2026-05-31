@@ -233,143 +233,103 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
     setTimeout(onDismiss, 700);
   }
 
+  const eventChips = ["Weddings", "Corporate Events", "Conferences", "Social Gatherings", "Birthdays"];
+
   return (
     <div
       className="fixed inset-0 z-50 overflow-hidden"
       style={{
-        transition: "opacity 0.7s ease",
+        transition: "opacity 0.8s ease",
         opacity: hiding ? 0 : 1,
         pointerEvents: hiding ? "none" : "auto",
-        background:
-          "radial-gradient(ellipse at 20% 55%, #ead9be 0%, #d8c8a4 20%, #c5d8e8 55%, #90b8d0 80%, #7aaac4 100%)",
+        background: "linear-gradient(145deg, #0a1628 0%, #0f1e35 35%, #0c1a2e 65%, #10202e 100%)",
       }}
       data-ocid="curtain.overlay"
     >
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 360, height: 360,
-          top: -90, right: -90,
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 32% 28%, #d8edf8 0%, #9dc4de 38%, #5a90b8 68%, #2e6690 100%)",
-          boxShadow: "inset -14px -14px 28px rgba(0,0,0,0.22), inset 6px 6px 16px rgba(255,255,255,0.55), 0 24px 48px rgba(42,90,130,0.3)",
-          opacity: 0.92,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 400, height: 400,
-          bottom: -130, left: -110,
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 36% 28%, #fdf0d8 0%, #e8d0a0 40%, #ccb070 72%, #b89050 100%)",
-          boxShadow: "inset -16px -16px 32px rgba(0,0,0,0.18), inset 8px 8px 18px rgba(255,255,255,0.6), 0 28px 52px rgba(160,120,60,0.28)",
-          opacity: 0.88,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 120, height: 120,
-          top: "36%", left: "7%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 33% 28%, #d6eaf7 0%, #88bcd8 45%, #4a88b4 80%, #2a6090 100%)",
-          boxShadow: "inset -6px -6px 14px rgba(0,0,0,0.2), inset 3px 3px 8px rgba(255,255,255,0.55), 0 10px 24px rgba(42,80,130,0.25)",
-          opacity: 0.82,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 80, height: 80,
-          bottom: "16%", right: "13%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 33% 28%, #faecd6 0%, #e8cc90 45%, #ccaa58 80%, #b08838 100%)",
-          boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.18), inset 2px 2px 6px rgba(255,255,255,0.55), 0 8px 18px rgba(160,120,40,0.24)",
-          opacity: 0.82,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 52, height: 52,
-          top: "20%", right: "22%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 33% 28%, #d0e8f8 0%, #78b0d0 50%, #3878a8 100%)",
-          boxShadow: "inset -3px -3px 8px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.5), 0 6px 14px rgba(40,80,130,0.22)",
-          opacity: 0.7,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 38, height: 38,
-          top: "62%", right: "34%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 33% 28%, #fce8c8 0%, #e0c080 50%, #c8a040 100%)",
-          boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.16), inset 1px 1px 4px rgba(255,255,255,0.5), 0 5px 12px rgba(160,120,40,0.2)",
-          opacity: 0.65,
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 180, height: 180,
-          top: "50%", right: "8%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 34% 28%, #e8f4fc 0%, #a8cce4 40%, #68a0c4 70%, #3878a0 100%)",
-          boxShadow: "inset -8px -8px 18px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(255,255,255,0.52), 0 16px 36px rgba(40,80,130,0.25)",
-          opacity: 0.72,
-        }}
-      />
+      <div className="absolute pointer-events-none" style={{ width: 700, height: 700, top: -200, right: -150, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,164,60,0.13) 0%, rgba(201,164,60,0.04) 50%, transparent 72%)", filter: "blur(30px)" }} />
+      <div className="absolute pointer-events-none" style={{ width: 500, height: 500, bottom: -150, left: -100, borderRadius: "50%", background: "radial-gradient(circle, rgba(180,130,50,0.10) 0%, rgba(160,110,40,0.03) 55%, transparent 75%)", filter: "blur(28px)" }} />
+      <div className="absolute pointer-events-none" style={{ width: 800, height: 300, top: "50%", left: "50%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(80,120,180,0.07) 0%, transparent 70%)", filter: "blur(40px)" }} />
+
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)", backgroundSize: "48px 48px", opacity: 0.4 }} />
+
+      {[
+        { top: "12%", left: "18%", size: 3, opacity: 0.7 },
+        { top: "22%", right: "26%", size: 2, opacity: 0.5 },
+        { top: "68%", left: "12%", size: 2.5, opacity: 0.55 },
+        { top: "78%", right: "18%", size: 3, opacity: 0.65 },
+        { top: "38%", right: "9%", size: 2, opacity: 0.45 },
+        { top: "55%", left: "6%", size: 2, opacity: 0.4 },
+        { top: "15%", right: "12%", size: 3.5, opacity: 0.6 },
+        { top: "85%", left: "32%", size: 2, opacity: 0.45 },
+        { top: "30%", left: "5%", size: 2.5, opacity: 0.5 },
+      ].map((s, i) => (
+        <div key={i} className="absolute pointer-events-none" style={{ top: s.top, left: (s as any).left, right: (s as any).right, width: s.size * 2, height: s.size * 2, borderRadius: "50%", background: "#c9a43c", opacity: s.opacity, boxShadow: `0 0 ${s.size * 3}px rgba(201,164,60,0.8)` }} />
+      ))}
 
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
 
         <motion.div
-          initial={{ opacity: 0, y: -18 }}
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="flex items-center gap-2.5 mb-8"
+          className="flex items-center gap-3 mb-6"
         >
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{
-              background: "linear-gradient(145deg, #5b8db8, #3d6e96)",
-              boxShadow: "0 4px 14px rgba(61,110,150,0.4)",
-            }}
+            className="w-11 h-11 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(145deg, #c9a43c, #a07828)", boxShadow: "0 4px 18px rgba(180,140,50,0.45)" }}
           >
             <CalendarDays size={20} color="#fff" />
           </div>
-          <span
-            className="font-display font-bold text-xl"
-            style={{ color: "#2c4a62" }}
-          >
+          <span className="font-display font-bold text-2xl tracking-wide" style={{ color: "#e8d49a", letterSpacing: "0.06em" }}>
             EventIQ
           </span>
         </motion.div>
 
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.6, delay: 0.12 }}
+          style={{ width: 56, height: 1.5, background: "linear-gradient(90deg, transparent, #c9a43c, transparent)", margin: "0 auto 24px" }}
+        />
+
         <motion.h1
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-display font-black leading-tight mb-5"
-          style={{ fontSize: "clamp(2.4rem, 6vw, 4rem)", color: "#1e3448" }}
+          transition={{ duration: 0.6, delay: 0.18 }}
+          className="font-display font-black leading-tight mb-4"
+          style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.8rem)", color: "#f4edd8" }}
         >
-          Plan.{" "}
-          <span style={{ color: "#4a7fa8" }}>Perfect.</span>
-          {" "}Celebrate.
+          Dehradun's Smartest
+          <br />
+          <span style={{ color: "#c9a43c" }}>Event Management</span> Platform
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.22 }}
-          className="text-base leading-relaxed max-w-xs mb-10"
-          style={{ color: "#4a6070" }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-sm leading-relaxed max-w-sm mb-7"
+          style={{ color: "rgba(210,195,160,0.75)" }}
         >
-          Your all-in-one platform for smart event planning
-          and unforgettable experiences.
+          Discover verified vendors, build your budget, and plan every detail — all in one place.
         </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.38 }}
+          className="flex flex-wrap gap-2 justify-center mb-9"
+        >
+          {eventChips.map((chip) => (
+            <span
+              key={chip}
+              className="text-xs px-3 py-1 rounded-full font-medium"
+              style={{ background: "rgba(201,164,60,0.12)", border: "1px solid rgba(201,164,60,0.28)", color: "#c9a43c" }}
+            >
+              {chip}
+            </span>
+          ))}
+        </motion.div>
 
         <motion.button
           type="button"
@@ -377,21 +337,24 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           onClick={handleStart}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.32 }}
+          transition={{ duration: 0.55, delay: 0.46 }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
-          className="flex items-center gap-3 px-9 py-3.5 rounded-full font-semibold text-base"
-          style={{
-            background: "rgba(255,255,255,0.55)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.75)",
-            color: "#1e3448",
-            boxShadow: "0 6px 24px rgba(90,140,180,0.18)",
-            cursor: "pointer",
-          }}
+          className="flex items-center gap-3 px-10 py-3.5 rounded-full font-semibold text-base"
+          style={{ background: "linear-gradient(135deg, #c9a43c, #a07828)", color: "#fff", boxShadow: "0 6px 28px rgba(180,140,50,0.45)", cursor: "pointer" }}
         >
-          Get Started <ArrowRight size={18} />
+          Start Planning <ArrowRight size={18} />
         </motion.button>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.58 }}
+          className="mt-5 text-xs"
+          style={{ color: "rgba(180,160,110,0.5)" }}
+        >
+          Serving Dehradun · 16 service categories · 100+ vendors
+        </motion.p>
       </div>
     </div>
   );

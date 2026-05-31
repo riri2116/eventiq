@@ -256,7 +256,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         backgroundImage: "radial-gradient(circle at 100% 100%, #1a5c4a 0%, transparent 65%)",
       }} />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-8 max-w-xl w-full">
+      <div className="relative z-10 flex flex-col items-center text-center px-8 max-w-2xl w-full mx-auto">
 
         <motion.div
           initial={{ opacity: 0, y: -12 }}
@@ -301,8 +301,8 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.26 }}
-          className="text-sm leading-relaxed mb-7"
-          style={{ color: "#6b5c48", maxWidth: 340 }}
+          className="text-sm leading-relaxed mb-7 max-w-md w-full"
+          style={{ color: "#6b5c48" }}
         >
           Connect with trusted local vendors, compare packages, and bring your event vision to life — weddings, corporate events, and everything in between.
         </motion.p>
@@ -311,7 +311,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45, delay: 0.34 }}
-          className="flex flex-wrap gap-2 justify-center mb-8"
+          className="flex flex-nowrap gap-2 justify-center mb-8 w-full"
         >
           {eventChips.map((chip) => (
             <span

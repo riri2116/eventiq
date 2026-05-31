@@ -256,7 +256,17 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         backgroundImage: "radial-gradient(circle at 100% 100%, #1a5c4a 0%, transparent 65%)",
       }} />
 
-      <div className="relative z-10 flex flex-col items-center text-center w-full" style={{ maxWidth: 560, padding: "0 24px" }}>
+      <div
+        className="relative z-10 flex flex-col items-center text-center w-full rounded-2xl"
+        style={{
+          maxWidth: 560,
+          padding: "36px 40px 32px",
+          background: "rgba(255,252,247,0.72)",
+          backdropFilter: "blur(8px)",
+          boxShadow: "0 2px 1px rgba(255,255,255,0.9) inset, 0 20px 60px rgba(100,80,40,0.10), 0 4px 16px rgba(100,80,40,0.07)",
+          border: "1px solid rgba(200,184,154,0.45)",
+        }}
+      >
 
         <motion.div
           initial={{ opacity: 0, y: -12 }}
@@ -290,7 +300,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.16 }}
           className="font-display font-bold leading-tight mb-4 w-full"
-          style={{ fontSize: "clamp(1.75rem, 4vw, 2.9rem)", color: "#1c1208", letterSpacing: "-0.01em" }}
+          style={{ fontSize: "clamp(1.75rem, 4vw, 2.9rem)", color: "#1c1208", letterSpacing: "-0.01em", textShadow: "0 2px 8px rgba(100,80,40,0.1)" }}
         >
           Your Event,{" "}
           <span style={{ color: "#1a5c4a" }}>Perfectly Planned.</span>
@@ -310,12 +320,12 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45, delay: 0.34 }}
-          className="flex flex-wrap gap-2 justify-center mb-7 w-full"
+          className="flex flex-nowrap gap-1.5 justify-center mb-7 w-full"
         >
           {eventChips.map((chip) => (
             <span
               key={chip}
-              className="text-xs px-3 py-1 rounded-full font-medium whitespace-nowrap"
+              className="text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap"
               style={{ background: "#ede5d8", color: "#6b5c48", border: "1px solid #c8b89a" }}
             >
               {chip}
@@ -343,7 +353,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.52 }}
           className="flex items-center justify-center gap-4 px-5 py-2 rounded-full"
-          style={{ border: "1px solid #c8b89a", background: "#ede5d8" }}
+          style={{ border: "1px solid #c8b89a", background: "#ede5d8", boxShadow: "0 2px 6px rgba(100,80,40,0.10), inset 0 1px 0 rgba(255,255,255,0.7)" }}
         >
           {[["16", "service categories"], ["100+", "vendors"], ["Free", "to use"]].map(([val, label], i) => (
             <span key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">

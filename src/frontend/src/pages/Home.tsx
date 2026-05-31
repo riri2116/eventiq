@@ -352,15 +352,14 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.52 }}
-          className="flex items-center justify-center gap-4 px-5 py-2 rounded-full"
-          style={{ border: "1px solid #c8b89a", background: "#ede5d8", boxShadow: "0 2px 6px rgba(100,80,40,0.10), inset 0 1px 0 rgba(255,255,255,0.7)" }}
+          className="flex items-center justify-center gap-1.5 text-xs"
+          style={{ color: "#8a7860" }}
         >
-          {[["16", "service categories"], ["100+", "vendors"], ["Free", "to use"]].map(([val, label], i) => (
-            <span key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
-              <span className="font-semibold" style={{ color: "#1a5c4a" }}>{val}</span>
-              <span style={{ color: "#8a7860" }}>{label}</span>
-            </span>
-          ))}
+          <span className="font-semibold" style={{ color: "#1a5c4a" }}>16</span> service categories
+          <span className="mx-2" style={{ color: "#c8b89a" }}>·</span>
+          <span className="font-semibold" style={{ color: "#1a5c4a" }}>100+</span> vendors
+          <span className="mx-2" style={{ color: "#c8b89a" }}>·</span>
+          <span className="font-semibold" style={{ color: "#1a5c4a" }}>Free</span> to use
         </motion.div>
       </div>
     </div>

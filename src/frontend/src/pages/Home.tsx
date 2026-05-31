@@ -237,50 +237,37 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{
-        transition: "opacity 0.8s ease",
+        transition: "opacity 0.7s ease",
         opacity: hiding ? 0 : 1,
         pointerEvents: hiding ? "none" : "auto",
-        background: "linear-gradient(145deg, #0a1628 0%, #0f1e35 35%, #0c1a2e 65%, #10202e 100%)",
+        background: "#f7f2ea",
       }}
       data-ocid="curtain.overlay"
     >
-      <div className="absolute pointer-events-none" style={{ width: 700, height: 700, top: -200, right: -150, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,164,60,0.13) 0%, rgba(201,164,60,0.04) 50%, transparent 72%)", filter: "blur(30px)" }} />
-      <div className="absolute pointer-events-none" style={{ width: 500, height: 500, bottom: -150, left: -100, borderRadius: "50%", background: "radial-gradient(circle, rgba(180,130,50,0.10) 0%, rgba(160,110,40,0.03) 55%, transparent 75%)", filter: "blur(28px)" }} />
-      <div className="absolute pointer-events-none" style={{ width: 800, height: 300, top: "50%", left: "50%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(80,120,180,0.07) 0%, transparent 70%)", filter: "blur(40px)" }} />
+      <div className="absolute inset-6 rounded-2xl pointer-events-none" style={{ border: "1px solid #c8b89a", opacity: 0.5 }} />
+      <div className="absolute inset-8 rounded-2xl pointer-events-none" style={{ border: "1px solid #c8b89a", opacity: 0.25 }} />
 
-      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)", backgroundSize: "48px 48px", opacity: 0.4 }} />
+      <div className="absolute top-0 left-0 w-48 h-48 pointer-events-none opacity-20" style={{
+        backgroundImage: "radial-gradient(circle at 0% 0%, #1a5c4a 0%, transparent 65%)",
+      }} />
+      <div className="absolute bottom-0 right-0 w-48 h-48 pointer-events-none opacity-20" style={{
+        backgroundImage: "radial-gradient(circle at 100% 100%, #1a5c4a 0%, transparent 65%)",
+      }} />
 
-      {[
-        { top: "12%", left: "18%", size: 3, opacity: 0.7 },
-        { top: "22%", right: "26%", size: 2, opacity: 0.5 },
-        { top: "68%", left: "12%", size: 2.5, opacity: 0.55 },
-        { top: "78%", right: "18%", size: 3, opacity: 0.65 },
-        { top: "38%", right: "9%", size: 2, opacity: 0.45 },
-        { top: "55%", left: "6%", size: 2, opacity: 0.4 },
-        { top: "15%", right: "12%", size: 3.5, opacity: 0.6 },
-        { top: "85%", left: "32%", size: 2, opacity: 0.45 },
-        { top: "30%", left: "5%", size: 2.5, opacity: 0.5 },
-      ].map((s, i) => (
-        <div key={i} className="absolute pointer-events-none" style={{ top: s.top, left: (s as any).left, right: (s as any).right, width: s.size * 2, height: s.size * 2, borderRadius: "50%", background: "#c9a43c", opacity: s.opacity, boxShadow: `0 0 ${s.size * 3}px rgba(201,164,60,0.8)` }} />
-      ))}
-
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+      <div className="relative z-10 flex flex-col items-center text-center px-8 max-w-xl w-full">
 
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="flex items-center gap-3 mb-6"
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-2.5 mb-7"
         >
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center"
-            style={{ background: "linear-gradient(145deg, #c9a43c, #a07828)", boxShadow: "0 4px 18px rgba(180,140,50,0.45)" }}
-          >
-            <CalendarDays size={20} color="#fff" />
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#1a5c4a" }}>
+            <CalendarDays size={17} color="#fff" />
           </div>
-          <span className="font-display font-bold text-2xl tracking-wide" style={{ color: "#e8d49a", letterSpacing: "0.06em" }}>
+          <span className="font-display font-bold text-xl tracking-wide" style={{ color: "#1a5c4a", letterSpacing: "0.04em" }}>
             EventIQ
           </span>
         </motion.div>
@@ -288,43 +275,49 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 0.12 }}
-          style={{ width: 56, height: 1.5, background: "linear-gradient(90deg, transparent, #c9a43c, transparent)", margin: "0 auto 24px" }}
-        />
+          transition={{ duration: 0.55, delay: 0.1 }}
+          className="flex items-center gap-3 mb-7 w-full justify-center"
+        >
+          <div style={{ flex: 1, height: 1, background: "#c8b89a", maxWidth: 64 }} />
+          <span className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "#8a7860" }}>
+            Dehradun
+          </span>
+          <div style={{ flex: 1, height: 1, background: "#c8b89a", maxWidth: 64 }} />
+        </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 22 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.18 }}
-          className="font-display font-black leading-tight mb-4"
-          style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.8rem)", color: "#f4edd8" }}
+          transition={{ duration: 0.55, delay: 0.16 }}
+          className="font-display font-bold leading-tight mb-4"
+          style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", color: "#1c1208", letterSpacing: "-0.01em" }}
         >
-          Dehradun's Smartest
+          Your Event,
           <br />
-          <span style={{ color: "#c9a43c" }}>Event Management</span> Platform
+          <span style={{ color: "#1a5c4a" }}>Perfectly Planned.</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-sm leading-relaxed max-w-sm mb-7"
-          style={{ color: "rgba(210,195,160,0.75)" }}
+          transition={{ duration: 0.5, delay: 0.26 }}
+          className="text-sm leading-relaxed mb-7"
+          style={{ color: "#6b5c48", maxWidth: 340 }}
         >
-          Discover verified vendors, build your budget, and plan every detail — all in one place.
+          Connect with trusted local vendors, compare packages, and bring your event vision to life — weddings, corporate events, and everything in between.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.38 }}
-          className="flex flex-wrap gap-2 justify-center mb-9"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.45, delay: 0.34 }}
+          className="flex flex-wrap gap-2 justify-center mb-8"
         >
           {eventChips.map((chip) => (
             <span
               key={chip}
               className="text-xs px-3 py-1 rounded-full font-medium"
-              style={{ background: "rgba(201,164,60,0.12)", border: "1px solid rgba(201,164,60,0.28)", color: "#c9a43c" }}
+              style={{ background: "#ede5d8", color: "#6b5c48", border: "1px solid #c8b89a" }}
             >
               {chip}
             </span>
@@ -335,25 +328,25 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           type="button"
           data-ocid="curtain.start_button"
           onClick={handleStart}
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.46 }}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.97 }}
-          className="flex items-center gap-3 px-10 py-3.5 rounded-full font-semibold text-base"
-          style={{ background: "linear-gradient(135deg, #c9a43c, #a07828)", color: "#fff", boxShadow: "0 6px 28px rgba(180,140,50,0.45)", cursor: "pointer" }}
+          transition={{ duration: 0.45, delay: 0.42 }}
+          whileHover={{ scale: 1.03, backgroundColor: "#155248" }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center gap-2.5 px-9 py-3 rounded-full font-semibold text-sm"
+          style={{ background: "#1a5c4a", color: "#fff", cursor: "pointer", letterSpacing: "0.02em" }}
         >
-          Start Planning <ArrowRight size={18} />
+          Start Planning <ArrowRight size={16} />
         </motion.button>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.58 }}
+          transition={{ duration: 0.4, delay: 0.52 }}
           className="mt-5 text-xs"
-          style={{ color: "rgba(180,160,110,0.5)" }}
+          style={{ color: "#a8967e" }}
         >
-          Serving Dehradun · 16 service categories · 100+ vendors
+          16 service categories &nbsp;·&nbsp; 100+ vendors &nbsp;·&nbsp; Free to use
         </motion.p>
       </div>
     </div>

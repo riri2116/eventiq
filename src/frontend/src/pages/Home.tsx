@@ -233,7 +233,7 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
     setTimeout(onDismiss, 700);
   }
 
-  const eventChips = ["Weddings", "Corporate Events", "Conferences", "Social Gatherings", "Birthdays"];
+  const eventChips = ["Weddings", "Corporate", "Conferences", "Social Events", "Birthdays"];
 
   return (
     <div
@@ -256,18 +256,18 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
         backgroundImage: "radial-gradient(circle at 100% 100%, #1a5c4a 0%, transparent 65%)",
       }} />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-8 max-w-2xl w-full mx-auto">
+      <div className="relative z-10 flex flex-col items-center text-center w-full" style={{ maxWidth: 560, padding: "0 24px" }}>
 
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center gap-2.5 mb-7"
+          className="flex items-center justify-center gap-2.5 mb-6 w-full"
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#1a5c4a" }}>
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#1a5c4a" }}>
             <CalendarDays size={17} color="#fff" />
           </div>
-          <span className="font-display font-bold text-xl tracking-wide" style={{ color: "#1a5c4a", letterSpacing: "0.04em" }}>
+          <span className="font-display font-bold text-xl" style={{ color: "#1a5c4a", letterSpacing: "0.04em" }}>
             EventIQ
           </span>
         </motion.div>
@@ -276,24 +276,23 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.55, delay: 0.1 }}
-          className="flex items-center gap-3 mb-7 w-full justify-center"
+          className="flex items-center justify-center gap-3 mb-6 w-full"
         >
-          <div style={{ flex: 1, height: 1, background: "#c8b89a", maxWidth: 64 }} />
-          <span className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "#8a7860" }}>
+          <div style={{ width: 56, height: 1, background: "#c8b89a", flexShrink: 0 }} />
+          <span className="text-xs font-medium tracking-[0.18em] uppercase whitespace-nowrap" style={{ color: "#8a7860" }}>
             Dehradun
           </span>
-          <div style={{ flex: 1, height: 1, background: "#c8b89a", maxWidth: 64 }} />
+          <div style={{ width: 56, height: 1, background: "#c8b89a", flexShrink: 0 }} />
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.16 }}
-          className="font-display font-bold leading-tight mb-4"
-          style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", color: "#1c1208", letterSpacing: "-0.01em" }}
+          className="font-display font-bold leading-tight mb-4 w-full"
+          style={{ fontSize: "clamp(1.75rem, 4vw, 2.9rem)", color: "#1c1208", letterSpacing: "-0.01em" }}
         >
-          Your Event,
-          <br />
+          Your Event,{" "}
           <span style={{ color: "#1a5c4a" }}>Perfectly Planned.</span>
         </motion.h1>
 
@@ -301,22 +300,22 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.26 }}
-          className="text-sm leading-relaxed mb-7 max-w-md w-full"
+          className="text-sm leading-relaxed mb-6 w-full"
           style={{ color: "#6b5c48" }}
         >
-          Connect with trusted local vendors, compare packages, and bring your event vision to life — weddings, corporate events, and everything in between.
+          Connect with trusted local vendors, compare packages, and plan every detail — all in one place.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45, delay: 0.34 }}
-          className="flex flex-nowrap gap-2 justify-center mb-8 w-full"
+          className="flex flex-wrap gap-2 justify-center mb-7 w-full"
         >
           {eventChips.map((chip) => (
             <span
               key={chip}
-              className="text-xs px-3 py-1 rounded-full font-medium"
+              className="text-xs px-3 py-1 rounded-full font-medium whitespace-nowrap"
               style={{ background: "#ede5d8", color: "#6b5c48", border: "1px solid #c8b89a" }}
             >
               {chip}
@@ -333,21 +332,26 @@ function CurtainOverlay({ onDismiss }: { onDismiss: () => void }) {
           transition={{ duration: 0.45, delay: 0.42 }}
           whileHover={{ scale: 1.03, backgroundColor: "#155248" }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2.5 px-9 py-3 rounded-full font-semibold text-sm"
+          className="flex items-center justify-center gap-2.5 px-9 py-3 rounded-full font-semibold text-sm mb-6"
           style={{ background: "#1a5c4a", color: "#fff", cursor: "pointer", letterSpacing: "0.02em" }}
         >
           Start Planning <ArrowRight size={16} />
         </motion.button>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.52 }}
-          className="mt-5 text-xs"
-          style={{ color: "#a8967e" }}
+          className="flex items-center justify-center gap-4 px-5 py-2 rounded-full"
+          style={{ border: "1px solid #c8b89a", background: "#ede5d8" }}
         >
-          16 service categories &nbsp;·&nbsp; 100+ vendors &nbsp;·&nbsp; Free to use
-        </motion.p>
+          {[["16", "service categories"], ["100+", "vendors"], ["Free", "to use"]].map(([val, label], i) => (
+            <span key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <span className="font-semibold" style={{ color: "#1a5c4a" }}>{val}</span>
+              <span style={{ color: "#8a7860" }}>{label}</span>
+            </span>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
